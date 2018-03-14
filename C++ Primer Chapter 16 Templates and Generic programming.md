@@ -1589,4 +1589,195 @@
 	* 既然在寫定義的時候如果會因為沒看到某些宣告 compiler 就偷偷幫你生一個不該生的實例的話，那就先把 overload set 的 function 全部宣告完再開始定義囉
 
 ## 16.4 Variadic Templates
+* 總之就是可以吃任意數量 arguments 的 template....
+* The varying parameters are known as a **parameter pack**.
+* parameter pack 還有兩種==:
+	* template parameter pack: 吃 0 或多個 template parameters
+	* function parameter pack: 吃 0 或多個 function parameters
+* 用 ellipsis 來表示這兩種 pack
+	* 如果在 template parameter list 內寫 `class/typename ...` 這種東西，則接下來的 parameter 代表 0 或多個 types
+	* 如果你在 temp para pack 後面還有定義 type，這些 type 只能是 nontype parameter
+
+## 媽的先跳過= = 看 16.5
+
+## 16.5 Template Specializations
+* template 定義的 code 有時候不可能滿足所有 type，甚至根本不能編譯或者行為是錯的
+* 這時候我們就可以根據某個 type 的特定性為自己寫一個特別的版本，可能行為正確或更有效率
+* 例如我們的 `compare`，完全不能比較 character pointers
+	* 我們希望比較 char ptr 時是呼叫(lib已經寫好且行為正確的) `strcmp`，而不是用原本 template 定義的直接比較指標
+* 實際上 16.1.1 已經寫了一個有點像的東西，還記得的話:
+	```c++
+	// first version; can compare any two types 
+	template <typename T> int compare(const T&, const T&); // second version to handle string literals 
+	template<size_t N, size_t M>
+	int compare(const char (&)[N], const char (&)[M]);
+	```
+	* 但是上面有兩個 nontype parameter 的版本只能處理 string literal 或者 char array，
+	* 如果你傳 `char*`，一樣是第一個版本會被呼叫:
+	```C++
+	const char *p1 = "hi", *p2 = "mom";
+	compare(p1, p2); // calls the first template
+	compare("hi", "mom"); // calls the template with two nontype parameters
+	```
+	* 第二個版本 non viable 因為不可能把 `char*` 轉成 reference to array
+* 我們可以定義對第一個版本的 template 定義 **template specialization** 來解決這個問題，
+	* A specialization is a separate definition of the template **in which one or more template parameters are specified to have particular types.**
+* 詳見下面
+#### Defining a Function Template Specialization
+* 格式長這樣:
+	```c++
+	// special version of compare to handle pointers to character arrays 
+	template <> 
+	int compare(const char* const &p1, const char* const &p2) {
+		return strcmp(p1, p2);
+	}
+	```
+	* 用 `template<>` 來說這是 specialization，然後 template type parameter 全部都要給定
+* 注意上面的 specialization 的 parameter type 很ㄎㄧㄤ，為什麼要這樣寫得先從原本的 template 講起:
+	```c++
+	template <typename T> int compare(const T&, const T&);
+	```
+	* 首先我們的 specialization，除了 T 以外，其他行別都要一致，包含 const 阿，reference 阿等等
+	* 而這邊原本的 template 它是吃一個 **reference to 「const T」**
+	* 我們這邊是希望寫一個 T 為 `const char*` 的 specialization
+	* 所以我們的 specialization 要宣告為 **reference to 「const "const char\*"」**也就是指標本身的 top-level 也要是 const 啦，reference to const pointer to const char
+#### Function Overloading versus Template Specializations
+* 本質上定義一個 template specialization 是在搶 compiler 的工作(因為它做的不會照你的期望)
+* **It is important to realize that *a specialization is an instantiation*; it is not an overloaded instance of the function name.**
+* Specializations instantiate a template; they do not overload it. As a result, **specializations do not affect function matching.**
+* 所以你把上面的東西寫成一個 template specialization 跟寫成一個 nontemplate ordinary function 的效果是不一樣的:
+	* 一個會影響 function matching 一個不會
+	* 假設原本有這兩種:
+	```c++
+	// first version; can compare any two types 
+	template <typename T> int compare(const T&, const T&); // second version to handle string literals 
+	template<size_t N, size_t M>
+	int compare(const char (&)[N], const char (&)[M]);
+	```
+	* 然後你定義了第一個的 specialization，就如同上面定義的那個參數很噁心的版本
+	* 當你寫
+	```c++
+	compare("hi", "mom")
+	```
+	* 兩個都是 exact match，但是因為 nontype 的版本更 specialized，所以 compiler 會選它，這時你定義的 specialization 完全不會被用到
+	* 但如果你不要定義成 specialization，定義成 ordinary function
+	* 則這時會有三個 viable function，一個就是你新定義的一般 function，另外兩個是 template 生的；而之前也學到，這種情況下 compiler 會選擇一般 function。
+
+#### KEY CONCEPT: ORDINARY SCOPE RULES APPLY TO SPECIALIZATIONS 
+* 要 specialize 某 template 時 template 的宣告必須 in scope
+* **要使用這個 specialization 時這個 specialization 的宣告也要 in scope!!** 
+* 如果你在使用某特定的 instantiation 時，對應的 specialization 還沒 in scope，compiler 就會幫你生一個它自己的版本，這樣就用不到你的 specialization 了，這樣(預期)行為就會出錯
+* 而且這種 error 很難找
+* Best Practice: Templates and their specializations should be **declared in the same header file.** **Declarations** for all the templates with a given name **should appear first, followed by any specializations of those templates.**
+#### Class Template Specializations
+* 當然可以 specialize class template...
+* Primer 用 `hash` 舉例...
+* 還記得 unordered container 嗎...
+* 要用 `hash<key_type>`
+* 如果我們要在 unorder 容器放 `Sales_data` 之類的沒有支援 `hash` 的 type，但又想要容器用預設的 `hash<key_type` 我們就要 specialize 一個特別的版本...
+* 要定義下列 member:
+	* `operator()`，吃 container 的 `key_type`，return `size_t`
+	* 兩個 type member: `result_type` 跟 `argument_type`，分別就是 call operator 的 return type 跟 argument type
+	* default ctor 跟 copy assignment(可以讓 compiler 合成)
+* 要對 class/function template 定義 specialization 有一個前提...，你必須在跟它同樣 scope 的地方定義 specialization!
+* 但是 `hash` 是定義在 `std` 這個 namespace 內的阿? 我們要怎麼在這裏面定義 specialization 呢?
+* 18.2 章會講到，我們現在只要知道如下操作就可:
+	* 我們需要"開啟"(open) namespace:
+	```c++
+	// open the std namespace so we can specialize std::hash 
+	namespace std {
+	}	// close the std namespace; note: no semicolon after the close curly
+	```
+* 這樣你在 {} 內定義的 name 就會屬於 `std` 這個 namespace 了
+* 下面的 code 會寫一個針對 `Sales_data` 的 specialization:
+	```c++
+	// open the std namespace so we can specialize std::hash 
+	namespace std { 
+	template <> 						// we’re defining a specialization with
+	struct hash<Sales_data> // the template parameter ofSales_data 
+	{
+		// the type used to hash an unordered container must define these types 
+		typedef size_t result_type; 
+		typedef Sales_data argument_type; // by default, this type needs == 
+		size_t operator()(const Sales_data& s) const; 
+		// our class uses synthesized copy control and default constructor
+	}; 
+	size_t
+	hash<Sales_data>::operator()(const Sales_data& s) const 
+	{
+		return hash<string>()(s.bookNo) ^ 
+			   hash<unsigned>()(s.units_sold) ^ 
+			   hash<double>()(s.revenue);
+	}
+	}// close the stdnamespace; note: no semicolon after the close curly
+	``` 
+* 我們對 `hash` 這個 template 定義一個 specialization，`hash<Sales_data>`
+* 它在幹嘛不重要啦...反正你他媽又不會 hash，總之它避免掉了寫爛 hash 的可能，直接使用 library 定義好了 `hash<string/unsigned/double>` 來算 hash code
+* 總之寫了這個以後，我們就可以寫下面的 code 了:	
+	```c++
+	// uses hash<Sales_data>and Sales_dataoperator== from § 14.3.1 (p. 561) 
+	unordered_multiset<Sales_data> SDset;
+	```
+* 阿還要在 `Sales_data` 內宣告 `hash<Sales_data>` 為 friend，因為它會用到 private member
+	```c++
+	template <class T> class std::hash; // needed for the friend declaration 
+	class Sales_data { 
+		friend class std::hash<Sales_data>; 
+		// other members as before
+	};
+	```
+* 還有，整個 specialization 要定義在 `Sales_data` 的 header 內，這樣 compiler 才看的到...
+#### Class-Template Partial Specializations
+* class template specialization 不一定要全部 temp arg 都提供，或者"只提供某些 arg 的某些特性"(const , l/r reference 之類的)，這叫做 partial specializations
+* A class template **partial specialization is itself a template.**
+	* Users must supply arguments for those template parameters that are not fixed by the specialization.
+* 再強調一次，只有 class template 可以 partial，function template 不行
+* 例如 std 的 `remove_reference`，其實有很多種 partial specializations:
+	```c++
+	// original, most general template 
+	template <class T> struct remove_reference {
+		typedef T type;
+	}; 
+	// partial specializations that will be used for lvalue and rvalue references 
+	template <class T> struct remove_reference<T&> // lvalue references 
+		{ typedef T type; };
+	template <class T> struct remove_reference<T&&> // rvalue references
+		{ typedef T type; };
+	```
+	* 第一個 template 最 general，可以實例化任何 type；後面兩個是 partial specializations
+* 這裡真的不知道在銃三小...
+* 看 code...:
+	```c++
+	int i; 
+	// decltype(42) is int, uses the original template 
+	remove_reference<decltype(42)>::type a; 
+	// decltype(i) is int&, uses first (T&) partial specialization 
+	remove_reference<decltype(i)>::type b; 
+	// decltype(std::move(i)) is int&&, uses second (i.e., T&&) partial specialization
+	remove_reference<decltype(std::move(i))>::type c;
+	```
+#### Specializing Members but Not the Class
+* 我們可以只 spectialize 某個 member:
+	```c++
+	template <typename T> struct Foo {
+		Foo(const T &t = T()): mem(t) { } 
+		void Bar() { /* .. . */} 
+		T mem; 
+		// other members of Foo
+	};
+	template<> // we’re specializing a template
+	void Foo<int>::Bar() // we’re specializing the Bar member of Foo<int>
+	{ 
+		// do whatever specialized processing that applies to ints
+	}
+	```
+	* 我們這樣寫的話，當我們真的定義了 `Foo<int>` 且使用 `Bar` 時，compiler 就不會實例化一個，而是用我們定義的:
+	```c++
+	Foo<string> fs; // instantiates Foo<string>::Foo() 
+	fs.Bar(); 		// instantiates Foo<string>::Bar()
+	Foo<int> fi; 	// instantiates Foo<int>::Foo() 
+	fi.Bar(); 		// uses our specialization ofFoo<int>::Bar()
+	```
+	* 最後一行 code 會用我們定義的 `Foo<int>::Bar()`
+
 
