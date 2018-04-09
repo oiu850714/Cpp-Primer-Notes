@@ -1,4 +1,4 @@
-# C++ Primer Chapter 9 Sequential Containers
+﻿# C++ Primer Chapter 9 Sequential Containers
 * 把 sequential containers 講完
 * The container classes share a common interface, which each of the containers extends in its own way.
 * container 有著共同的 interface，然後再各自延伸一些自己專屬的 interace
@@ -609,33 +609,208 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
 
 
 ## 9.5 Additional string Operations
-* 很多都標選讀，這裡主要講專屬 string 的 operation(其他 container 不能用)
-* 有的是跟 C string 接的
-* 總之快速讀過，要用再看
+* 這裡主要講專屬於 string 的 operations，這些 operations 其他 sequential 容器不能用
+	* 有的是跟 C string 接的
+	* 有的是讓我們可以用 index 而不是 iterator 來操作 string
 
 ### 9.5.1 Other Ways to Construct strings
-![](https://i.imgur.com/v0CJWeE.png)
+* 除了 3.2.1(p.84) 跟 table 9.3(p.335) 列的 ctor 之外，string 還有以下三個 ctors:
+![](https://i.imgur.com/LdcSznb.png)
+
+	* 第一個是拿來接 C string 的，剩下兩個都是 copy `std::string`
+		* 其中 copy `std::string` 的可以指定要從 `std::string` 的哪裡開始 copy(也就是上表的 `pos2` 參數)
+來點例子:
+	```c++
+	const char *cp = "Hello World!!!"; // null-terminated array 
+	char noNull[] = {’H’, ’i’}; // not null terminated
+	string s1(cp); // copy up to the null in cp; s1 == "Hello World!!!" 
+	string s2(noNull, 2); // copy two characters from no_null; s2 == "Hi" 
+	string s3(noNull); // undefined: noNull not null terminated 
+	string s4(cp + 6, 5);// copy 5 characters starting at cp[6]; s4 == "World" 
+	string s5(s1, 6, 5); // copy 5 characters starting at s1[6]; s5 == "World" 
+	string s6(s1, 6); // copy from s1[6] to end of s1; s6 == "World!!!" 
+	string s7(s1, 6, 20); // ok, copies only to end of s1; s7 == "World!!!"
+	string s8(s1, 16); // throws an out_of_range exception
+	```
+	* 如果是要從 C `char` array copy, array 一定要 null-terminated，否則是 UB；除非你有給定要 copy 多少字元，但就算有給定，只要 copy 的位置超過你給定的內容，就會 copy 到垃圾，就會是 UB
+	* 如果是從 `std::string` copy，而給定的起始位置 >= `size()`，則會 throw `out_of_range` exception
+	* 如果 copy `std::string` 時給定的起始位置沒有超界，無論你給的 copy 數量有多少，最多只會 copy 到第 `[size()-1]` 個字元
 
 #### The substr Operation
+* 回傳一個子字串
+* 起始位置一樣不能超界，否則 `throw`
+* copy 的量一樣最多只會有 `size()-pos` 個
 ![](https://i.imgur.com/EHyvA9A.png)
+* 例子:
+	```c++
+	string s("hello world"); 
+	string s2 = s.substr(0, 5); // s2 = hello 
+	string s3 = s.substr(6); // s3 = world 
+	string s4 = s.substr(6, 11); // s3 = world
+	string s5 = s.substr(12); // throws an out_of_range exception
+	```
 
 ### 9.5.2 Other Ways to Change a string
-
+* 除了支援  (§ 9.2.5, p. 337, § 9.3.1, p. 342, and § 9.3.3, p. 348) 介紹的 `assign`, `insert`, and `erase`，`std::string` 還支援一些額外的 `insert` 跟 `erase`
+* 一般的 `insert` 跟 `erase` 是吃 iterators，`std::string` 還支援吃 index 的:
+	```c++
+	s.insert(s.size(), 5, ’!’); // insert five exclamation points at the end of s 
+	s.erase(s.size() - 5, 5); // erase the last five characters from s
+	```
+	* 別忘記 `insert` 是把東西插到給定的位置**之前**，`erase` 是把東西從給定的位置**開始**刪掉
+* `insert` 跟 `assign` 還有額外版本，是拿來跟 C string 接的
+	```c++
+	const char *cp = "Stately, plump Buck"; 
+	s.assign(cp, 7); // s == "Stately"
+	s.insert(s.size(), cp + 7); // s == "Stately, plump Buck"
+	```
+	* 一樣，給定的複製字元數量不能超過各種 C string 的邊界，否則是 UB
+* 還有一些更煩人的，跟 `std::string` 接的 `insert`:
+	```c++
+	string s = "some string", s2 = "some other string"; 
+	s.insert(0, s2); // insert a copy of s2 before position 0 in s 
+	// insert s2.size() characters from s2 starting at s2[0] before s[0]
+	s.insert(0, s2, 0, s2.size());
+	```
+	* `s` = `"some other stringsome other stringsome string"`
+#### The `append` and `replace` Functions
+* `std::string` 額外定義 `append` 跟 `replace`，可以改變 string 的內容
+	* `append` 可以看做是 "insert at the end" 的 syntax sugar:
+	```c++
+	string s("C++ Primer"), s2 = s; // initialize sand s2 to "C++ Primer" 
+	s.insert(s.size(), " 4th Ed."); // s == "C++ Primer 4th Ed."
+	s2.append(" 4th Ed."); // equivalent: appends " 4th Ed." to s2; s == s2
+	* `replace` 可以看做是 `erase` + `insert` 的 syntax sugar:
+	```
+	```c++
+	// equivalent way to replace "4th"by "5th" 
+	s.erase(11, 3); // s == "C++ Primer Ed."
+	s.insert(11, "5th"); // s == "C++ Primer 5th Ed."
+	// starting at position 11, erase three characters and then insert "5th"
+	s2.replace(11, 3, "5th"); // equivalent: s == s2
+	```
+	* 注意上面 replace 的字串的長度剛好跟我們想要替換掉的內容一樣長(都是 3)
+	* 你要替換的字串要更長或更短都可以:
+	```c++
+	s.replace(11, 3, "Fifth"); // s == "C++ Primer Fifth Ed."
+	```
+	* 這時我們刪了 3 個字元，插入 5 個字元
+* 以下是拿來更改 `std::string` 內容的 member function 的總結:
+![](https://i.imgur.com/6sepGgV.png)
+#### The Many Overloaded Ways to Change a string
+* 這算是 table 9.13 的總結
+* `append`, `assign`, `insert`,and `replace`有一狗屁的 overloaded 版本
+* Fortunately, these functions **share a common interface.**
+	* `assign` 不用指定哪個部分要被替換，整個字串都會被替換
+	* `append` 不用指定要插在哪個位置，一定插在最後面
+	* `replace` 可以用兩種方法指定要被移除的區間
+		* position and length
+		* iterator
+	* `insert` 也有給兩種方法指定插入點
+		* index
+		* iterator
+* 而指定要插入的字元的方法就有好幾個
+	* taken from another `std::string`
+	* from a character pointer
+		* 上面這兩個，可以額外再傳入參數，指定我們要 copy 部分或者全部的字元
+	* from a brace-enclosed list of characters
+	* as a character and a count
+* 還是要注意 table 9.13 最後的表，某些組合的 API 是不支援的
 ### 9.5.3 string Search Operations
-* The string class provides six different search functions, each of which has four overloaded versions.
-    * ㄎㄧㄤ
-* return size_type, which is unsigned
-    * **不要用 signed 去接
-![](https://i.imgur.com/fITQ1pf.png)
-
-### 9.5.4 The compare Functions
-* mimic C strcmp
-* s.compare returns zero or a positive or negative value depending on whether s is equal to, greater than, or less than the string formedfrom the given arguments.
+* 有六種 search functions，每種有四個 overload LOL
+	* 看 table 9.14
+  
+* returns a `string::size_type`, that is the index of where the match occurred
+    * **不要用 signed type 去接**
+    * If there is no match, the function returns a static member (§ 7.6, p. 300) named [`string::npos`](http://www.cplusplus.com/reference/string/string/npos/).
+	    * `npos` 被初始化成 `-1`，但因為他是 `size_type`(unsigned)，所以變成 largest possible size any `string` could have
+![](https://i.imgur.com/LB8uFBJ.png)
+* `find` 最簡單，就顧名思義...
+	```c++
+	string name("AnnaBelle"); 
+	auto pos1 = name.find("Anna"); // pos1 == 0
+	```
+	* 找不到就回傳 `npos`
+	* case matters
+	```c++
+	string lowercase("annabelle"); 
+	pos1 = lowercase.find("Anna"); // pos1 == npos
+	```
+* `find_first_of` 則是要在被搜尋的字串內，找尋是否有給定字串內的字元:
+	```c++
+	string numbers("0123456789"), name("r2d2"); 
+	// returns 1, i.e., the index of the first digit in name
+	auto pos = name.find_first_of(numbers);
+	```
+	* `name` 是被搜尋的字串，`numbers` 是給定字串；因為 `name[1]` 是 `'2'`，`numbers` 內有 `'2'`，所以回傳 `1`
+* `find_first_not_of` 則是找第一個不在給定字串內的字元的位置
+	* 例如要找某個字串的第一個非數字字元(non-numeric character)，可以這樣改寫:
+	```c++
+	string dept("03714p3"); 
+	// returns 5, which is the index to the character ’p’
+	auto pos = dept.find_first_not_of(numbers);
+	```
+#### Specifying Where to Start the Search
+* 上面的幾個 search member functions 還可以傳入額外的參數
+* 例如 `find` 可以再傳入一個起始位置，這個位置的 default argument 是 `0`
+* 寫一個例子，這個例子算是一個 common pattern，就是利用 `find` 系列找尋某個字串內*所有*出現過某個*想要的東西*(不一定是字串，例如用 `find_first_of` 是找單一字元)的位置:
+	```c++
+	string::size_type pos = 0; // each iteration finds the next number in name 
+	while ((pos = name.find_first_of(numbers, pos)) != string::npos) {
+		cout << "found number at index: " << pos 
+			 << " element is " << name[pos] << endl;
+		++pos; // move to the next character
+	}
+	```
+	* 注意 `find_first_of` 的參數是 `pos`，是*當前位置*
+#### Searching Backward
+* 到目前為止的 `find` 系列都是從頭找到尾(或者說從左找到右)
+* 標準也提供從尾找到頭ㄉ，API 會多一個 `r` 當作前綴，例如 `rfind`，或者把 `first` 改成 `last`
+	```c++
+	string river("Mississippi"); 
+	auto first_pos = river.find("is"); // returns 1
+	auto last_pos = river.rfind("is"); // returns 4
+	```
+	* 注意逆向搜尋的 API 並不會把被搜尋參數也「倒過來」LOL，不要認為 `rfind` 看到 `si` 之類的會說他找到ㄌ
+* `find_first` 系列對應的是 `find_last`，會找**最後一個** match，而不是第一個 match
+	* `find_last_of` *searches for the last character* that matches any element of the search string.
+	* `find_last_not_of` *searches for the last character* that does not match any element of the search string.
+* 這些 API 一樣提供一個 optional 參數，來指定起始位置
+	* **但注意那個起始位置的定義很靠北...一樣是*從最左邊*開始算**
+	* 沒有給的話，預設是 `npos`，也就是從最後面開始找
+	* 有給 index 的話，就是從你指定的位置開始找，注意不會倒過來數...
+	* 看例子比較快 LOL
+	```c++
+	string s =  "123456781234";
+	std::cout << s.rfind("1") << endl; // 從最後面開始數，所以看到第二個 1，所以印出 8(第二個 1 的位置是 8)
+	std::cout << s.rfind("1", 10) << endl; // 從第 10 個位置開始數，因為還在第二個 1 後面，所以還是印出 8
+	std::cout << s.rfind("1", 7) << endl; // 從第 7 個位置開始數，因為在第二個 1 前面，所以會找到第一個 1，所以會印出 0(第一個 1 的位置是 0)
+	```
+### 9.5.4 The `compare` Functions
+* mimic C `strcmp`
+* `s.compare` returns zero or a positive or negative value depending on whether s is equal to, greater than, or less than the `string` formed from the given arguments.
+* 有六種 overload，三種跟 C string 比較，三種跟 `std::string` 比較
+![](https://i.imgur.com/80Llzds.png)
 
 ### 9.5.5 Numeric Conversions
-* 把字串轉成 arithmetic type，或者倒過來
-* ![](https://i.imgur.com/2fMTTpE.png)
-
+* 把字串轉成 arithmetic type，或者倒過來把 arithmetic type 轉成字串
+* 然後這居然是 C++11 的東西 XD
+* 給點例子:
+	```c++
+	int i = 42;
+	string s = to_string(i); // converts the int i to its character representation 
+	double d = stod(s); // converts the strings to floating-point
+	```
+	* The first non-whitespace character in the string we convert to numeric value **must be a character that can appear in a number:**
+	```c++
+	string s2 = "pi = 3.14";
+	// convert the first substring in s that starts with a digit, d=3.14
+	d = stod(s2.substr(s2.find_first_of("+-.0123456789")));
+	```
+	* `s2.substr(find_first_of("+-.0123456789))"` 把 "pi = " 給去掉
+	![](https://i.imgur.com/wvcX3MM.png)
+* Note: 注意，如果字串的轉換的第一個*非空*字元沒辦法被轉換，那 `string` 會 `throw` `invalid_argument` exception
+* 如果轉換出來的 arithmetic value 是要轉換的 arithmetic type 無法表示的值，那則會 `throw` `out_of_range` exception LOL，真是貼心
 
 ### 9.6 Container Adaptors
 * In addition to the sequential containers, the library *defines three sequential container adaptors: stack, queue,and priorityqueue.*
