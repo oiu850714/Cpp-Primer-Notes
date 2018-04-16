@@ -1,4 +1,4 @@
-# C++ Primer Chapter 7 Classes
+﻿# C++ Primer Chapter 7 Classes
 * class 背後真正想做到的是什麼?
     * **data abstraction** and **encapsulation**.
     * abstraction 個人認為是把要處理的事情(dealing with data)給抽象化成一些操作(operations)，這些操作構成了使用這個 class 的介面(interface)，而 class 的使用者只需要知到介面怎麼用，介面背後的實作使用者不用知道
@@ -546,7 +546,7 @@
     };
     ```
     * 上面一些注意事項
-        * 三個參數的 cstr 雖然有用 cstr initializer list，不過他沒初始化到 cursor，他用 in-class initialzer 初始化 cursor
+        * 三個參數的 ctor雖然有用 ctorinitializer list，不過他沒初始化到 cursor，他用 in-class initialzer 初始化 cursor
         * 還有注意看他怎麼初始化 contents，**他給了兩個參數!!**，因為 string 可以用兩個參數來初始化
         * 其實 contructor initializer list 就是在 call member 的 constructor，所以才可以很ㄎㄧㄤ的給兩個參數給 str，因為 string 本來就可以給兩個參數來初始化
         * 上面的 get 有 overloading
@@ -577,7 +577,7 @@
     * 在提醒一次，compiler 在編譯的時候決定到底要不要把 function inline 之前他一定要知道定義阿，所以 inline function 要定義(define)在 class 定義的地方(或者說定義要跟 class 定義在同一個 translaton unit)，不然 compiler 會看不到
 
 #### Overloading Member Functions
-* cstr 都可以 overload 了，member function 當然也可以
+* ctor 都可以 overload 了，member function 當然也可以
     * 怎麼定義不會衝突，以及 call function 時怎麼 match 都跟第六章講的一樣
 * 這個例子定義了兩個 get，兩個的參數數量不同所以不會搞混
 
@@ -621,7 +621,7 @@
     * 你可以想想看為啥不能用 () 那種
         * vector\<int> ivec(94, 87);
     * 跟 member function 宣告 syntax collision 啦!
-    * 不過你還是可以用 = 搭配 cstr 啦
+    * 不過你還是可以用 = 搭配 ctor 啦
         * vector\<int> ivec = vector\<int>(94, 87); 
     * 不然乾脆都放在 constructor initializer list 阿 LOL
 
@@ -984,15 +984,19 @@
 
 
 ## 7.5 Constructors Revisited
-* 多講一點
+* 7.1.4 將基本的 ctor 概念
+* 這裡再額外講一些 ctor 的功能，並且把之前講過的功能加深
 
 ### 7.5.1 Constructor Initializer List
-* 當我們宣告一般變數時，如果想要給特定值，通常會提供 initializer；而不是先宣告，然後再在下一行給值
-    * string s1 = "hsilu"; // good
-    * string s2; s2 = "hsilu"; // bad
+* 當我們宣告一般變數時，如果想要給特定值，通常會提供 initializer；而不是先宣告，然後才在下一行給值
+    ```c++
+    string s1 = "hsilu"; // good
+    string s2;
+    s2 = "hsilu"; // bad
+    ```
 * constructor initializer list 的概念就跟上面一樣
 * If we do not explicitly initialize a member in the constructor initializer list, **that member is default initialized *before the constructor body starts executing.*** For example:
-    ```C++
+    ```c++
     Sales_data::Sales_data(const string &s, unsigned cnt, double price)
     {
         bookNo = s;
@@ -1000,53 +1004,56 @@
         revenue = cnt * price;
     }
     ```
-    * 概念上來說，data member 會在 cstr 的 body 開始執行之前就完成初始化
-    * 而這裡只有提供一個 empty cstr initializer list，所以所有 member 都是 default initialize
-    * 初始化完之後再執行 cstr 的 body，**此時 body 內的 = 全部都是 assignment，不是初始化!**
-* 上面的 code 最終結果跟之前的有用 cstr init list 的版本一樣
-* 可是你用 cstr init list 初始化跟用 assignment 給值，這兩種的差異要看被初始化的 member 是什麼 type，有可能效果一樣，有可能不同
-    * How significant this distinction is depends on thetypeof thedata member.
+    * 概念上來說，data member 會在 ctor 的 body 開始執行之前就完成初始化
+    * 如果你要指定 data member 如何初始化，你就必須使用 ctor init list 來達成
+	    * 語法: `ctorname(args) : ctor_init_list {...}`
+    * 而上面的 code 沒有寫出 ctor init list，(或者說提供一個 empty ctor init list)，所以所有 member 都是 default initialize
+    * 初始化完之後，再執行 ctor 的 body，**此時 body 內的 = 全部都是 assignment，不是初始化!**
+* 上面的 code *最終結果*跟之前的有用 ctor init list 的版本一樣
+* 結論: 你用 ctor init list 初始化跟用 assignment 給值，這兩種的差異要看被初始化的 member 是什麼 type，有可能效果一樣，有可能差很多(How significant this distinction is depends on the type of the data member.)
 
-* Constructor Initializers Are Sometimes Required
-    * 既然都說了 cstr body 內的 = 都是 assignment，那就**意味著那些不能用 = 來給值的 member 要在 cstr init list 就初始化!** 例如 const object 跟 reference，**還有那些不能 default initialize 的 class object!**
-    ```C++
-    class ConstRef {
-    public:
-        ConstRef(int ii);
-    private:
-        int i;
-        const int ci;
-        int &ri;
-    };
-    // error: ci and ri must be initialized     
-    ConstRef::ConstRef(int ii) {
-        // assignments: 
-        i = ii; // ok 
-        ci = ii; // error: cannot assign to a const 
-        ri = i; // error: ri was never initialized
-    }
-    ```
-* 再說一次，結論就是**當 cstr 的 body 開始執行時，class member 的初始化就已經全部完成了**
-* 上面錯誤的 cstr 應該寫成這樣
-    ```
+#### Constructor Initializers Are Sometimes Required
+   * 既然都說了 ctor body 內的 = 都是 assignment，那就**意味著那些不能用 = 來給值的 member 要在 ctor init list 就初始化!** 
+	   * 例如 const object 跟 reference
+	* **還有那些不能 default initialize 的 class 的 object**
+```c++
+class ConstRef {
+public:
+    ConstRef(int ii);
+private:
+    int i;
+    const int ci;
+    int &ri;
+};
+// error: ci and ri must be initialized     
+ConstRef::ConstRef(int ii) {
+    // assignments: 
+    i = ii; // ok 
+    ci = ii; // error: cannot assign to a const 
+    ri = i; // error: ri was never initialized
+}
+```
+* 再說一次，結論就是**當 ctor 的 body 開始執行時，data member 的初始化就已經全部完成了**
+* 上面錯誤的 ctor 應該寫成這樣
+    ```c++
     ConstRef::ConstRef(int ii): i(ii), ci(ii), ri(i) { }
     ```
-* We must use the constructor initializer list to provide values for members that are const, reference, or of a class type that does not have a default constructor.
+* Note: We must use the constructor initializer list to provide values for members that are `const`, reference, or of a class type that does not have a default constructor.
 
 * ADVICE: USE CONSTRUCTOR INITIALIZERS
-    * practice 就是用 cstr init list，因為如果你的 cstr 想要主動對 member 做初始化，你本來就應該寫在 cstr init list 裡面，而不是在 cstr body 用 assigment 的方式給值。
-    * 而且就像上面說的，有些 member 是不能用 assignment 給值的，直接用 cstr init list 可以不用去顧慮到哪些 member 不能用 =
+    * practice 就是用 ctor init list，因為如果你的 cto r想要主動對 member 做初始化，你本來就應該寫在 ctor init list 裡面，而不是在 ctor body 用 assigment 的方式給值。
+    * 而且就像上面說的，有些 member 是不能用 assignment 給值的，直接用 ctor init list 可以不用去顧慮到哪些 member 不能用 =
 
 #### Order of Member Initialization
-* cstr init list 給定 member initializer 的順序一點意義都沒有
+* ctor init list 給定 member initializer 的**順序一點意義都沒有**
     ```C++
     class_name::class_name(int i, int j, int k): member_i(i), member_j(j), member_k(k);
     class_name::class_name(int i, int j, int k): member_k(k), member_i(i), member_j(j);
     ```
     * 上面兩個是等價的
-* 真正影響到 class member 初始化順序的是 member 在 class 定義內宣告的順序
-* 如果你有 member 是依賴定一個 member 來初始化的，這時候 class 定義 members 的順序跟 cstr init list 給的順序如果有差異可能就會有問題了(UB)。
-    ```C++
+* 真正影響到 class member 初始化順序的是，data member 在 class definition 內宣告的順序
+* 如果你有 data member 是依賴另一個 data member 來初始化的，而且你 ctor init list 初始化給的順序，跟 class 定義 data members 的順序，如果有差異可能就會有問題了(UB)。
+    ```c++
     class X { 
         int i;
         int j;
@@ -1055,12 +1062,13 @@
         X(int val): j(val), i(j) { }
     };
     ```
-    * class 內明明就是先初始化 i 再 j，你卻在 cstr init list 說 i 要靠 j 來初始化，這是 UB
-    * 上面的 cstr 寫成
-        * X(int val): i(j), j(val) { }
-    * 也可以，反正順序不重要，可是這時候你就會感受到怪異了，上面 code section 內的寫法看起來就很正常，可是 list 的順序不重要，是假的!
-
-* Some compilers are kind enough to generate a warning if the data members are listed in the constructor initializer *in a different order from the order in which the members are declared.*
+    * class 內明明就是先初始化 i 再 j，你卻在 ctor init list 說 i 要靠 j 來初始化，這是 UB
+    * 上面的 ctor init list 如果順序倒過來，寫成:
+    ```c++
+    X(int val): i(j), j(val) { }
+    ```
+	* 這時候你就會感受到怪異了，因為現在 `j` 擺在 `i` 的後面，看起來就怪怪的；不過再強調一次，ctor init list 內 data member 寫的順序沒有意義!
+		* Some compilers are kind enough to generate a warning if the data members are listed in the constructor initializer *in a different order from the order in which the members are declared.*
 
 * BEST PRACTICE: It is a good idea to **write constructor initializers in the same order as the members are declared.** Moreover, when possible, **avoid using members to initialize other members.**
 * It is a good idea **write member initializers to use the constructor’s parameters** rather than another data member from the same object.
@@ -1068,11 +1076,11 @@
     ```C++
     X(int val): i(val), j(val) { }
     ```
-    上面 cstr 根本不用管 i, j 宣告在 class 內的順序
+    上面 ctor 根本不用管 i, j 宣告在 class 內的順序
     
 #### Default Arguments and Constructors
-* 如果某 cstr 他所有 parameter 都有 default value，亦即可以不用給參數，他就會等價於 default cstr。
-    * 你這時候反而不能定義一個真的沒參數的 default cstr，因為當你真的宣告一個不吃參數的 object，會 ambiguous call
+* 如果某 ctor 他的所有 parameters 都有 default value，亦即，可以不用給參數，他就會等價於 default ctor
+    * 你這時候反而不能定義一個真的沒參數的 default ctor ，因為當你真的宣告 default initialize 的 object 時，這兩個 ctors 會造成 ambiguous call
 
 ### 7.5.2 Delegating Constructors
 * A delegating constructor uses another constructor from its own class to perform its initialization.
@@ -1083,9 +1091,9 @@
     * the member initializer list **has a single entry that is the name of the class itself.**
     * followed by a parenthesized list of arguments.
     * The argument list must match another constructor in the class.
-    * 其實就是 call 另一個 cstr 的意思
-
-```C++
+    * 其實就是 call 另一個 ctor 的意思
+* 直接舉例:
+```c++
 class Sales_data {
 public:
     // nondelegating constructor initializes members from corresponding arguments
@@ -1099,35 +1107,44 @@ public:
     // other members as before 
 };
 ```
-* 第一個之外的 cstr 都把部分工作丟給第一個 cstr 做
-* The constructor that takes an istream& also delegates. It delegates to the default constructor, *which in turn delegates to the three-argument constructor.*
-    * 看看第三個，實際上 delegate 了兩次
+	* 除了第一個之外的 ctor 都把部分工作丟給第一個 ctor 做
+	* The constructor that takes an istream& also delegates. It delegates to the default constructor, *which in turn delegates to the three-argument constructor.*
+	    * 看看第三個 ctor，實際上 delegate 了兩次
 
 
 * When a constructor delegates to another constructor, **the constructor initializer list and function body of the delegated-to constructor are both executed.**
-* delegated-to cstr 的 body 會在 delegating cstr 的 body 之前執行。
-    * In Sales_data, the function bodies of the delegated-to constructors happen to be empty. **Had the function bodies contained code, that code would be run *before control returned to the function body of the delegating constructor*.**
+	* delegated-to ctor 的 body 會在 delegating ctor 的 body 之前執行。
+	* 換句話說如果一個 ctor 有用另一個 ctor 來當 delegate ctor 的話，那執行順序會是:
+		1. delegated-to ctor's init list
+		2. delegated-to ctor's body
+		3. 自己的 init list
+		4. 自己的 body
+* In `Sales_data`, the function bodies of the delegated-to constructors happen to be empty. **Had the function bodies contained code, that code would be run *before control returned to the function body of the delegating constructor*.**
 
 
 ### 7.5.3 The Role of the Default Constructor
-
+* 這裡講 default ctor 什麼 context 之下會用到
 * 複習一下 default initialization 跟 value initialization
 * Default initialization happens 
     * When we define nonstatic variables (§ 2.2.1, p. 43) or arrays (§ 3.5.1, p. 114) at block scope without initializers
+	    * function 內宣告的 class object 或者 array of class object 如果沒有給 initializer 的話就會使用 default ctor
     * When a class that itself has members of class type uses the synthesized default constructor (§ 7.1.4, p. 262)
+	    * class 有 data member 在初始化時就是 default initialized
     * When members of class type are not explicitly initialized in a constructor initializer list (§ 7.1.4, p. 265)
+	    * 當你 class 的某些 data member 不在 ctor init list 內時，這些 member 會用 default ctor
 
 * Value initialization happens 
     * During array initialization when we provide fewer initializers than the size of the array (§ 3.5.1, p. 114)
+	    * 當你有給 array initializers，但是數量小於 array size 的話，後面的 elements 會被 value initialized
     * When we *define a local static object without an initializer* (§ 6.1.1, p. 205)
-    * When we explicitly request value initialization by writing an expressions of the form T() where T is the name of a type 
+	    * 當你定義一個 local static object 時如果沒有給 initializer，他也會被 value initialized
+    * When we explicitly request value initialization by writing an expressions of the form `T()` where `T` is the name of a type 
         * The vector constructor that takes a single argument to specify the vector’s size (§ 3.3.1, p. 98) uses an argument of this kind to value initialize its element initializer.
 
 * Classes must have a default constructor in order to be used in these contexts.
-    * class object 要能達到上面兩種初始化，class 一定要提供 defalut cstr
+    * class object 要能達到上面兩種初始化的話，一定要提供 defalut ctor
     * **並且 class 內的 member 也都能 default initialize**
-
-    ```C++
+    ```c++
     class NoDefault {
     public:
         NoDefault(const std::string&);
@@ -1143,47 +1160,48 @@ public:
         NoDefault b_member;
     }
     ```
-    * 如果你要為一個 class 寫預設 cstr，但是有一個 member 不能預設初始化，那你一定要在這個愈射 cstr 的 cstr init list 內初始化這個 member，不然就會像上面 B 的預設 cstr 一樣噴 error
+    * 如果你要為一個 class 寫預設 ctor ，但是有一個 member 不能預設初始化，那你一定要在這個預設 ctor 的 ctor init list 內初始化這個 member，不然就會像上面 B 的 default ctor 一樣噴 error
 
 * Best Practice: In practice, **it is almost always right to provide a default constructor if other constructors are being defined.**
-    * 你就強制讓你的每個 class 都提供預設 cstr 就不用擔心會發生上面的問題了
+    * 你就強制讓你的每個 class 都提供預設 ctor 就不用擔心會發生上面的問題了
 
 #### Using the Default Constructor
-* 注意宣告使用預設 cstr 的物件時的語法
-    * class_name obj;
+* 注意宣告使用預設 ctor 的物件時的語法
+    `class_name obj;`
 * 而不是
-    * class_name obj();
+    `class_name obj();`
     * 這是在宣告 function!
+    * 題外話，可以看看有關 Most vexing parse 的資料
 
 
 ### 7.5.4 Implicit Class-Type Conversions
-* 那些只有吃一個參數的 cstr 就恰好定義了從參數型態到 class 型態的 conversion
-    * 又叫 converting constructor
+* 那些只有吃一個參數的 ctor，也**定義了從參數型態到 class 型態的隱性轉換(implicit conversion)**
+    * 又叫 **converting constructor**
 * 14 章的 operator overloading 會講怎麼把 class object 轉成其他 type
 
-* 因為上述的關係，結合我們之前定義的 Sales_data，你可以這樣寫
-    ```C++
+* 因為上述的關係，結合我們之前定義的 `Sales_data`，你可以這樣寫
+    ```c++
     string null_book = "9-999-99999-9"; 
-    // constructs a temporary Sales_dataobject // with units_sold and revenueequal to 0 and bookNo equal to null_book
+    // constructs a temporary Sales_data object
+    // with units_sold and revenue equal to 0 and bookNo equal to null_book
     item.combine(null_book);
     ```
-    * combine 原本是吃一個 Sales_data object 當參數，而這裡卻是餵給他 string，這是合法的，compiler 會用 Sales_data 那個吃 string 的 cstr 把這個 string 轉成一個**暫時的 Sales_data 物件**，然後把這個物件給 combine 當作參數
-        * **注意，只有 const reference 才可以 bind 暫時物件，所以這裡 combine 宣告的 const Sales_data 必不可少**
+    * `combine`原本是吃一個 `Sales_data` object 當參數，而這裡卻是餵給他 `string`，這是合法的，compiler 會用 `Sales_data` 的那個吃 `string`的 ctor 把這個 `string` 轉成一個**暫時的 `Sales_data` 物件(temporary `Sales_data` object)**，然後把這個暫時物件給 `combine` 當作參數
+        * 注意，只有 const reference 才可以 bind 暫時物件，所以這裡 `combine` 宣告的 **`const`**  `Sales_data` 必不可少
 
 #### Only One Class-Type Conversion Is Allowed
 * 隱性轉換不能連續發生兩次
-
-    ```C++
+    ```c++
     // error: requires two user-defined conversions: 
     // (1) convert "9-999-99999-9"to string
     // (2) convert that (temporary) string to Sales_data
     item.combine("9-999-99999-9");
     ```
-    * "9-999-99999-9" 必須先轉成 string，因為 Sales_data 只有吃 string 的 cstr，沒有吃 C string 的 cstr
-    * **可是這樣就會把 "9-999-99999-9" 從 C str 轉成 string 再轉成 Sales_data，這種轉換不允許，會噴 error**
+    * "9-999-99999-9" 必須先轉成 string，因為 `Sales_data` 只有吃 `std::string` 的 ctor ，沒有吃 C string 的 ctor 
+    * **可是這樣就會把 "9-999-99999-9" 從 C str 轉成 `std::string` 再轉成 `Sales_data`，這種轉換不允許，會噴 error**
 
-* 真的要做 N 次轉換，前 N-1 次要 explicit 轉
-    ```C++
+* 真的要做 N 次轉換，前 N-1 次要顯示轉換(explicit conversion)
+    ```c++
     // ok: explicit conversion to string, implicit conversion to Sales_data 
     item.combine(string("9-999-99999-9"));     
     // ok: implicit conversion to string, explicit conversion to Sales_data
@@ -1195,62 +1213,138 @@ public:
 #### Class-Type Conversions Are Not Always Useful
 * 這種隱性轉換有時候其實爛爆ㄌ，難用ㄉ要死，有時候不希望 compiler 做隱性轉換
     * 首先這種轉換得到的 object 都是暫時物件，你做隱性轉換的地方執行完之後物件就不能 access 了
-* 比方說可以把 cin 轉成 Sales_data 怎麼想都很ㄎㄧㄤ
+* 比方說還記得 `Sales_data` 有定義一個 ctor 是吃 `std::istream&`，這代表可以把 `std::cin` 轉成 `Sales_data`，怎麼想都很ㄎㄧㄤ
 
 #### Suppressing Implicit Conversions Defined by Constructors
-* 用 explicit 宣告某個只有一個參數的 cstr，避免 compiler 使用那個 cstr 再某個 context 把那個參數的物件轉換成 class object
-    ```C++
+* 用 `explicit` keyword 宣告某個只有一個參數的 ctor ，避免 compiler 使用那個 ctor 在某個 context 把那個參數的物件(隱性)轉換成 class object
+    ```c++
     explicit Sales_data(std::istream&);
     ```
-* 如果吃 istream 的 cstr 這樣宣告， item.combine(cin); 這種詭異的 code 就會噴 error
-* explicit 只適用在一個參數的 cstr，因為多參數的 cstr 本來就不會拿來做隱性轉換
-
-* 然後 explicit 只能宣告在 class 定義內，你 member funtion 定義在 class 外面的時候不能加 explicit，會 syntax error
-    ```C++
-    // error: explicitallowed only on a constructor declaration in a class header
+* 如果吃 `std::istream` 的 ctor 這樣宣告， `item.combine(cin);` 這種詭異的 code 就會噴 error
+* `explicit` 只適用在一個參數的 ctor ，因為擁有一個參數以上的 ctor 本來就不會拿來做隱性轉換
+* 然後 `explicit` 只能宣告在 class 定義內，你 member funtion 定義在 class 外面的時候不能加 `explicit`，會噴 syntax error
+    ```c++
+    // error: explicit allowed only on a constructor declaration in a class header
     explicit Sales_data::Sales_data(istream& is) {
         read(is, *this);
     }
     ```
     
 #### explicit Constructors Can Be Used Only for Direct Initialization
-* 宣告成 explicit 的 cstr 只能用 (參數) 的方式給物件，不能用 = 參數的方式
-* 例如，如果沒有對吃 cin 的 cstr 用 explicit 的話這樣寫合法:
-    ```C++
+* 宣告成 `explicit` 的 ctor 只能用 `classname obj(args)` 的方式初始化物件，不能用 `classname obj = args` 的方式初始化
+* 例如，如果沒有對吃 cin 的 ctor 用 `explicit` 宣告的話，這樣寫合法:
+    ```c++
     Sales_data data1 = cin;
     Sales_data data2(cin); // 等價上面的
     ```
     * 光用看的就覺得ㄎㄧㄤ爆
-* 用了 explicit 就只能這樣寫第二種
+* 如果用了 `explicit` 的話就只能這樣用第二種寫法了
 
 #### Explicitly Using Constructors for Conversions
-* explicit 的 cstr 還是可以 explicitly 使用(XD
-    * 例如自己寫 class_name(parameter)
-    * 或者 static_cast\<class_name> parameter 都是合法的
-    ```C++
+* explicit 的 ctor 還是可以 explicitly 使用 LOL，總之還是一樣，吃一個參數的 ctor 就是定義了從參數到 class type 的轉換，只是 compiler 不會自己偷用，你要直接用還是可以
+    * 例如自己寫 `class_name(parameter)`
+    * 或者 `static_cast<class_name>(parameter)` 都是合法的
+    ```c++
     // ok: the argument is an explicitly constructed Sales_data object 
     item.combine(Sales_data(null_book));
     // ok: static_castcan use an explicit constructor
     item.combine(static_cast<Sales_data>(cin));
     ```
-    * 注意上面吃 null_book(string) 的 code Primer 也是把它改成 explicit，所以才要明確寫出 Sales_data(null_book) 這種強制轉換
+    * 注意上面吃 `null_book(string)` 的 code，Primer 也是把它改成 explicit，所以才要明確寫出 `Sales_data(null_book)` 這種強制轉換
 
-#### Library Classes with explicit Constructors
-* The string constructor that takes a single parameter of type const char* (§ 3.2.1, p. 84) is not explicit.
-    * 所以才可以寫 string str = "hsilu"; 這種 code
+#### Library Classes with `explicit` Constructors
+* The string constructor that takes a single parameter of type const char* (§ 3.2.1, p. 84) is not `explicit`.
+    * 所以才可以寫 `string str = "hsilu";` 這種 code
 * The vector constructor that takes a size (§ 3.3.1, p. 98) is explicit.
-    * 所以才不能寫 vector\<int> vec = 10; 這種鬼東西
-    * 如果可以的話他會跟 vector\<int> vec(10); 等價，可是 = 的寫法整個很 confusing
+    * 所以才不能寫 `vector<int> vec = 10;` 這種鬼東西
+    * 如果可以的話他會跟 `vector<int> vec(10);` 等價，可是 = 的寫法整個很 confusing
 
 ### 7.5.5 Aggregate Classes
-* 這根本就對應到 C struct...
-* 也不是啦
-* 這邊就直接看 Primer 了，不打筆記
-
+* 這東西很像 C `struct` 的延伸
+* Primer 會告訴你當你怎樣定義你的 class 時你定義的 type 會是 aggregate classes
+* aggregate class 有個特性，就是所有 member 都可以直接 access
+	* 就跟 C `struct` 一樣
+* 定義: 一個 class is aggregate if:
+	* All of its data members are public
+		* 所有 data member 都是 public
+	* It does not define any constructors
+		* 沒有自己定義任何 ctor
+	* it has no in-class initializers (§ 2.6.1, p. 73)
+		* 沒有使用 in-class initializer 來初始化 data member
+	* It has no base classes or `virtual` functions, which are class-related features that we’ll cover in Chapter 15
+		* 他沒有繼承某個 class，也沒有 `virtual` functions，這 15章會講
+* 你會發現沒了這些東西根本就跟 C `struct` 87%像
+* 舉個例子:
+	```c++
+	struct Data {
+		int ival; 
+		string s;
+	};
+	```
+* aggregate class 可以用 brace list 來初始化:
+	```c++
+	// val1.ival = 0; val1.s = string("Anna")
+	Data val1 = { 0, "Anna" };
+	```
+	* 每個 initializer 的順序要跟 class data member 宣告的順序對的上
+		* 然後這本來就是 C 的語法...
+	* 如果你 initializer 的數量又少於 data member 的數量，則後面的 data member 會 value initailized
+* 注意 aggregate class 就完全沒有封裝的概念了，詳情請教你的 OOP 老師
 
 ### 7.5.6 Literal Classes
-* 又是有關 constexpr 的東西...
-* 再強調一次 C++14 在 constexpr 的部分不相容 C++11，建議之後再看
+* 又是有關 `constexpr` 的東西...
+* 再強調一次 C++14 在 `constexpr` 的部分不相容 C++11，建議之後再看
+* 之前說過 `constexpr` 的 return type 要是 literal type
+* 其實某些 class 只要滿足某些條件也可以是 literal type，叫做 literal class
+* 這種 class 也可以有 `constexpr` member function
+	* 而且這些 `constexpr` member function 是 implicitly `const`
+* 舉例:
+	* 如果某個 aggregate class 內的所有 data member 都是 literal type，則這個 class 是 literal class
+	* 如果某個 class 不是 aggregate，只要符合下面條件，他就還是 literal class:
+		* data member 全部都要是 literal type
+		* 至少要有一個 `constexpr` ctor LOL
+		* 如果有 data member 有 in-class initializer，則這個 initializer 要是 `constexpr`
+		* `dtor` 只能用 compiler 生的，不能自己寫
+
+#### `constexpr` Constructors
+* 所以這她媽到底是三小?!
+* 雖然 ctor 不能宣告成 `const`，但是 literal class 的 ctor 可以宣告成 `constexpr`
+	* 實際上 literal class 一定至少要提供一個 `constexpr` ctor
+* `constexpr` ctor 一樣可以宣告成 `= default` 也可以宣告成 `= delete`(13章)
+	* 他也要滿足 ctor 的條件，也就是 no return statement
+	* 也要滿足 `constexpr` 的條件，也就是 statement 只能有 return statement(注意這個條件在 C++14 應該有擴充)
+	* 換句話說 `constexpr` ctor 通常是 empty body LOL
+* 來定義個 nonaggregate literal class 吧!
+	```c++
+	class Debug {
+	public:
+		constexpr Debug(bool b = true): hw(b), io(b), other(b) { }
+		constexpr Debug(bool h, bool i, bool o):
+										hw(h), io(i), other(o) { }
+		constexpr bool any() { return hw || io || other; }
+		void set_io(bool b) { io = b; }
+		void set_hw(bool b) { hw = b; }
+		void set_other(bool b) { hw = b; }
+		private: bool hw; // hardware errors other than IO errors
+		bool io; // IO errors 
+		bool other; // other errors
+	};
+	```
+	* `constexpr` ctor 一定要初始化所有 data member
+		* initializer 要馬用 `constexpr` ctor 提供的東西來組合，例如 parameters，或者直接用 constant expression
+	* **constexpr ctor 的重點是可以生出一個 class object，那個 object 本身是 constant expression!**
+* 直接看 code，看 `constexpr` object 會等價於什麼 code:
+	```c++
+	constexpr Debug io_sub(false, true, false); // debugging IO 
+	if (io_sub.any()) // equivalent to if(true) 
+		cerr << "print appropriate error messages" << endl;
+	constexpr Debug prod(false); // no debugging during production 
+	if (prod.any()) // equivalent to if(false)
+		cerr << "print an error message" << endl;
+	```
+	* 在編譯時期 compiler 就會知道一些 member function 的 return value
+	* 這看起來好像沒什麼，不過還有更多應用(尤其是 C++14)
+* 還有一個重點 Primer 沒有提，當你 class 內有 data member 不是 literal type(或 literal class)，則你宣告這個 class 的 ctor 為 `constexpr` 會噴 error，原因很簡單，因為這個 `constexpr` ctor 永遠不可能產生 constant exprssion! 那些 non literal type member 永遠不可能是 constant exprssion，導致整個 class object 不可能是 constant expression，所以你宣告了一個永遠不可能是 constant expression 的東西為 `constexpr` 就噴 error 惹
 
 ## 7.6 static Class Members
 * Classes sometimes need **members that are associated with the class,** rather than with individual objects of the class type.
@@ -1315,7 +1409,7 @@ private:
     * **Because static data members are not part of individual objects of the class type, they are not defined when we create objects of the class.**
     * 亦即 static member 不是在創造物件的時候初始化的，而且這意味著你在 class definition 裡面寫 static data member 的宣告時，**真的只有宣告**，你必須在 class 外面再定義一次 member
     * http://en.cppreference.com/w/cpp/language/static
-* 所以 static member 也不是靠 cstr 初始化的
+* 所以 static member 也不是靠 ctor 初始化的
 
 
 #### In-Class Initialization of static Data Members
