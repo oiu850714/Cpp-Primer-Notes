@@ -1347,11 +1347,13 @@ public:
 * 還有一個重點 Primer 沒有提，當你 class 內有 data member 不是 literal type(或 literal class)，則你宣告這個 class 的 ctor 為 `constexpr` 會噴 error，原因很簡單，因為這個 `constexpr` ctor 永遠不可能產生 constant exprssion! 那些 non literal type member 永遠不可能是 constant exprssion，導致整個 class object 不可能是 constant expression，所以你宣告了一個永遠不可能是 constant expression 的東西為 `constexpr` 就噴 error 惹
 
 ## 7.6 static Class Members
+
 * Classes sometimes need **members that are associated with the class,** rather than with individual objects of the class type.
+* 用 keyword `static` 來宣告 class member，那個 member 就會跟著 class 本身，而不是 class object
 
 #### Declaring static Members
-
-```C++
+* 看例子，定義一個 class 來表示一個銀行帳戶:
+```c++
 class Account {
 public:
     void calculate() { amount += amount * interestRate; }
@@ -1365,25 +1367,26 @@ private:
 };
 ```
 * The static members of a class **exist outside any object.**
-* **Objects do not contain** data associated with **static data members**.
-* 所以 Account object 只會有 amount 跟 owner 這兩個 object 而已
-* There is only one interestRate object that will **be shared by all the Account objects.**
+	* `static` data member 不屬於任何一個 class object
+	* 按照上面的例子來看，`Account` object 只會有 `owner` 跟 `amount` 這兩個 data member，不會有 `interestRate`，這個 member 是所有 class objects 共享的
+	* There is only one interestRate object that will **be shared by all the Account objects.**
 * Similarly, **static member functions are not bound to any object;**
-    * 注意，之前說的，會把每個 member function 隱性的傳入 this 這件事情不會發生!
-* 因為上述，static member function 不能宣告成 const，也不能在裡面使用 this
-    * 不能宣告成 const 是因為，原本 member function 宣告成 const 就是在改變傳入的 this 的 low-level const，阿現在 this 根本不會傳到 static member function，所以 C++ 索性限制 static member function 不能宣告成 const
-* 不能用 this 的真正效果是，所有 nonstatic member 都不能訪問! 原本 nonstatic member 本來就是(隱性的)透過 this 去存取的，現在沒有 this，根本存取不到
+    * 注意，之前說的，會把每個 member function 隱性的傳入 `this` 這件事情不會發生!
+	* 因為上述(static member function 沒有 `this` 可以用這件事)，static member function 不能宣告成 `const`，也不能在裡面使用 `this`
+    * 不能宣告成 const 是因為，原本 member function 宣告成 `const` 就是在改變傳入的 `this` 的 low-level `const`，阿現在 `this` 根本不會傳到 static member function，所以 C++ 索性限制 static member function 不能宣告成 `const`
+* 不能用 this 的真正效果是，所有 non`static` member 都不能訪問! 原本 non`static` member 本來就是(隱性的)透過 this 去存取的，現在沒有 this，根本存取不到
+	* 注意不管是 `static` data member 還是 member function 都不能訪問
 
 
-#### Using a Class static Member
-* Access a static member directly through the scope operator:
-    ```C++
+#### Using a Class `static` Member
+* 可以用 scope operator `::` 直接存取 static member
+    ```c++
     double r;
     r = Account::rate();
     // access a static member using the scope operator
-
-* 雖然 static member 不屬於任何一個 class object，我們還是可以透過 object(或 ptr/ref to object)去存取 static member
-    ```C++
+	```
+* 雖然 `static` member 不屬於任何一個 class object，我們還是可以透過 object(或 ptr/ref to object)去存取 `static` member
+    ```c++
     Account ac1;
     Account *ac2 = &ac1;
     // equivalent ways to call the static member rate function 
@@ -1392,8 +1395,8 @@ private:
     r = ac2->rate(); // through a pointer to an Account object
     ```
 
-* member function 也可以直接存取 static member
-    ```C++
+* member function 也可以直接存取 static member，也不用加 scope operator
+    ```c++
     class Account {
     public:
         void calculate() { amount += amount * interestRate; }
@@ -1404,15 +1407,86 @@ private:
     ```
     
 #### Defining static Members
-* static member function 你要定義在 class 內還外都可以，不過 class 外不可以再寫一次 static，會 error
+* `static` member function 你要定義在 class 內還外都可以，不過 class 外不可以再寫一次 `static`，會噴 syntax error
+
 * **不過 static data member 一定要在 class 外面再定義一次!**，理由如下:
     * **Because static data members are not part of individual objects of the class type, they are not defined when we create objects of the class.**
-    * 亦即 static member 不是在創造物件的時候初始化的，而且這意味著你在 class definition 裡面寫 static data member 的宣告時，**真的只有宣告**，你必須在 class 外面再定義一次 member
+    * 亦即 `static` data member 不是在創造物件的時候初始化(或者說被 define)的，這意味著你的 class ctor 不會，也不能，初始化 `static` data member；更 general 來說，這代表著我們不能在 class 內初始化 `static` data member；相反的，**我們只能在 class 外面定義/初始化 `static` data members**
+    * 跟其他物件一樣，`static` data member 也只能定義一次
     * http://en.cppreference.com/w/cpp/language/static
-* 所以 static member 也不是靠 ctor 初始化的
+* `static` data member 跟 global object 一樣也是定義在任何 function 之外的，因此他們一旦他們被定義後就會存活到 program 結束為止
+* 定義 `static` data member 的方式，就跟把 member function 定義在 class 外面很像:
+	```c++
+	// define and initialize a static class member 
+	double Account::interestRate = initRate();
+	```
+	* 該加的 scope 要加好，不多贅述
+	* 注意 `initRate` 是 `private` (`static`) member function，不過 `static` member function 一樣也可以存取 `private` (`static`) member
 
+* Tip: 確認 `static` data member 只有定義一次的方式就是把它的**定義**放到對應 class 的 implementation file 內，或者說把他們放到定義了 class 的 non`inline` member functions 的 file 內
 
-#### In-Class Initialization of static Data Members
+#### In-Class Initialization of `static` Data Members
+* 前面有說過 `static` data member 不能在 class 內初始化，也就是不能提供 in-class initializer
+* 不過如果 `static` data member 符合以下條件的話則是例外:
+	* `const` && integral type；注意，`double`/etc 那一類不是 integral type LOL
+	* 如果上面不符合，但是是 `constexpr` of literal type，則**一定要**提供 in-class initailizer；
+		* 注意，你可以在定義 `double`/etc 那一類時加上 `constexpr` 就可以在 class 內定義這些型別了 LOL
+		* ![](https://i.imgur.com/7bfGreo.png)
+		* ![](https://i.imgur.com/996Z0iB.png)
+* **然後定義時給的 initializer 一定要是 constant expression**；換句話說可以想成這種定義一定要在 compile time 時就能知道結果；而因為這些 data member 符合上面的兩個例外條件其中之一，並且是用 constant expression 初始化的，所以**這些 member 也是 constant expression**
+	* 所以他們可以被使用在需要 constant expression 的地方，例如當 array dimension:
+	```c++
+	class Account {
+	public:
+		static double rate() { return interestRate; }
+		static void rate(double);
+	private:
+		static constexpr int period = 30;// period is a constant expression 
+		double daily_tbl[period];
+	};
+	```
+* 不過有一點很重要，雖然上面說的 `const` integral type 或者 literal type 可以提供 in-class initializer，**但是在 class 內提供 initalizer 的那一行 statement 一樣是 declaration 不是 definition!**
+* 這導致以下情況:
+	* 如果這些 member 只用在某些 compiler 可以把這些 member 替換成他們的 constant expression 的情況，則這些 member 就不用在 class 外面寫 definition(Primer 說這叫做 separately defined)
+	* 但如果這些 member 用在那些 compiler 不能把這些 member 替換成他們的 constant expression 的情況，則這些 member 就需要 separately defined 了
 
+* 舉例:
+	* 例如上面 code 的 `period` 只用在宣告 `daily_tbl` 的時候，這時候因為 compiler 有辦法把宣告內的 `period` 替換成它的 constant expression，也就是 30，所以不用再 class `Account` 外面再定義 `period`
+	* 但是如果我們真的沒有在 `Account` 外面定義 `period`，則會發生這樣的情況: 我們很可能只是新增了一點 code 就導致不能編譯!
+	* 例如如果我們把 `period` 傳給一個吃 `const int&` 的 function，因為這時 compiler 不可能做什麼替換的動作，所以 `period` 就需要在 `Account` 外額外定義；而因為我們在這裡沒有額外定義 `period`，所以會噴 error
+* 如果上面有在 `Account` 外提供 `period` 的定義，則定義不可以給 initializer:
+	```c++
+	// definition ofa staticmember with no initializer 
+	constexpr int Account::period; // initializer provided in the class definition
+	```
+### 注意，上面的東西經過實驗，C++11/14 的確會噴 error，可是 C++17 就不會了，還要再研究一下
 
-# 跳過，覺得 7.5 後半跟 7.6 都要之後再看一次
+#### static Members Can Be Used in Ways Ordinary Members Can’t
+* `static` members 因為獨立於 class object，某些對 non`static` member 是非法的使用方式在 `static` members 就合法了
+* 舉例:
+	* `static` members 可以是 incomplete type LOL
+		* 因為上面的關係，`static` members 的 type 可以是包含他的 class type LOL
+		* 而 non`static` members 就只能宣告成 ptr/ref to 包含他的 class type
+* 看 code:
+	```c++
+	class Bar { 
+	public: 
+		// ...
+	private:
+		static Bar mem1; // ok: static member can have incomplete type 
+		Bar *mem2; // ok: pointer member can have incomplete type
+		Bar mem3; // error: data members must have complete type
+	};
+	```
+* 還有，可以把 `static` member 當成 member function 的 default argument:
+	```c++
+	class Screen { 
+	public: 
+		// bkground refers to the static member 
+		// declared later in the class definition 
+		Screen& clear(char = bkground);
+	private:
+		static const char bkground;};
+	```
+	* 我覺得這邊 Primer 的解釋太牽強，看這份: https://stackoverflow.com/questions/4539406/nonstatic-member-as-a-default-argument-of-a-nonstatic-member-function
+		* 雖然也是有點ㄎ一ㄤ
