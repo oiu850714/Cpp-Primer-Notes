@@ -1,4 +1,8 @@
-﻿# C++ Primer Chapter 7 Classes
+﻿---
+tags: C++
+---
+
+# C++ Primer Chapter 7 Classes
 * class 背後真正想做到的是什麼?
     * **data abstraction** and **encapsulation**.
     * abstraction 個人認為是把要處理的事情(dealing with data)給抽象化成一些操作(operations)，這些操作構成了使用這個 class 的介面(interface)，而 class 的使用者只需要知到介面怎麼用，介面背後的實作使用者不用知道
@@ -20,13 +24,13 @@
 * We have no access to the data members stored in a Sales_item object.
     * 你沒有辦法直接存取到實際上存著 isbn 內容的 data member，你只能呼叫 isbn 這個 function 來拿到它
         * 其實你也不用知道他到底怎麼存 isbn 的，什麼都不用知道，你只要知道呼叫 isbn 這個 member function 可以拿到 ISBN 就好了
-* Our *Salesdata* class (§ 2.6.1, p. 72) is *not* an abstract data type.
+* Our *Sales_data* class (§ 2.6.1, p. 72) is *not* an abstract data type.
     * 如果忘記的話，就是那個 struct，裡面所有 data member 都可以存取，還要額外定義 function 來處理的那個鬼東西
     * To make Sales_data an abstract type, we **need to define operations for users of Sales_data to use.** Once Sales_data defines its own operations, we can encapsulate (that is, hide) its data members.
 
 ### 7.1.1 Designing the Sales_data Class
 * 感覺 Primer 希望從一個 non ADT 的 Sales_data 一步一步幹成 ADT 的 Sales_item?
-* The *Salesitem* class had one member function (§ 1.5.2, p. 23), named isbn, and supported the +, =, +=, <<,and >> operators.
+* The *Sales_item* class had one member function (§ 1.5.2, p. 23), named isbn, and supported the +, =, +=, <<,and >> operators.
     * 很後面的章節才會講到怎麼定義 operator，現在先用一般的 member function，也就是有名子的 function 代替
     * 有些 operator 其實不能用 member function 來實作，要用 global function，這之後的章節也會講
     * 之後也會講，因為一些原因，我們(預設)不用定義 = 怎麼實作
@@ -41,7 +45,7 @@
 #### Using the Revised Sales_data Class
 * 在我們想怎麼實作 Sales_data 的 interface，我們先想要怎麼使用它
 * 如果我們實作了上述說的 Sales_data 的 interface，我們就可以把章節 1.6 使用 Sales_item 的一個簡單小程式改成這樣:
-    ```C++
+    ```cpp
     Sales_data total;    // variable to hold the running sum
     if (read(cin, total)) { // read the first transaction
         Sales_data trans;    // variable to hold data for the next transaction
@@ -63,6 +67,7 @@
 * member 就跟 2.6.1(p.72) 定義的一樣
 * 會有兩個 member function，isbn 跟 combine
 * 還有一個額外的 member function 是拿來算平均的，avg_price，**他是 private member  function**
+    * Not for general usage
     * It will be part of the implementation, not part of the interface.
 
 * 宣告 member function 的方式跟宣告 ordinary function 的方式差不多
@@ -71,7 +76,7 @@
     * 而那些構成 interface 但是是 ordinary function 的就宣告和定義在 class 外面就好
 
 * 有了上述的知識，你可以寫一個基本的 class 宣告惹，包含了 data member，member function，跟 ordinary function
-    ```C++
+    ```cpp
     struct Sales_data { 
         // new members: operations on Sales_data objects
         std::string isbn() const { return bookNo; }
@@ -94,22 +99,22 @@
 #### Defining Member Functions
 * member function 可以定義在 class 宣告的外面，上面把 isbn 定義在 class 內，combine 和 avg_price 則定義在 class 外
 * 先來解釋 isbn 這個已經定義好的 member function
-    ```C++
+    ```cpp
     std::string isbn() const { return bookNo; }
     ```
     * 其實長得跟 ordinary function 有 87%像
     * **但是 bookNo 打哪來的?**
 #### **Introducing this**
 * Primer p.300 會講一個例外(應該是 static member function)，不過我們在 call 一個 member function 時，實際上是透過某個 object 來呼叫 member function
-    ```C++
+    ```cpp
     total.isbn()
     ```
 * 當 isbn 用到了某些 data member 時(例如 bookNo)，**他實際上是用到了呼叫他的那個 object 的 data member**
     * 上面這個例子，當 isbn 用到 bookNo，他實際上是用到 total.bookNo
 * 為什麼會這樣呢?
-    * Member functions access the object on which they were **called through an extra, implicit parameter named this.**
-    * When we call a member function, **this is initialized with the address of the object** on which the function was invoked.
-    * 當我們 call total.isbn()，compiler 就如同在 call **Sales_data::isbn(&total)** 一樣，會有一個隱性的 this 參數來接 object 的 address
+    * Member functions access the object on which they were **called through an extra, implicit parameter named `this`.**
+    * When we call a member function, **`this` is initialized with the address of the object** on which the function was invoked.
+    * 當我們 call `total.isbn()`，compiler 就如同在 call **`Sales_data::isbn(&total)`** 一樣，會有一個隱性的 this 參數來接 object 的 address
         * Sales_data::isbn(&total)，雖然這是 pesudo-code，不過注意我用的是 scope operator，:: 左邊是 class name 不是 object name
 * 總之，any direct use of a member of the class is assumed to be an implicit reference through this.
     * 你如果直接使用的 class 的 member(不管是 data 還是 function)，compiler 都假設微你是使用 this->member
@@ -119,7 +124,7 @@
 
 #### Introducing const Member Functions
 * 再看一次 isbn 的定義
-    ```C++
+    ```cpp
     std::string isbn() const { return bookNo; }
     ```
     * 有沒有看到 parameter list 右邊有一個 const?
@@ -146,11 +151,11 @@
 * 當然，definition 要 match class 內的 declaration
     * return type，name，parameter list，還有 member function 的 const 如果有的話也要寫!
 * 要定義在外面的話格式是這樣
-    ```C++
+    ```cpp
     return_type class_name::member_function (parameter_list) (這裡按照宣告看是否要給 const)
         body
     ```
-    ```C++
+    ```cpp
     double Sales_data::avg_price() const { 
         if (units_sold) return revenue/units_sold;
         else return 0;
@@ -164,7 +169,7 @@
 * 這個 hen 重要
 * 想想看我們的 Sales_data 的 combine 是對應到 Sales_item 的 +=，換句話說 combine 的行為要很像 +=，例如 result 是 lvalue 之類的，這要怎麼做呢?
     * total.combine(trans)，total 宛如 += 的 left operand，trans 宛如 += 的 right operand
-    ```C++
+    ```cpp
     Sales_data& Sales_data::combine(const Sales_data &rhs)
     {
         units_sold += rhs.units_sold; // add the members ofrhs into 
@@ -172,16 +177,17 @@
         return *this; // return the object on which the function was called
     }
     ```
+    * 模擬 += -> return lvalue -> return reference type
     * 注意最後一行的 return *this;
     * **return the object on which the function was called**
 
 * 當我們寫這樣的 code
-    ```C++
+    ```cpp
     total.combine(trans); // update the running total
     ```
     * &total 會 assign 給 this，而 trans 會被 bound 到 rhs
 * 所以當在執行
-    ```C++
+    ```cpp
     units_sold += rhs.units_sold; // add the members ofrhs into
     ```
     * 其實就是把 total.units_sold 跟 trans.units_sold 相加然後存回 total.units_sold 裡
@@ -192,7 +198,7 @@
 * 但我們到底要怎樣把 total 這個 object 回傳當作 +=(或者說 combine)的 left operand?
     * **We need to use this to access the object as a whole**
     * 既然 this 現在指向 total(或者說指向 call 了 member function 的 object)，那我們回傳 *this 就是回傳這個 object 啦!
-    ```C++
+    ```cpp
     return *this;
     ```
     * For the call above, we return a reference to total.
@@ -207,7 +213,7 @@
 #### Defining the read and print Functions
 * 長的就跟 2.6.2 的有 87%像
     * 不用真的回去看啦...
-    ```C++
+    ```cpp
     // input transactions contain ISBN, number of copies sold, and sales price 
     istream &read(istream &is, Sales_data &item) {
         double price = 0;
@@ -232,7 +238,7 @@
 
 #### Defining the add Function
 * 
-    ```C++
+    ```cpp
     Sales_data add(const Sales_data &lhs, const Sales_data &rhs) {
         Sales_data sum = lhs; // copy data members from lhs into sum         
         sum.combine(rhs);
@@ -242,6 +248,10 @@
     * add 跟 combine 本質上不同，combine 其實是 mimic +=，add 是 mimic +
     * 所以 add 的 return 才會是 plain object 不是 reference
     * 不過 add 可以用 combine 實作就是了
+        * **而且這個實作方式背後是有很多哲學的**
+        * 某種程度上，+= 也可以用 + 實作
+            * 但是這個 overhead 比較高
+            * 詳情看 13/14 章
 * 這裡有個小問題，sum = lhs 是三小? 我們沒有定義兩個 class object 怎麼 assign 阿?
     * *By default, copying a class object copies that object’s members.*
 
@@ -253,7 +263,7 @@
 * **A constructor is run whenever an object of a class type is created.**
 
 * 這裡只會講怎麼寫基本的 constructor
-    * constructor 其實非常ㄎㄧㄤ，7.5，15.7，18.1.3 會有更ㄎㄧㄤ的介紹
+    * constructor 其實非常ㄎㄧㄤ，7.5，15.7，18.1.3 還有 13 章會有更ㄎㄧㄤ的介紹
 
 * Constructors have the same name as the class.
     * 沒有 return type
@@ -277,14 +287,15 @@
 * 第一，你只要定義了任何一個 constructor，compiler 就不會幫我們 generate default constructor
 * 只有簡單到不行的 class 才會不定義自己的 constructor 用 compiler 給的
 * The basis for this rule is that **if a class requires control to initialize an object in one case, then the class is likely to require control in all cases.**
-    * 你定了其他種的 contructor，你如果希望你的 class object 可以在宣告的時候不給參數，你就要自己定義 defalut constructor
+    * compiler 在這種情況下不定義 default ctor 的哲學: 你如果定義了一種 ctor 並且要自己定義如何初始化，很有可能在所有其他的情境(其他 ctors) 時你也要自己控制如何初始化
+        * 這個情境也包含 default ctor
 * A second reason to define the default constructor is that for some classes, the **synthesized default constructor does the wrong thing.**
-    * 你有 buitl-in type member，然後你又沒有在 class 宣告時給這些 member 一個 in-class initializer，且你又只有 compiler 給的 default constructor，那你這個物件被初始化的時候這些 member 就會有 undefined value
+    * 你有 built-in type member，然後你又沒有在 class 宣告時給這些 member 一個 in-class initializer，且你又只有 compiler 給的 default constructor，那你這個物件被初始化的時候這些 member 就會有 undefined value
         * 不過一個 practice 就是你可以把所有的 built-in member 都給上 in-class initailizer，這樣就不會有 undefined value
 
 * 第三，some classes must define their own default constructor is that sometimes **the compiler is unable to synthesize one.**
     * 比方說你這個 class 有一個 member，他沒有 defalut constructor，那你這個 class compiler 一定沒辦法幫你 generate defalut constructor
-    ```C++
+    ```cpp
     class B {
       int number = 87;
       B(int i) { number = i; }
@@ -309,7 +320,7 @@
     * A const string& representing an ISBN. This constructor will use default values for the other members.
     * An empty parameter list (i.e., the default constructor) which as we've just seen we must define because we have defined other constructors.
 * 我們的 class 宣告就會變這樣
-    ```C++
+    ```cpp
     struct Sales_data { 
         // constructors added 
         Sales_data() = default;
@@ -327,7 +338,7 @@
     ```
 * ㄏㄏ上面有一堆東西要講，慢慢來
 * 我們先看 defalut constructor
-    ```C++
+    ```cpp
     Sales_data() = default;
     ```
     * 那個 defalut 是三小?
@@ -338,7 +349,7 @@
 
 #### Constructor Initializer List
 * 再看另外兩個 constructor
-    ```C++
+    ```cpp
     Sales_data(const std::string &s): bookNo(s) { } 
     Sales_data(const std::string &s, unsigned n, double p):
         bookNo(s), units_sold(n), revenue(p*n) { }
@@ -356,7 +367,7 @@
 
 #### Defining a Constructor outside the Class Body
 * 剩下那個收 istream& 的 constructor 還沒講，這個 constructor 真的需要做事情，function 也不是空的，所以定義在 class 外面
-    ```C++
+    ```cpp
     Sales_data::Sales_data(std::istream &is) {
     read(is, *this);
     // read will read a transaction from is into this object
@@ -367,7 +378,7 @@
     * In this constructor there is no constructor initializer list, although technically speaking, it would be more correct to say that the **constructor initializer list is empty.**
     * Even though the constructor initializer list is empty, ***the members of this object are still initialized before the constructor body is executed.***
     * 這很重要
-        ```C++
+        ```cpp
         CLASS() :i(1){}
         跟
         CLASS()
@@ -380,6 +391,8 @@
 
 
 ### 7.1.5 Copy, Assignment, and Destruction
+* 這邊主要是說 class 也負責控制他們的物件在被 copy/assign/destroy 時的行為
+    * 但只有講概念，細節在 13 章
 * In addition to defining how objects of the class type are initialized, **classes also control what happens when we copy, assign, or destroy objects of the class type.**
 * Objects are **copied in several contexts,** such as when we **initialize a variable** or when we **pass or return an object by value** (§ 6.2.1, p. 209, and § 6.3.2, p. 224).
 * Objects are assigned when we use the **assignment operator**
@@ -389,11 +402,11 @@
 * If we **do not define** these operations, **the compiler will synthesize them for us.**
 * Ordinarily, the versions that the compiler generates for us **execute by copying, assigning, or destroying *each member of the object.***
     * 拿 Sales_data 來說
-        ```C++
+        ```cpp
         total = trans; // process the next book
         ```
     * 宛如
-        ```C++
+        ```cpp
         // default assignment for Sales_data is equivalent to: 
         total.bookNo = trans.bookNo; 
         total.units_sold = trans.units_sold;
@@ -422,7 +435,7 @@
     * private sections encapsulate (i.e., hide) the implementation.
 
 * 把我們的 Sales_data 改寫使得 interface 跟 implementation 分開
-    ```C++
+    ```cpp
     class Sales_data {
     public:
     // access specifier added
@@ -452,7 +465,7 @@
     * 該怎麼辦呢?
 * 用 friend!
     * A class can allow another class or function to access its nonpublic members **by making that class or function a friend.**
-    ```C++
+    ```cpp
     class Sales_data {
     friend Sales_data add(const Sales_data&, const Sales_data&);
     friend std::istream &read(std::istream&, Sales_data&);
@@ -488,7 +501,7 @@
 #### Declarations for Friends
 * A friend declaration **only specifies access.** **It is not a general declaration of the function.**
     * 他真的不是宣告，宣告成 friend 的時候，compiler 會在 class scope 再往外一層的 scope 找這個 declaration
-* 看似像宣告的 friend 語法其實不是宣告，按照標準的話，你還是要在 class 外面宣告這個 function，這樣 user code 才看的到這個構成 class interface 的 nonmember function
+* 看似像宣告的 friend 語法其實不是宣告，按照標準的話，你還是要在 class 外面宣告這個 function，這樣 user code 在 include class header 時才看的到這個構成 class interface 的 nonmember function
 
 ## 7.3 Additional Class Features
 * type members,
@@ -508,7 +521,7 @@
 
 * In addition to defining data and function members, a **class can define its own local names for types.**
     * 這些 class 內定義的 type 也有 access control，可以是 public 或 private
-    ```C++
+    ```cpp
     class Screen { 
     public:
         typedef std::string::size_type pos;
@@ -522,12 +535,12 @@
 * 上面要用 using 取代 typedef 也可以
 * 還有一點，p.284 會講到，type name 跟一般的 member 不一樣，我們在 member function 使用 type name 之前就一定要看到定義
     * 這跟之前說的 member 也可以定義在 member function 之後不一樣
-* 所以最好吧 type name 宣告在 class 定義的最前方
+* 所以需要把 type name 宣告在 class 定義的最前方
 
 #### Member Functions of class Screen
 * a *constructor* that will let users define the size and contents of the screen, along with *members to move the cursor and to get the character at a given location*
 
-    ```C++
+    ```cpp
     class Screen {
     public:
         typedef std::string::size_type pos;
@@ -546,7 +559,7 @@
     };
     ```
     * 上面一些注意事項
-        * 三個參數的 ctor雖然有用 ctorinitializer list，不過他沒初始化到 cursor，他用 in-class initialzer 初始化 cursor
+        * 三個參數的 ctor 雖然有用 ctor initializer list，不過他沒初始化到 cursor，他用 in-class initialzer 初始化 cursor
         * 還有注意看他怎麼初始化 contents，**他給了兩個參數!!**，因為 string 可以用兩個參數來初始化
         * 其實 contructor initializer list 就是在 call member 的 constructor，所以才可以很ㄎㄧㄤ的給兩個參數給 str，因為 string 本來就可以給兩個參數來初始化
         * 上面的 get 有 overloading
@@ -554,10 +567,11 @@
 #### Making Members inline
 * Classes often have small functions that can benefit from being inlined.
 * 可以直接在 class 定義裡面宣告 function 時加上 inline，然後 definition 寫在 class 定義的外面，這樣還是會 inline
-    * 你也可以宣告跟定義都寫，甚至可以只寫在定義，**不過後者就是他媽的糞code**
-        * 如果是我的話我會兩邊都寫
-
-    ```C++
+    * 你也可以宣告跟定義都寫，甚至可以只寫在定義
+        * https://isocpp.org/wiki/faq/inline-functions#where-to-put-inline-keyword
+        * 上面有到底該寫在哪的 best practice
+        * If "it" can’t be observed from the caller’s code, "it" shouldn’t be in the public: part of the class body.
+    ```cpp
     inline // we can specify inline on the definition
     Screen &Screen::move(pos r, pos c) {
         pos row = r * width; // compute the row location 
@@ -571,10 +585,12 @@
         return contents[row + c]; //return character at a given column
     }
     ```
-    * 上面的 move 在 class 內宣告時沒給 inline，get 則是在宣告時有給 inline，兩者最後都會發 inline request 給 compiler，不過很明顯 move 就是ㄎㄧㄤ，為什麼不在宣告的時候寫 inline 呢?
+    * 上面的 move 在 class 內宣告時沒給 inline，get 則是在宣告時有給 inline，兩者最後都會發 inline request 給 compiler
+        * 但是只寫在 member function definition 的話，class definition 會比較好讀
+        * 而且"到底要不要宣告這個不會 default inline 的 member function 為 inline" 其實也是一種實作細節，只看 class definition 的 public parts 時其實不需要在意有無 inline
 * inline member function 還有一個重點!
     * For the same reasons that we define inline functions in headers (§ 6.5.2, p. 240), **inline member functions should be defined in the same header as the corresponding class definition.**
-    * 在提醒一次，compiler 在編譯的時候決定到底要不要把 function inline 之前他一定要知道定義阿，所以 inline function 要定義(define)在 class 定義的地方(或者說定義要跟 class 定義在同一個 translaton unit)，不然 compiler 會看不到
+    * 再提醒一次，compiler 在編譯的時候決定到底要不要把 function inline 之前他一定要知道定義阿，所以 inline function 要定義(define)在 class 定義的地方(或者說定義要跟 class 定義在同一個 translaton unit)，不然 compiler 會看不到
 
 #### Overloading Member Functions
 * ctor 都可以 overload 了，member function 當然也可以
@@ -590,7 +606,7 @@
 * **A mutable data member is never const, even when it is a member of a const object.**
     * 就算 function 宣告為 const，你還是可以在這個 function 內改變 mutable member 的 value
 * As an example, we’ll give Screen a mutable member named **access_ctr, which we’ll use to track how often each Screen member function is called:**
-    ```C++
+    ```cpp
     class Screen { public: void some_member() const;
     private:
         mutable size_t access_ctr; // may change even in a const object 
@@ -609,7 +625,7 @@
     * have a vector of Screens
     * By default, we’d like our Window_mgr class to *start up with a single, default-initialized Screen.*
         * 在 C++11，這件事情最簡單的達成方法就是用 in-class initializer
-    ```C++
+    ```cpp
     class Window_mgr {
     private: // Screens this Window_mgr is tracking 
     // by default, a Window_mgr has one standard sized blank Screen             
@@ -621,15 +637,17 @@
     * 你可以想想看為啥不能用 () 那種
         * vector\<int> ivec(94, 87);
     * 跟 member function 宣告 syntax collision 啦!
+    * https://stackoverflow.com/questions/24836526/why-c11-in-class-initializer-cannot-use-parentheses
     * 不過你還是可以用 = 搭配 ctor 啦
         * vector\<int> ivec = vector\<int>(94, 87); 
     * 不然乾脆都放在 constructor initializer list 阿 LOL
+        * 別，在 C++11 後能用 in-class 就要優先用
 
 
 ### 7.3.2 Functions That Return \*this 
 * 接下來要寫一些 set 背景 character 的 function，也有 overload，分別是 set 當前 cursor 位置的字元，或者給定位址設定該位址的字元
 
-    ```C++
+    ```cpp
     class Screen {
     public:
         Screen &set(char);
@@ -649,7 +667,7 @@
     ```
     * our set members return a reference to the object on which they are called
     * 聯合之前的 move, which also returns lvalue:
-        ```C++
+        ```cpp
         // move the cursor to a given position, and set that character
         myScreen.move(4,0).set(’#’);
         ```
@@ -663,7 +681,7 @@
 * 我們希望這個 display 也可以跟 move 還有 set 一樣在一個 object 上面連 call，所以他應該要 return reference
 * 但是邏輯上來說 display 應該要宣告成 const，因為他不會改變 object
     * 可是這樣 display 回傳的 this 就會是 low-level const，對 \*this call set 就會是 error，因為 set 不是 const function
-    ```C++
+    ```cpp
     Screen myScreen; // if display returns a const reference, the call to setis an error
     myScreen.display(cout).set(’*’);
     ```
@@ -692,7 +710,7 @@
     * 再說一件事 const member function 只有說不能改 non mutable 的 **member**，nonmember 隨便你，比方說上面 do_display 傳進來的 os 就不是 const，隨便你亂改都可以
     * do_display 既然是 member function，那他其實也會隱性的收到 this，當 const object call 他時，傳進來的 this 的 low-level 是 const；當 nonconst object call 他時，因為 do_display 是 const，傳進來的 this 的 low-level 一樣會被轉成 const。
 * 結論是，when we call display on an object, **whether that object is const determines which version of display is called:**
-    ```C++
+    ```cpp
     Screen myScreen(5,3);
     const Screen blank(5, 3); myScreen.set(’#’).display(cout); // calls nonconst version
     blank.display(cout); // calls constversion
@@ -714,10 +732,10 @@
 * 宣告 class object 的時候可以用 C 的方式宣告
     * class class_name obj;
     * struct struct_name obj;
-    * 有沒有加 keyword 都可以
+    * 有沒有加 `class/struct` keyword 都可以
 
 * We can also declare a class without defining it:
-    ```C++
+    ```cpp
     class Screen; // declaration of the Screen class
     ```
     * 之前偷用過ㄌ
@@ -737,7 +755,7 @@
 * 但是 class 內可以有 pointer to 這個 class，因為 pointer 只要看到 declare 就可以定義了。
 
 * 其實我覺得這就只是用C++的方法解釋 C 的這種鬼東西?
-    ```C++
+    ```cpp
     class Link_screen {
         Screen window;
         Link_screen *next;
@@ -754,7 +772,7 @@
     * Window_mgr 需要碰到 Screen 的 private member
         * 有個 clear member function，會把 Screen 的 contents 全部設成 blank
     * 把 Window_mgr 設成 Screen 的 friend
-    ```C++
+    ```cpp
     class Screen {
         // Window_mgr members can access the private parts of class Screen
         friend class Window_mgr;
@@ -763,7 +781,7 @@
     ```
 * The member functions of a friend class **can access all the members, including the nonpublic members,** of the class granting friendship.
 * 把 Window_mgr 宣告成 Screen 的 friend 之後 clear 就可以這樣寫
-    ```C++
+    ```cpp
     class Window_mgr {
     public: // location ID for each screen on the window 
         using ScreenIndex = std::vector<Screen>::size_type;
@@ -782,12 +800,14 @@
     * clear contents, height, width 都用到了
 * friend is not transtive
     * 現在是 Screen 把 Window_mgr 設成 friend，但是 Window_mgr 的 friend 不會因此可以 access Screen 的 private member。
+    * 幹，你一定沒有看懂原文
+    * 原文的意思是，A 宣告 B 為 friend，B 宣告 C 為 friend，但這時 A 的 friend 一樣沒有 C
 
 * Note: Each class controls which classes or functions are its friends.
 
 #### Making AMember Function a Friend
 * 這麼粗暴的把整個 class 都列為 friend 太ㄎㄧㄤ，其實你可以指定說某個 class 的某些 member function 要當 friend 就好了
-    ```C++
+    ```cpp
     class Screen {
         // Window_mgr::clear must have been declared before class Screen 
         friend void Window_mgr::clear(ScreenIndex);
@@ -805,20 +825,20 @@
     * 操你媽的如果分寫在不同檔案怎麼辦.......zzzz
 
 #### Overloaded Functions and Friendship
-* 你如果 overloaded functions 全部變成某 class 的 friend，那你全部都要寫 friend
+* 你如果要把某些 overloaded functions 全部變成某 class 的 friend，那你全部都要寫在 class 內宣告 friend
 
 
 #### Friend Declarations and Scope
 * 如果只是要把某 class A 或某 nonmember function F 宣告成 class B 的 friend，在宣告成 friend 之前，A 跟 F 甚至可以不用宣告
 * 為什麼可以這樣呢?
-* **When a name first appears in a friend declaration, that name is implicitly assumed to be part of the surrounding scope.**
+* **When a name first appears in a friend declaration, that name is implicitly "assumed" to be part of the surrounding scope.**
 * However, the **friend itself is not actually declared** in that scope (§ 7.2.1, p. 270)
-* **所以 friend 其實會去 class scope 再往外一層的 scope 找 name**
+* **所以 friend 其實會去 class scope 再往外一層的 scope(也就是 surrounding scope) 找 name**
 * 不過 friend nonmember funcion 還是可以定義在 class 裡面
     * 感覺就糞 code...
     * **不過你就算定義在 class 裡面，你還是要在 class 外面提供一分宣告。**
     * 即使我們只是從宣告了 friend function 的 class 的 member call 了這個 friend function，我們還是要在 class 外面宣告這個 friend function，不然 member function 會找不到這個 friend function。
-    ```C++
+    ```cpp
     struct X {
         friend void f() { /* friend function can be defined in the class body */ }
         X() { f(); } // error: no declaration for f 
@@ -843,20 +863,20 @@
     * **因為在 class 外，member name 被隱藏起來了**
 
 * 而且一旦你用了 class_name:: 之後，class_name 的所有 member 你都看的到了，這也是為什麼下面的 code 合法的原因
-    ```C++
+    ```cpp
     void Window_mgr::clear(ScreenIndex i) {
         Screen &s = screens[i];
         s.contents = string(s.height * s.width, ’ ’);
     }
     ```
-    * 照理來講 ScreenIndex 是定義在 Window_mgr 內的一個 type member，可是因為你用了 Window_mgr::，跟在他之後定義的所有東西在查找 name 的時候都看的到 Window_mgr 這個 scope 了，所以他也看的到在 Window_mgr 內的 ScreenIndex
+    * 照理來講 ScreenIndex 是定義在 Window_mgr 內的一個 type member，可是因為這裡用了 Window_mgr:: 宣告 member function，跟在他之後定義的所有東西在查找 name 的時候都看的到 Window_mgr 這個 scope 了，所以 compiler 也看的到在 Window_mgr 內的 ScreenIndex
        * Once the **class name is seen,** the remainder of the definition—including the parameter list and the function body—**is in the scope of the class.**
     * function body 內的 screens 也是同理
 * 但是定義再 class 外面的 member function 的 return type 就不是這樣了
     * 你想想看，return type 是出現在 class_name:: 之前，所以在看 return type 時是在 class_name 這個 scope 之外的
 * 如果 return type 是定義在 class_name 裡面，那你的 return type 就要給 class_name:: 這個 prefix 來告訴 compiler 這個 type 是定義在 class_name 裡面
 * 舉個例子，假設現在 Window_mgr 要額外加一個 function 可以讓 user code 新增一個 screen，然後這個 function 會回傳新的 screen 的 ScreenIndex，因為 ScreenIndex 這個 type 是定義在 Window_mgr 裡面，所以要這樣寫
-    ```C++
+    ```cpp
     class Window_mgr { 
     public: 
         // add a Screen to the window and returns its index 
@@ -870,6 +890,7 @@
     }
     ```
     * 注意上面定義在 class 外面的 member function，return type 要加上 Window_mgr::
+* 另外補充，這邊 primer 居然沒有解釋 member function 的 trailing return type 已經在 class scope 所以不用加上 `class_name::`，覺得母湯
 
 
 ### 7.4.1 Name Lookup and Class Scope
@@ -881,11 +902,11 @@
     * 比方說你貌似可以在 member function 內用比 member function 還之後宣告的 member
     * 但那是假的! 原因如下
 
-* Class definitions are processed in two phases:
+* Class definitions are processed(compiled) in two phases:
     * First, the member declarations are compiled. 
     * Function bodies are compiled only after the entire class has been seen.
 
-* Note: Member function definitions are processed after the compiler processes all of the declarations in the class.
+* Note: Member function **definitions**(也就是 function body) are processed after the compiler processes all of the declarations in the class.
 
 * Classes are processed in this two-phase way to **make it easier to organize class code.**
 
@@ -896,10 +917,10 @@
 #### Name Lookup for Class Member Declarations
 * This two-step process applies only to names used in the body of a member function.
 * 上面說的兩部處理只在 member function **的 body 適用**
-* 宣告 member function 時的 header，用的 return type, paramete list 用到的 type，還是必須先宣告過。
-* 如果你宣告的 member function header 用到的 name 目前還不存在在 class 定義內，那 compiler 會直接往宣告 class 的 scope 找 name。
+* 宣告 member function 時，用的 return type, paramete list 用到的 type，還是必須先宣告過。
+* 如果你宣告的 member function 用到的 name 目前還不存在在 class 定義內，那 compiler 會直接往宣告 class 的 scope 找 name。
 
-    ```C++
+    ```cpp
     typedef double Money;
     string bal;
     class Account {
@@ -910,14 +931,14 @@
     };
     ```
     * 上面這例子 demo compiler 怎麼 look up name
-    * 在 member function balance 的宣告，return type 是用一般的方式找的，而 Money 目前還沒出現，所以往外找，找到 typedef dounle Money
-    * 在 balance 的 body 內，return bal 是用 class 兩段式找法找 name 的，所以他看的到 private member bal，return 的就是這個 bal
+    * 在 member function balance 的**宣告部分**，return type 是用一般的方式找的，而 Money 目前還沒出現，所以往外找，找到 typedef dounle Money
+    * 在 balance 的 body 內，return bal 是用 class 兩段式找法找 name 的，所以他看的到 private member bal，return 的就是這個 private member bal
 
 #### Type Names Are Special
 * 如果 class 外面定義了某個 name 為 type 的話，class 內部不能再重新定義這個 name
 * 只有 type name 才這樣
 
-    ```C++
+    ```cpp
     typedef double Money;
     class Account {
     public:
@@ -928,6 +949,8 @@
     };
     ```
     
+* 原因:
+    * https://stackoverflow.com/questions/45384956/why-cant-redefine-type-names-in-class-in-c
 * Tip: **Definitions of type names usually should appear at the beginning of a class.** That way any member that uses that type will be seen after the type name has already been defined.
 
 
@@ -939,7 +962,7 @@
     3. 如果上述不成立，就從 member function 被定義之前的 code 找，找不到就噴 error
 
 * 最好不要讓 member function 參數的名字跟其他 member 的名字 collision；下面是為了 demo 用而寫的糞 code
-    ```C++
+    ```cpp
     // note: this code is for illustration purposes only and reflects bad practice
     // it is generally a bad idea to use the same name for a parameter and a member 
     int height;
@@ -958,7 +981,7 @@
     ```
     * In this case, the height parameter hides the member named height.
     * 你真的要在這種情況下使用 member height，要用 this-> 或者 Screen::
-    ```C++
+    ```cpp
     // bad practice: names local to member functions shouldn’t hide member names 
     void Screen::dummy_fcn(pos height) { 
         cursor = width * this->height; 
@@ -984,19 +1007,15 @@
 
 
 ## 7.5 Constructors Revisited
-* 7.1.4 將基本的 ctor 概念
-* 這裡再額外講一些 ctor 的功能，並且把之前講過的功能加深
+* 多講一點
 
 ### 7.5.1 Constructor Initializer List
-* 當我們宣告一般變數時，如果想要給特定值，通常會提供 initializer；而不是先宣告，然後才在下一行給值
-    ```c++
-    string s1 = "hsilu"; // good
-    string s2;
-    s2 = "hsilu"; // bad
-    ```
+* 當我們宣告一般變數時，如果想要給特定值，通常會提供 initializer；而不是先宣告，然後再在下一行給值
+    * string s1 = "hsilu"; // good
+    * string s2; s2 = "hsilu"; // bad
 * constructor initializer list 的概念就跟上面一樣
 * If we do not explicitly initialize a member in the constructor initializer list, **that member is default initialized *before the constructor body starts executing.*** For example:
-    ```c++
+    ```cpp
     Sales_data::Sales_data(const string &s, unsigned cnt, double price)
     {
         bookNo = s;
@@ -1005,55 +1024,52 @@
     }
     ```
     * 概念上來說，data member 會在 ctor 的 body 開始執行之前就完成初始化
-    * 如果你要指定 data member 如何初始化，你就必須使用 ctor init list 來達成
-	    * 語法: `ctorname(args) : ctor_init_list {...}`
-    * 而上面的 code 沒有寫出 ctor init list，(或者說提供一個 empty ctor init list)，所以所有 member 都是 default initialize
-    * 初始化完之後，再執行 ctor 的 body，**此時 body 內的 = 全部都是 assignment，不是初始化!**
-* 上面的 code *最終結果*跟之前的有用 ctor init list 的版本一樣
-* 結論: 你用 ctor init list 初始化跟用 assignment 給值，這兩種的差異要看被初始化的 member 是什麼 type，有可能效果一樣，有可能差很多(How significant this distinction is depends on the type of the data member.)
+    * 而這裡只有提供一個 empty ctor initializer list，所以所有 member 都是 default initialize
+    * 初始化完之後再執行 ctor 的 body，**此時 body 內的 = 全部都是 assignment，不是初始化
+* 上面的 code 最終結果跟之前的有用 ctor init list 的版本一樣
+* 可是你用 ctor init list 初始化跟用 assignment 給值，這兩種的差異要看被初始化的 member 是什麼 type，有可能效果一樣，有可能不同
+    * How significant this distinction is depends on the type of the data member.
 
-#### Constructor Initializers Are Sometimes Required
-   * 既然都說了 ctor body 內的 = 都是 assignment，那就**意味著那些不能用 = 來給值的 member 要在 ctor init list 就初始化!** 
-	   * 例如 const object 跟 reference
-	* **還有那些不能 default initialize 的 class 的 object**
-```c++
-class ConstRef {
-public:
-    ConstRef(int ii);
-private:
-    int i;
-    const int ci;
-    int &ri;
-};
-// error: ci and ri must be initialized     
-ConstRef::ConstRef(int ii) {
-    // assignments: 
-    i = ii; // ok 
-    ci = ii; // error: cannot assign to a const 
-    ri = i; // error: ri was never initialized
-}
-```
-* 再說一次，結論就是**當 ctor 的 body 開始執行時，data member 的初始化就已經全部完成了**
+* Constructor Initializers Are Sometimes Required
+    * 既然都說了 ctor body 內的 = 都是 assignment，那就**意味著那些不能用 = 來給值的 member 要在 ctor init list 就初始化!** 例如 const object 跟 reference，**還有那些不能 default initialize 的 class object!**
+    ```cpp
+    class ConstRef {
+    public:
+        ConstRef(int ii);
+    private:
+        int i;
+        const int ci;
+        int &ri;
+    };
+    // error: ci and ri must be initialized     
+    ConstRef::ConstRef(int ii) {
+        // assignments: 
+        i = ii; // ok 
+        ci = ii; // error: cannot assign to a const 
+        ri = i; // error: ri was never initialized
+    }
+    ```
+* 再說一次，結論就是**當 ctor 的 body 開始執行時，class member 的初始化就已經全部完成了**
 * 上面錯誤的 ctor 應該寫成這樣
-    ```c++
+    ```
     ConstRef::ConstRef(int ii): i(ii), ci(ii), ri(i) { }
     ```
-* Note: We must use the constructor initializer list to provide values for members that are `const`, reference, or of a class type that does not have a default constructor.
+* We must use the constructor initializer list to provide values for members that are const, reference, or of a class type that does not have a default constructor.
 
 * ADVICE: USE CONSTRUCTOR INITIALIZERS
-    * practice 就是用 ctor init list，因為如果你的 cto r想要主動對 member 做初始化，你本來就應該寫在 ctor init list 裡面，而不是在 ctor body 用 assigment 的方式給值。
+    * practice 就是用 ctor init list，因為如果你的 ctor 想要主動對 member 做初始化，你本來就應該寫在 ctor init list 裡面，而不是在 ctor body 用 assigment 的方式給值。
     * 而且就像上面說的，有些 member 是不能用 assignment 給值的，直接用 ctor init list 可以不用去顧慮到哪些 member 不能用 =
 
 #### Order of Member Initialization
-* ctor init list 給定 member initializer 的**順序一點意義都沒有**
-    ```C++
+* ctor init list 給定 member initializer 的順序一點意義都沒有
+    ```cpp
     class_name::class_name(int i, int j, int k): member_i(i), member_j(j), member_k(k);
     class_name::class_name(int i, int j, int k): member_k(k), member_i(i), member_j(j);
     ```
     * 上面兩個是等價的
-* 真正影響到 class member 初始化順序的是，data member 在 class definition 內宣告的順序
-* 如果你有 data member 是依賴另一個 data member 來初始化的，而且你 ctor init list 初始化給的順序，跟 class 定義 data members 的順序，如果有差異可能就會有問題了(UB)。
-    ```c++
+* 真正影響到 class member 初始化順序的是 member 在 class 定義內宣告的順序
+* 如果你有 member 是依賴定一個 member 來初始化的，這時候 class 定義 members 的順序跟 ctor init list 給的順序如果有差異可能就會有問題了(UB)。
+    ```cpp
     class X { 
         int i;
         int j;
@@ -1063,24 +1079,23 @@ ConstRef::ConstRef(int ii) {
     };
     ```
     * class 內明明就是先初始化 i 再 j，你卻在 ctor init list 說 i 要靠 j 來初始化，這是 UB
-    * 上面的 ctor init list 如果順序倒過來，寫成:
-    ```c++
-    X(int val): i(j), j(val) { }
-    ```
-	* 這時候你就會感受到怪異了，因為現在 `j` 擺在 `i` 的後面，看起來就怪怪的；不過再強調一次，ctor init list 內 data member 寫的順序沒有意義!
-		* Some compilers are kind enough to generate a warning if the data members are listed in the constructor initializer *in a different order from the order in which the members are declared.*
+    * 上面的 ctor 寫成
+        * X(int val): i(j), j(val) { }
+    * 也可以，反正順序不重要，可是這時候你就會感受到怪異了，上面 code section 內的寫法看起來就很正常，可是 list 的順序不重要，是假的!
+
+* Some compilers are kind enough to generate a warning if the data members are listed in the constructor initializer *in a different order from the order in which the members are declared.*
 
 * BEST PRACTICE: It is a good idea to **write constructor initializers in the same order as the members are declared.** Moreover, when possible, **avoid using members to initialize other members.**
 * It is a good idea **write member initializers to use the constructor’s parameters** rather than another data member from the same object.
     * 如果 member 彼此初始化方式是獨立的，那我們根本不用管 member 宣告的順序惹
-    ```C++
+    ```cpp
     X(int val): i(val), j(val) { }
     ```
     上面 ctor 根本不用管 i, j 宣告在 class 內的順序
     
 #### Default Arguments and Constructors
-* 如果某 ctor 他的所有 parameters 都有 default value，亦即，可以不用給參數，他就會等價於 default ctor
-    * 你這時候反而不能定義一個真的沒參數的 default ctor ，因為當你真的宣告 default initialize 的 object 時，這兩個 ctors 會造成 ambiguous call
+* 如果某 ctor 他所有 parameter 都有 default value，亦即可以不用給參數，他就會等價於 default ctor。
+    * 你這時候反而不能定義一個真的沒參數的 default ctor，因為當你真的宣告一個不吃參數的 object，會 ambiguous call
 
 ### 7.5.2 Delegating Constructors
 * A delegating constructor uses another constructor from its own class to perform its initialization.
@@ -1092,8 +1107,8 @@ ConstRef::ConstRef(int ii) {
     * followed by a parenthesized list of arguments.
     * The argument list must match another constructor in the class.
     * 其實就是 call 另一個 ctor 的意思
-* 直接舉例:
-```c++
+
+```cpp
 class Sales_data {
 public:
     // nondelegating constructor initializes members from corresponding arguments
@@ -1107,44 +1122,35 @@ public:
     // other members as before 
 };
 ```
-	* 除了第一個之外的 ctor 都把部分工作丟給第一個 ctor 做
-	* The constructor that takes an istream& also delegates. It delegates to the default constructor, *which in turn delegates to the three-argument constructor.*
-	    * 看看第三個 ctor，實際上 delegate 了兩次
+* 第一個之外的 ctor 都把部分工作丟給第一個 ctor 做
+* The constructor that takes an istream& also delegates. It delegates to the default constructor, *which in turn delegates to the three-argument constructor.*
+    * 看看第四個吃 istream& 的 ctor，實際上 delegate 了兩次
 
 
 * When a constructor delegates to another constructor, **the constructor initializer list and function body of the delegated-to constructor are both executed.**
-	* delegated-to ctor 的 body 會在 delegating ctor 的 body 之前執行。
-	* 換句話說如果一個 ctor 有用另一個 ctor 來當 delegate ctor 的話，那執行順序會是:
-		1. delegated-to ctor's init list
-		2. delegated-to ctor's body
-		3. 自己的 init list
-		4. 自己的 body
-* In `Sales_data`, the function bodies of the delegated-to constructors happen to be empty. **Had the function bodies contained code, that code would be run *before control returned to the function body of the delegating constructor*.**
+* delegated-to ctor 的 body 會在 delegating ctor 的 body 之前執行。
+    * 後進先出
+    * In Sales_data, the function bodies of the delegated-to constructors happen to be empty. **Had the function bodies contained code, that code would be run *before control returned to the function body of the delegating constructor*.**
 
 
 ### 7.5.3 The Role of the Default Constructor
-* 這裡講 default ctor 什麼 context 之下會用到
+
 * 複習一下 default initialization 跟 value initialization
 * Default initialization happens 
     * When we define nonstatic variables (§ 2.2.1, p. 43) or arrays (§ 3.5.1, p. 114) at block scope without initializers
-	    * function 內宣告的 class object 或者 array of class object 如果沒有給 initializer 的話就會使用 default ctor
     * When a class that itself has members of class type uses the synthesized default constructor (§ 7.1.4, p. 262)
-	    * class 有 data member 在初始化時就是 default initialized
     * When members of class type are not explicitly initialized in a constructor initializer list (§ 7.1.4, p. 265)
-	    * 當你 class 的某些 data member 不在 ctor init list 內時，這些 member 會用 default ctor
 
 * Value initialization happens 
     * During array initialization when we provide fewer initializers than the size of the array (§ 3.5.1, p. 114)
-	    * 當你有給 array initializers，但是數量小於 array size 的話，後面的 elements 會被 value initialized
     * When we *define a local static object without an initializer* (§ 6.1.1, p. 205)
-	    * 當你定義一個 local static object 時如果沒有給 initializer，他也會被 value initialized
-    * When we explicitly request value initialization by writing an expressions of the form `T()` where `T` is the name of a type 
+    * When we explicitly request value initialization by writing an expressions of the form T() where T is the name of a type 
         * The vector constructor that takes a single argument to specify the vector’s size (§ 3.3.1, p. 98) uses an argument of this kind to value initialize its element initializer.
 
 * Classes must have a default constructor in order to be used in these contexts.
-    * class object 要能達到上面兩種初始化的話，一定要提供 defalut ctor
-    * **並且 class 內的 member 也都能 default initialize**
-    ```c++
+    * class object 要能達到上面兩種初始化，class 一定要提供 defalut ctor
+
+    ```cpp
     class NoDefault {
     public:
         NoDefault(const std::string&);
@@ -1160,200 +1166,132 @@ public:
         NoDefault b_member;
     }
     ```
-    * 如果你要為一個 class 寫預設 ctor ，但是有一個 member 不能預設初始化，那你一定要在這個預設 ctor 的 ctor init list 內初始化這個 member，不然就會像上面 B 的 default ctor 一樣噴 error
+    * 如果你要為一個 class 寫 default ctor，但是存在一個 member 不能 default initialize，那你一定要在這個 default ctor 的 ctor init list 內初始化這個 member，不然就會像上面 B 的預設 ctor 一樣噴 error
 
 * Best Practice: In practice, **it is almost always right to provide a default constructor if other constructors are being defined.**
     * 你就強制讓你的每個 class 都提供預設 ctor 就不用擔心會發生上面的問題了
 
 #### Using the Default Constructor
-* 注意宣告使用預設 ctor 的物件時的語法
-    `class_name obj;`
+* 注意宣告使用 default ctor 初始化物件的語法
+    * `class_name obj;`
 * 而不是
-    `class_name obj();`
+    * `class_name obj();`
     * 這是在宣告 function!
-    * 題外話，可以看看有關 Most vexing parse 的資料
+        * obj is function without parameter and return `class_name`
 
 
 ### 7.5.4 Implicit Class-Type Conversions
-* 那些只有吃一個參數的 ctor，也**定義了從參數型態到 class 型態的隱性轉換(implicit conversion)**
-    * 又叫 **converting constructor**
-* 14 章的 operator overloading 會講怎麼把 class object 轉成其他 type
+* 那些可以只用一個 argument 呼叫的 ctor 就恰好定義了從該 argument type 到 class type 的 conversion
+    * 又叫 converting constructor
+* 14 章的 operator overloading 會講怎麼把 class type 轉成其他 type
 
 * 因為上述的關係，結合我們之前定義的 `Sales_data`，你可以這樣寫
-    ```c++
+    ```cpp
     string null_book = "9-999-99999-9"; 
-    // constructs a temporary Sales_data object
-    // with units_sold and revenue equal to 0 and bookNo equal to null_book
+    // constructs a temporary Sales_data object // with units_sold and revenue equal to 0 and bookNo equal to null_book
     item.combine(null_book);
     ```
-    * `combine`原本是吃一個 `Sales_data` object 當參數，而這裡卻是餵給他 `string`，這是合法的，compiler 會用 `Sales_data` 的那個吃 `string`的 ctor 把這個 `string` 轉成一個**暫時的 `Sales_data` 物件(temporary `Sales_data` object)**，然後把這個暫時物件給 `combine` 當作參數
-        * 注意，只有 const reference 才可以 bind 暫時物件，所以這裡 `combine` 宣告的 **`const`**  `Sales_data` 必不可少
+    * combine 原本是吃一個 Sales_data object 當參數，而這裡卻是餵給他 string，這是合法的，compiler 會用 Sales_data 那個吃 string 的 ctor 把這個 string 轉成一個 ** temporary Sales_data 物件**，然後把這個物件給 combine 當作參數
+        * **注意，只有 const reference 才可以 bind 暫時物件，所以這裡 combine 宣告的 const Sales_data& 必不可少**
 
 #### Only One Class-Type Conversion Is Allowed
-* 隱性轉換不能連續發生兩次
-    ```c++
+* 上面說明的 implicit **class type** conversion 不能連續發生兩次
+
+    ```cpp
     // error: requires two user-defined conversions: 
     // (1) convert "9-999-99999-9"to string
     // (2) convert that (temporary) string to Sales_data
     item.combine("9-999-99999-9");
     ```
-    * "9-999-99999-9" 必須先轉成 string，因為 `Sales_data` 只有吃 `std::string` 的 ctor ，沒有吃 C string 的 ctor 
-    * **可是這樣就會把 "9-999-99999-9" 從 C str 轉成 `std::string` 再轉成 `Sales_data`，這種轉換不允許，會噴 error**
+    * "9-999-99999-9" 必須先轉成 `std::string`，因為 `Sales_data` 只有吃 `std::string` 的 ctor，沒有吃 C string 的 ctor
+    * **可是這樣就會把 "9-999-99999-9" 從 C str 轉成 string 再轉成 Sales_data，這種轉換不允許，會噴 error**
 
-* 真的要做 N 次轉換，前 N-1 次要顯示轉換(explicit conversion)
-    ```c++
+* 真的要做 N 次轉換，就不能有連續兩次是 implicit **class type** conversion
+    ```cpp
     // ok: explicit conversion to string, implicit conversion to Sales_data 
     item.combine(string("9-999-99999-9"));     
     // ok: implicit conversion to string, explicit conversion to Sales_data
     item.combine(Sales_data("9-999-99999-9"));
     ```
-    * 第一個例子，先顯性再隱性
-    * 第二個例子，先隱性再顯性
+    * 第一個例子，先明確轉成 `std::string` 再 implicit 轉成 `Sales_data`
+    * 第二個例子，先 implicit 轉成 `std::string` 再明確轉成 `Sales_data`
+
+* 注意如果是長這樣
+    ```cpp
+    class Sales_data {
+        Sales_data(int i);
+    }
     
+    Sales_data s = 'x'; // 'x' promote to int and implicit convert to Sales_data
+    ```
+    * 這樣有一次不是 class-type conversion，所以合法
 #### Class-Type Conversions Are Not Always Useful
 * 這種隱性轉換有時候其實爛爆ㄌ，難用ㄉ要死，有時候不希望 compiler 做隱性轉換
     * 首先這種轉換得到的 object 都是暫時物件，你做隱性轉換的地方執行完之後物件就不能 access 了
-* 比方說還記得 `Sales_data` 有定義一個 ctor 是吃 `std::istream&`，這代表可以把 `std::cin` 轉成 `Sales_data`，怎麼想都很ㄎㄧㄤ
+    * 有的時候可以允許這樣的轉換的話，反而會降低可讀性
+        * 比方說可以把 `std::cin` implicit 轉成 `Sales_data` 怎麼想都很ㄎㄧㄤ
 
 #### Suppressing Implicit Conversions Defined by Constructors
-* 用 `explicit` keyword 宣告某個只有一個參數的 ctor ，避免 compiler 使用那個 ctor 在某個 context 把那個參數的物件(隱性)轉換成 class object
-    ```c++
+* 用 `explicit` 宣告某個只有一個參數的 ctor，避免 compiler 使用那個 ctor 在某個 context 把那個參數的物件轉換成 class object
+    ```cpp
     explicit Sales_data(std::istream&);
     ```
-* 如果吃 `std::istream` 的 ctor 這樣宣告， `item.combine(cin);` 這種詭異的 code 就會噴 error
-* `explicit` 只適用在一個參數的 ctor ，因為擁有一個參數以上的 ctor 本來就不會拿來做隱性轉換
-* 然後 `explicit` 只能宣告在 class 定義內，你 member funtion 定義在 class 外面的時候不能加 `explicit`，會噴 syntax error
-    ```c++
-    // error: explicit allowed only on a constructor declaration in a class header
+* 如果吃 istream 的 csor 這樣宣告，`item.combine(cin);` 這種詭異的 code 就會噴 error
+* `explicit` 只適用在可用一個參數就能呼叫的 ctor，因為需要多參數來呼叫的 ctor 本來就不會拿來做隱性轉換
+
+* 然後 `explicit` 只能宣告在 class 定義內，你 member funtion 的定義寫在 class 外面的時候不能加 `explicit`，會 syntax error
+    ```cpp
+    // error: explicit allowed only on a constructor declaration in a class header('explicit' outside class definition)
     explicit Sales_data::Sales_data(istream& is) {
         read(is, *this);
     }
     ```
     
 #### explicit Constructors Can Be Used Only for Direct Initialization
-* 宣告成 `explicit` 的 ctor 只能用 `classname obj(args)` 的方式初始化物件，不能用 `classname obj = args` 的方式初始化
-* 例如，如果沒有對吃 cin 的 ctor 用 `explicit` 宣告的話，這樣寫合法:
-    ```c++
+* 宣告成 `explicit` 的 ctor 只能用 (參數) 的方式給物件，不能用 = 參數的方式
+* 例如，如果沒有對吃 `std::cin` 的 ctor 用 `explicit` 的話這樣寫合法:
+    ```cpp
     Sales_data data1 = cin;
     Sales_data data2(cin); // 等價上面的
     ```
     * 光用看的就覺得ㄎㄧㄤ爆
-* 如果用了 `explicit` 的話就只能這樣用第二種寫法了
+* 用了 `explicit` 後只能用第二種
 
 #### Explicitly Using Constructors for Conversions
-* explicit 的 ctor 還是可以 explicitly 使用 LOL，總之還是一樣，吃一個參數的 ctor 就是定義了從參數到 class type 的轉換，只是 compiler 不會自己偷用，你要直接用還是可以
+* `explicit` ctor 還是可以 explicitly 使用(XD
     * 例如自己寫 `class_name(parameter)`
-    * 或者 `static_cast<class_name>(parameter)` 都是合法的
-    ```c++
+    * 或者 `static_cast\<class_name> parameter` 都是合法的
+    ```cpp
     // ok: the argument is an explicitly constructed Sales_data object 
     item.combine(Sales_data(null_book));
     // ok: static_castcan use an explicit constructor
     item.combine(static_cast<Sales_data>(cin));
     ```
-    * 注意上面吃 `null_book(string)` 的 code，Primer 也是把它改成 explicit，所以才要明確寫出 `Sales_data(null_book)` 這種強制轉換
+    * 注意上面吃 null_book(string) 的 code Primer 也是把它改成 explicit，所以才要明確寫出 Sales_data(null_book) 這種強制轉換
 
-#### Library Classes with `explicit` Constructors
-* The string constructor that takes a single parameter of type const char* (§ 3.2.1, p. 84) is not `explicit`.
+#### Library Classes with explicit Constructors
+* The `std::string` constructor that takes a single parameter of type const char* (§ 3.2.1, p. 84) is not explicit.
     * 所以才可以寫 `string str = "hsilu";` 這種 code
-* The vector constructor that takes a size (§ 3.3.1, p. 98) is explicit.
-    * 所以才不能寫 `vector<int> vec = 10;` 這種鬼東西
-    * 如果可以的話他會跟 `vector<int> vec(10);` 等價，可是 = 的寫法整個很 confusing
+* The `std::vector` constructor that takes a size (§ 3.3.1, p. 98) is explicit.
+    * 所以才不能寫 vector\<int> vec = 10; 這種鬼東西
+    * 如果可以的話他會跟 vector\<int> vec(10); 等價，可是 = 的寫法整個很 confusing
 
 ### 7.5.5 Aggregate Classes
-* 這東西很像 C `struct` 的延伸
-* Primer 會告訴你當你怎樣定義你的 class 時你定義的 type 會是 aggregate classes
-* aggregate class 有個特性，就是所有 member 都可以直接 access
-	* 就跟 C `struct` 一樣
-* 定義: 一個 class is aggregate if:
-	* All of its data members are public
-		* 所有 data member 都是 public
-	* It does not define any constructors
-		* 沒有自己定義任何 ctor
-	* it has no in-class initializers (§ 2.6.1, p. 73)
-		* 沒有使用 in-class initializer 來初始化 data member
-	* It has no base classes or `virtual` functions, which are class-related features that we’ll cover in Chapter 15
-		* 他沒有繼承某個 class，也沒有 `virtual` functions，這 15章會講
-* 你會發現沒了這些東西根本就跟 C `struct` 87%像
-* 舉個例子:
-	```c++
-	struct Data {
-		int ival; 
-		string s;
-	};
-	```
-* aggregate class 可以用 brace list 來初始化:
-	```c++
-	// val1.ival = 0; val1.s = string("Anna")
-	Data val1 = { 0, "Anna" };
-	```
-	* 每個 initializer 的順序要跟 class data member 宣告的順序對的上
-		* 然後這本來就是 C 的語法...
-	* 如果你 initializer 的數量又少於 data member 的數量，則後面的 data member 會 value initailized
-* 注意 aggregate class 就完全沒有封裝的概念了，詳情請教你的 OOP 老師
+* 這根本就對應到 C struct...
+* 反正就是一包 data pack 的概念
+* 這邊就直接看 Primer 了，不打筆記
+
 
 ### 7.5.6 Literal Classes
-* 又是有關 `constexpr` 的東西...
-* 再強調一次 C++14 在 `constexpr` 的部分不相容 C++11，建議之後再看
-* 之前說過 `constexpr` 的 return type 要是 literal type
-* 其實某些 class 只要滿足某些條件也可以是 literal type，叫做 literal class
-* 這種 class 也可以有 `constexpr` member function
-	* 而且這些 `constexpr` member function 是 implicitly `const`
-* 舉例:
-	* 如果某個 aggregate class 內的所有 data member 都是 literal type，則這個 class 是 literal class
-	* 如果某個 class 不是 aggregate，只要符合下面條件，他就還是 literal class:
-		* data member 全部都要是 literal type
-		* 至少要有一個 `constexpr` ctor LOL
-		* 如果有 data member 有 in-class initializer，則這個 initializer 要是 `constexpr`
-		* `dtor` 只能用 compiler 生的，不能自己寫
-
-#### `constexpr` Constructors
-* 所以這她媽到底是三小?!
-* 雖然 ctor 不能宣告成 `const`，但是 literal class 的 ctor 可以宣告成 `constexpr`
-	* 實際上 literal class 一定至少要提供一個 `constexpr` ctor
-* `constexpr` ctor 一樣可以宣告成 `= default` 也可以宣告成 `= delete`(13章)
-	* 他也要滿足 ctor 的條件，也就是 no return statement
-	* 也要滿足 `constexpr` 的條件，也就是 statement 只能有 return statement(注意這個條件在 C++14 應該有擴充)
-	* 換句話說 `constexpr` ctor 通常是 empty body LOL
-* 來定義個 nonaggregate literal class 吧!
-	```c++
-	class Debug {
-	public:
-		constexpr Debug(bool b = true): hw(b), io(b), other(b) { }
-		constexpr Debug(bool h, bool i, bool o):
-										hw(h), io(i), other(o) { }
-		constexpr bool any() { return hw || io || other; }
-		void set_io(bool b) { io = b; }
-		void set_hw(bool b) { hw = b; }
-		void set_other(bool b) { hw = b; }
-		private: bool hw; // hardware errors other than IO errors
-		bool io; // IO errors 
-		bool other; // other errors
-	};
-	```
-	* `constexpr` ctor 一定要初始化所有 data member
-		* initializer 要馬用 `constexpr` ctor 提供的東西來組合，例如 parameters，或者直接用 constant expression
-	* **constexpr ctor 的重點是可以生出一個 class object，那個 object 本身是 constant expression!**
-* 直接看 code，看 `constexpr` object 會等價於什麼 code:
-	```c++
-	constexpr Debug io_sub(false, true, false); // debugging IO 
-	if (io_sub.any()) // equivalent to if(true) 
-		cerr << "print appropriate error messages" << endl;
-	constexpr Debug prod(false); // no debugging during production 
-	if (prod.any()) // equivalent to if(false)
-		cerr << "print an error message" << endl;
-	```
-	* 在編譯時期 compiler 就會知道一些 member function 的 return value
-	* 這看起來好像沒什麼，不過還有更多應用(尤其是 C++14)
-* 還有一個重點 Primer 沒有提，當你 class 內有 data member 不是 literal type(或 literal class)，則你宣告這個 class 的 ctor 為 `constexpr` 會噴 error，原因很簡單，因為這個 `constexpr` ctor 永遠不可能產生 constant exprssion! 那些 non literal type member 永遠不可能是 constant exprssion，導致整個 class object 不可能是 constant expression，所以你宣告了一個永遠不可能是 constant expression 的東西為 `constexpr` 就噴 error 惹
+* 又是有關 constexpr 的東西...
+* 再強調一次 C\++14 在 constexpr 的部分不相容 C\++11，建議之後再看
 
 ## 7.6 static Class Members
-
 * Classes sometimes need **members that are associated with the class,** rather than with individual objects of the class type.
-* 用 keyword `static` 來宣告 class member，那個 member 就會跟著 class 本身，而不是 class object
 
 #### Declaring static Members
-* 看例子，定義一個 class 來表示一個銀行帳戶:
-```c++
+
+```cpp
 class Account {
 public:
     void calculate() { amount += amount * interestRate; }
@@ -1367,26 +1305,25 @@ private:
 };
 ```
 * The static members of a class **exist outside any object.**
-	* `static` data member 不屬於任何一個 class object
-	* 按照上面的例子來看，`Account` object 只會有 `owner` 跟 `amount` 這兩個 data member，不會有 `interestRate`，這個 member 是所有 class objects 共享的
-	* There is only one interestRate object that will **be shared by all the Account objects.**
+* **Objects do not contain** data associated with **static data members**.
+* 所以 Account object 只會有 amount 跟 owner 這兩個 object 而已
+* There is only one interestRate object that will **be shared by all the Account objects.**
 * Similarly, **static member functions are not bound to any object;**
-    * 注意，之前說的，會把每個 member function 隱性的傳入 `this` 這件事情不會發生!
-	* 因為上述(static member function 沒有 `this` 可以用這件事)，static member function 不能宣告成 `const`，也不能在裡面使用 `this`
-    * 不能宣告成 const 是因為，原本 member function 宣告成 `const` 就是在改變傳入的 `this` 的 low-level `const`，阿現在 `this` 根本不會傳到 static member function，所以 C++ 索性限制 static member function 不能宣告成 `const`
-* 不能用 this 的真正效果是，所有 non`static` member 都不能訪問! 原本 non`static` member 本來就是(隱性的)透過 this 去存取的，現在沒有 this，根本存取不到
-	* 注意不管是 `static` data member 還是 member function 都不能訪問
+    * 注意，之前說的，會把每個 member function 隱性的傳入 this 這件事情不會發生!
+* 因為上述，static member function 不能宣告成 const，也不能在裡面使用 this
+    * 不能宣告成 const 是因為，原本 member function 宣告成 const 就是在改變傳入的 this 的 low-level const，阿現在 this 根本不會傳到 static member function，所以 C++ 索性限制 static member function 不能宣告成 const
+* 不能用 this 的真正效果是，所有 nonstatic member 都不能訪問! 原本 nonstatic member 本來就是(隱性的)透過 this 去存取的，現在沒有 this，根本存取不到
 
 
-#### Using a Class `static` Member
-* 可以用 scope operator `::` 直接存取 static member
-    ```c++
+#### Using a Class static Member
+* Access a static member directly through the scope operator:
+    ```cpp
     double r;
     r = Account::rate();
     // access a static member using the scope operator
-	```
-* 雖然 `static` member 不屬於任何一個 class object，我們還是可以透過 object(或 ptr/ref to object)去存取 `static` member
-    ```c++
+
+* 雖然 static member 不屬於任何一個 class object，我們還是可以透過 object(或 ptr/ref to object)去存取 static member
+    ```cpp
     Account ac1;
     Account *ac2 = &ac1;
     // equivalent ways to call the static member rate function 
@@ -1395,8 +1332,8 @@ private:
     r = ac2->rate(); // through a pointer to an Account object
     ```
 
-* member function 也可以直接存取 static member，也不用加 scope operator
-    ```c++
+* member function 也可以直接存取 static member
+    ```cpp
     class Account {
     public:
         void calculate() { amount += amount * interestRate; }
@@ -1407,86 +1344,15 @@ private:
     ```
     
 #### Defining static Members
-* `static` member function 你要定義在 class 內還外都可以，不過 class 外不可以再寫一次 `static`，會噴 syntax error
-
+* static member function 你要定義在 class 內還外都可以，不過 class 外不可以再寫一次 static，會 error
 * **不過 static data member 一定要在 class 外面再定義一次!**，理由如下:
     * **Because static data members are not part of individual objects of the class type, they are not defined when we create objects of the class.**
-    * 亦即 `static` data member 不是在創造物件的時候初始化(或者說被 define)的，這意味著你的 class ctor 不會，也不能，初始化 `static` data member；更 general 來說，這代表著我們不能在 class 內初始化 `static` data member；相反的，**我們只能在 class 外面定義/初始化 `static` data members**
-    * 跟其他物件一樣，`static` data member 也只能定義一次
+    * 亦即 static member 不是在創造物件的時候初始化的，而且這意味著你在 class definition 裡面寫 static data member 的宣告時，**真的只有宣告**，你必須在 class 外面再定義一次 member
     * http://en.cppreference.com/w/cpp/language/static
-* `static` data member 跟 global object 一樣也是定義在任何 function 之外的，因此他們一旦他們被定義後就會存活到 program 結束為止
-* 定義 `static` data member 的方式，就跟把 member function 定義在 class 外面很像:
-	```c++
-	// define and initialize a static class member 
-	double Account::interestRate = initRate();
-	```
-	* 該加的 scope 要加好，不多贅述
-	* 注意 `initRate` 是 `private` (`static`) member function，不過 `static` member function 一樣也可以存取 `private` (`static`) member
+* 所以 static member 也不是靠 ctor 初始化的
 
-* Tip: 確認 `static` data member 只有定義一次的方式就是把它的**定義**放到對應 class 的 implementation file 內，或者說把他們放到定義了 class 的 non`inline` member functions 的 file 內
 
-#### In-Class Initialization of `static` Data Members
-* 前面有說過 `static` data member 不能在 class 內初始化，也就是不能提供 in-class initializer
-* 不過如果 `static` data member 符合以下條件的話則是例外:
-	* `const` && integral type；注意，`double`/etc 那一類不是 integral type LOL
-	* 如果上面不符合，但是是 `constexpr` of literal type，則**一定要**提供 in-class initailizer；
-		* 注意，你可以在定義 `double`/etc 那一類時加上 `constexpr` 就可以在 class 內定義這些型別了 LOL
-		* ![](https://i.imgur.com/7bfGreo.png)
-		* ![](https://i.imgur.com/996Z0iB.png)
-* **然後定義時給的 initializer 一定要是 constant expression**；換句話說可以想成這種定義一定要在 compile time 時就能知道結果；而因為這些 data member 符合上面的兩個例外條件其中之一，並且是用 constant expression 初始化的，所以**這些 member 也是 constant expression**
-	* 所以他們可以被使用在需要 constant expression 的地方，例如當 array dimension:
-	```c++
-	class Account {
-	public:
-		static double rate() { return interestRate; }
-		static void rate(double);
-	private:
-		static constexpr int period = 30;// period is a constant expression 
-		double daily_tbl[period];
-	};
-	```
-* 不過有一點很重要，雖然上面說的 `const` integral type 或者 literal type 可以提供 in-class initializer，**但是在 class 內提供 initalizer 的那一行 statement 一樣是 declaration 不是 definition!**
-* 這導致以下情況:
-	* 如果這些 member 只用在某些 compiler 可以把這些 member 替換成他們的 constant expression 的情況，則這些 member 就不用在 class 外面寫 definition(Primer 說這叫做 separately defined)
-	* 但如果這些 member 用在那些 compiler 不能把這些 member 替換成他們的 constant expression 的情況，則這些 member 就需要 separately defined 了
+#### In-Class Initialization of static Data Members
 
-* 舉例:
-	* 例如上面 code 的 `period` 只用在宣告 `daily_tbl` 的時候，這時候因為 compiler 有辦法把宣告內的 `period` 替換成它的 constant expression，也就是 30，所以不用再 class `Account` 外面再定義 `period`
-	* 但是如果我們真的沒有在 `Account` 外面定義 `period`，則會發生這樣的情況: 我們很可能只是新增了一點 code 就導致不能編譯!
-	* 例如如果我們把 `period` 傳給一個吃 `const int&` 的 function，因為這時 compiler 不可能做什麼替換的動作，所以 `period` 就需要在 `Account` 外額外定義；而因為我們在這裡沒有額外定義 `period`，所以會噴 error
-* 如果上面有在 `Account` 外提供 `period` 的定義，則定義不可以給 initializer:
-	```c++
-	// definition ofa staticmember with no initializer 
-	constexpr int Account::period; // initializer provided in the class definition
-	```
-### 注意，上面的東西經過實驗，C++11/14 的確會噴 error，可是 C++17 就不會了，還要再研究一下
 
-#### static Members Can Be Used in Ways Ordinary Members Can’t
-* `static` members 因為獨立於 class object，某些對 non`static` member 是非法的使用方式在 `static` members 就合法了
-* 舉例:
-	* `static` members 可以是 incomplete type LOL
-		* 因為上面的關係，`static` members 的 type 可以是包含他的 class type LOL
-		* 而 non`static` members 就只能宣告成 ptr/ref to 包含他的 class type
-* 看 code:
-	```c++
-	class Bar { 
-	public: 
-		// ...
-	private:
-		static Bar mem1; // ok: static member can have incomplete type 
-		Bar *mem2; // ok: pointer member can have incomplete type
-		Bar mem3; // error: data members must have complete type
-	};
-	```
-* 還有，可以把 `static` member 當成 member function 的 default argument:
-	```c++
-	class Screen { 
-	public: 
-		// bkground refers to the static member 
-		// declared later in the class definition 
-		Screen& clear(char = bkground);
-	private:
-		static const char bkground;};
-	```
-	* 我覺得這邊 Primer 的解釋太牽強，看這份: https://stackoverflow.com/questions/4539406/nonstatic-member-as-a-default-argument-of-a-nonstatic-member-function
-		* 雖然也是有點ㄎ一ㄤ
+# 跳過，覺得 7.5 後半跟 7.6 都要之後再看一次

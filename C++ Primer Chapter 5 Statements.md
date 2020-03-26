@@ -1,3 +1,7 @@
+---
+tags: C++
+---
+
 # C++ Primer Chapter 5 Statements
 * Statements are **executed sequentially.**
 * C++ also defines a set of flow-ofcontrol statements that allowmore complicated execution paths.
@@ -5,20 +9,20 @@
 ## 5.1 Simple Statements
 * An expression, such as ival + 5, **becomes an expression statement when it is followed by a semicolon**
 * Expression statements **cause the expression to be evaluated** and its *result discarded:*
-    ```C++
+    ```cpp
     ival + 5; // rather useless expression statement
     cout << ival; // useful expression statement
     ```
     * first exp statement is useless, addition is doen but result not used
     * More commonly, an expression statement **contains an expression that has a side effect**—such as assigning a new value to a variable, or printing a result—when it is evaluated.
 #### Null Statements
-```C++
+```cpp
 ; // null statement
 ```
 * A null statement is useful where the language requires a statement but the program’s logic does not.
     * 用在那些語法上需要一個 statement 但是程式邏輯不需要的地方
     * 例如 loop 要做的事情全部寫在 header 裡面，可是還是需要一個 statement 當作 loop body，這時就加個 ;
-        ```C++
+        ```cpp
         // read until we hit end-of-file or find an input equal to sought 
         while (cin >> s && s != sought)
             ;// null statement
@@ -26,7 +30,7 @@
     * **Null statements should be commented.** That way anyone reading the code can see that the statement was omitted intentionally.
 #### Beware of Missing or Extraneous Semicolons
 * Null statements 就是 statement，他當然可以出現在 statements 可以出現的地方:
-    ```C++
+    ```cpp
     ival = v1 + v2;; 
     // ok: second semicolon is a superfluous null statement
     ```
@@ -45,7 +49,7 @@
 ## 5.2 Statement Scope
 * 我們可以在 if, switch, while, for 的 control structure(也就是它們後面跟著的括號)內定義變數
 * 對你沒看錯不只有 for 可以，不過如果是在 while 裡面宣告的話，**每次 loop 都會重新宣告跟初始化**
-```C++
+```cpp
 while (int i = get_num()) 
 // i is created and initialized on each iteration     
     cout << i << endl;
@@ -88,7 +92,7 @@ i = 0; // error: iis not accessible outside the loop
 
 #### Variable Definitions inside the Body of a switch
 * C++ 不准你寫這樣的 code:
-```C++
+```cpp
 case true:
 // this switch statement is illegal because these initializations might be bypassed
 string file_name; // error: control bypasses an implicitly initialized variable 
@@ -119,12 +123,12 @@ if (file_name.empty()); // file_name is in scope but wasn’t initialized
 
 ### 5.4.2 Traditional for Statement
 * 
-    ```C++
+    ```cpp
     for (init-statement condition; expression) statement
     ```
     * *init-statement* must be a declaration statement, an expression statement, or a null statement.
 ### 5.4.3 Range for Statement
-    ```C++
+    ```cpp
     for (declaration : expression) statement
     ```
 * 作用在 container 或 sequence 上
@@ -133,12 +137,12 @@ if (file_name.empty()); // file_name is in scope but wasn’t initialized
         * 能用 auto 就用!
 * On each iteration, **the control variable is defined and initialized by the next value in the sequence**, after which statement is executed.
 * 來點例子
-    ```C++
+    ```cpp
     for (auto &r : v) // for each element in v r *=2;
     // double the value ofeach element in v
     ```
 * 傳統的等價 loop
-    ```C++
+    ```cpp
     for (auto beg = v.begin(), end = v.end(); beg != end; ++beg) 
     { 
         auto &r = *beg; // r must be a reference so we can change the element 
@@ -153,7 +157,7 @@ if (file_name.empty()); // file_name is in scope but wasn’t initialized
     * 第九章才會講到底為什麼會被 invalidated
 
 ### 5.4.4 The do while Statement
-```C++
+```cpp
 do 
     statement
 while (condition);

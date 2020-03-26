@@ -1,3 +1,7 @@
+---
+tags: C++
+---
+
 # C++ Primer Chapter 6 Functions
 * 一樣，有 define 跟 declare 之分
 * A function is a **block of code with a name.**
@@ -22,7 +26,7 @@
     * intializer 要跟 parameter 同 type 或者可以被轉成 parameter 的 type
 
 * 題外話，下面的憤 code legal
-    ```C++
+    ```cpp
     int foo(int, int) // legal.......
     {
       return 87;
@@ -31,9 +35,10 @@
     int main() { cout << foo(94, 87) << endl; }
     ```
     * 你沒辦法用 unnamed parameters，可是你 call function 時還是要照傳
+    * 這有可能是為了符合某種(legacy) API 規範
 #### Function Return Type
 * 幾乎什麼 type 都可以傳，除了 array 跟 function
-    * 可是可以傳 pointer to array/function
+    * 可是可以傳 pointerce/referen to array/function
 
 
 
@@ -72,14 +77,16 @@
 * 雖然自行宣告 prototype 完全合法，但如果你每個會用到某個 function 的 source file 都自行宣告一次，這樣很容易出錯
 * 所以請把宣告放在 header，只宣告一次在 header，然後所有會用到 function 的 source file 去 include header，這樣還會避免掉不同 source 各自宣告然後宣告錯的問題
 * The source file that defines a function should include the header that contains that function’s declaration.
-    * 真正定義(define)那個 function 的 source 也要 include header
+    * 真正定義(define)那個 function 的 source 也要 include 有那個 function 的 declaration 的 header
     * That way the compiler will **verify** that the definition and declaration are consistent.
     * 其實不宣告也可以 link(ry
     * 但就是多了這層檢查
 
 ### 6.1.3 Separate Compilation
 * 怎麼突然就在講這麼重要的東西...
-* best practice 就是用一個 header 宣告會用到的 function，其他 header 去 include 他
+* best practice 就是用一個 header 宣告會用到的 function，其他 source 去 include 他
+* To produce an executable file, **we must tell the compiler where to find all of the code we use.**
+    * 注意，是產生「executable」
 
 
 ## 6.2 Argument Passing
@@ -99,7 +106,9 @@
 ### 6.2.2 Passing Arguments by Reference
 * They are often used to allow a function to change the value of one or more of its arguments.
 #### Using References to Avoid Copies
-* copy 效率差，**有些 class 甚至不能 copy**(待確認)
+* copy 效率差，**有些 class 甚至不能 copy**
+    * 有些 class 可以定義成不能被 copy，詳情 13~15 章
+
 * 之後會提到，如果你的 function 沒有要更改 argument，然後你又要用 reference，你應該宣告成 reference to const
 
 #### Using Reference Parameters to Return Additional Information
@@ -107,12 +116,12 @@
 ### 6.2.3 const Parameters and Arguments
 * Just as in any other initialization, when we copy an argument to initialize a parameter, top-level consts are ignored
 * As a result, **top-level const on parameters are ignored.**
-    ```C++
+    ```cpp
     void fcn(const int i) { /* fcn can read but not write to i */}
     ```
     * can pass either const int or int to fcn
 * 這件事情還會牽扯到之後會講的 function overloading
-    ```C++
+    ```cpp
     void fcn(const int i) { /* fcn can read but not write to i */} 
     void fcn(int i) { /* .. . */} // error: redefines fcn(int)
     ```
@@ -129,21 +138,21 @@
     * We **cannot pass a literal, an expression that evaluates to an int, an object that requires conversion, or a const int object.**
     * 有沒有很煩...
 * 如果你改成這樣: void func(const int&);
-    * 那你就可以傳 const int 或者 literal 進去，只是不能改值；你也可以傳其他原本可以轉成 int 的 type，它會綁定一個 temp converted object。
-        * 反正你都是宣告成 const 了，這本來就代表你不會去更改傳進去的 argument，所以 parameter 去 bind 一個 temp obj 也沒差ㄅ
+    * 那你就可以傳 const int 或者 literal 進去，只是不能改值；你也可以傳其他原本可以轉成 int 的 type，它會綁定一個 converted temp object。
+        * 反正 parameter 都是宣告成 const 了，這本來就代表 function 不會去更改傳進去的 argument，所以 parameter 去 bind 一個 temp obj 也沒差ㄅ
 #### Use Reference to const When Possible
 * It is a somewhat common mistake to define parameters that a function does not change as (plain) references.
-    * 這樣會讓 caller 以為你可能會改變 argument
+    * 這樣會讓 caller 以為 function 可能會改變 argument
 * Moreover, using a reference instead of a reference to const **unduly limits the type of arguments that can be used with the function.**
     * 就上面講的，你只能傳 base type 一樣的，並且不能是 const，其他都不行
     * As we’ve just seen, we cannot pass a const object, or a literal, or an object that requires conversion to a plain reference parameter.
     * 不過之後會講到 T&& 這種 C++11 新定義的東西，行為又不一樣惹
     * 這裡可以把 Primer P.214 再好好看一次，跟你說如果你錯把應該寫成 const T& 的 parameter 寫成 T&，會有什麼後果
-        * 不能傳需要轉型的 type
+        * 不能傳需要轉型的 object
         * const T& 也不能傳
 
-* 他還 demo 了一個不夠了解問題而做的 workaround，結果導致更慘的 code
-    ```C++
+* Primer 還 demo 了一個不夠了解問題而做的 workaround，結果導致更慘的 code
+    ```cpp
     bool is_sentence(const string &s) {
     // if there’s a single period at the end of s,then s is a sentence 
     string::size_type ctr = 0;
@@ -163,21 +172,21 @@
 
 ### 6.2.4 Array Parameters
 * Arrays have two special properties that affect how we define and use functions that operate on arrays:
-* 之前講過 array 跟 function 不能被 copy，換句話說 function 沒辦法直接宣告 array 跟 function 當作 paraeter
+* 之前講過 array 跟 function 不能被 copy，換句話說 function 沒辦法直接宣告 array 跟 function 當作 parameter
     * 但是可以宣告 pointer to function/array 當 parameter
 
-* 還有之前講過的 array 常常被轉成 pointer to first element，把 array 傳進 function 時也是如此
+* 還有之前講過的 array 常常被 decay 成 pointer to first element，把 array 傳進 function 時也是如此
 * 雖然不能直接宣告 array 當參數，可是可以宣告很像 array 的參數(ry
-    ```C++
+    ```cpp
     void print(const int*);
     void print(const int[]); // shows the intent that the function takes an array
     void print(const int[10]); // dimension for documentation purposes (at best)
     ```
-    * 以上三個參數的型態都一樣，不過第二個跟第三個有 comment 的功能，第二個說我要收一個 array，第三個還說我要收一個 size 為 10 的 array；不過他們的 type 都是 pointer to int。
+    * 以上三個參數的型態都一樣，不過第二個跟第三個有 comment 的功能，第二個說我要收一個 array，第三個還說我要收一個 size 為 10 的 array；不過他們的 type 都是 pointer to (const) int。
         * 注意第三個的 10 不是 type，僅僅只是提示作用
 * When the compiler checks a call to print, it checks only that the argument has type const int*(或者可以被轉成 const int*):
 
-    ```C++
+    ```cpp
     int i = 0, j[2] = {0, 1}; print(&i); // ok: &i is int*
     print(j); // ok: j is converted to an int* that points to j[0]
     ```
@@ -188,6 +197,7 @@
     1. Using a Marker to Specify the Extent of an Array
         * 類似 C string 放 null character 當 marker 的概念
         * 不過這個方法就要保證說，你的 array 內放的 data 不會用到這個 "marker"
+            * 例如你是傳 int array 的話就有點怪，因為 any int value 本質上應該都是合法的
     2. Using the Standard Library Conventions
         * A second technique used to manage array arguments is to pass pointers to the first and one past the last element in the array. 
         * 也就是把 array 的起始跟結束位置都當作 argument 傳進 function
@@ -195,6 +205,8 @@
         * interface: void func(T*, T*);
         * caller: func(begin(arr), end(arr));
         * 雖然可以用 begin end，不過有時候可能只要存取 subarray，這時候 API 定成這樣，計算 array 邊界的責任就落到 caller 身上了
+        * https://github.com/ericniebler/range-v3
+            * 這個ㄎㄧㄤ物可以看
     3. Explicitly Passing a Size Parameter
         * Common in C and older C++... QQ
         * interface: void func(T*, size_t size); 
@@ -204,8 +216,8 @@
 * 如果 function 沒有要更改 array 內容，那你的 pointer to element 也要宣告成 const，這理由之前講過了。
 #### Array Reference Parameters
 * 你宣告 reference 時的 type 可以是 ref to array，parameter 當然也可以宣告成 reference to array
-    ```C++
-    // ok: parameter is a reference to an array; the dimension is part ofthe type 
+    ```cpp
+    // ok: parameter is a reference to an array; the dimension is part of the type 
     void print(int (&arr)[10]) {
     for (auto elem : arr) 
         cout << elem << endl;
@@ -215,33 +227,34 @@
     * 這跟上面 pointer 的 syntax suger 裡面 [] 裡面的數字不一樣了，syntax sugar 的數字只是用來 document，這裡的數字就跟宣告 reference to array 一樣，是型別的一部份
     * 但是這也意味著這個 function 只能收 array of size 10 的陣列來 bind，其他 size 都不可以，很鳥
     * 16 章會有一種新方法可以 pass a reference parameter to an array of any size.
+        * template 怕爆
 #### Passing a Multidimensional Array
 * 噁...
 * 首先記得 C++ 沒有多維陣列
 * array of arrays.
 * As with any array, a multidimensional array is passed as a pointer to its first element (§ 3.6, p. 128).
-* Becausewe are dealingwith an array of arrays, that element is an array, **so the pointer is a pointer to an array.**
+* Becausewe are dealing with an array of arrays, that element is an array, **so the pointer is a pointer to an array.**
 * **The size of the second (and any subsequent) dimension is part of the element type and must be specified:**
-    ```C++
+    ```cpp
     // matrixpoints to the first element in an array whose elements are arrays often ints
     void print(int (*matrix)[10], int rowSize) { /* ... */}
     ```
     * pointer to the array of 10 ints
     * 第二個參數就給(外圍的)array 的長度
 * 等價的 syntax:
-    ```C++
+    ```cpp
     void print(int matrix[][10], int rowSize) { /* .. . */}
     ```
 
 ### 6.2.5 main: Handling Command-Line Options
-* It turns out that main is a good example of how C++ programs pass arrays to functions.
+* It turns out that `main` is a good example of how C++ programs pass arrays to functions.
 * command-line options are passed to main in two (optional) parameters:
-    ```C++
+    ```cpp
     int main(int argc, char *argv[]) { ... }
     ```
     * argv is an **array** of **pointers**
 * alternative
-    ```C++
+    ```cpp
     int main(int argc, char **argv) { ... }
     ```
 
@@ -254,7 +267,7 @@
     * ![](https://i.imgur.com/TEMgEra.png)
     * the elements in an initializer_list are always **const values; there is no way to change the value of an element in an initializer_list.**
 * 實際上用起來像這樣:
-    ```C++
+    ```cpp
     void error_msg(initializer_list<string> il) {
     for (auto beg = il.begin(); beg != il.end(); ++beg)    
         cout << *beg << " " ;
@@ -263,7 +276,7 @@
     ```
     * 有 begin end 其實也可以用 range for
 * caller 要 call function 時長這樣:
-    ```C++
+    ```cpp
     // expected, actualare strings 
     if (expected != actual)
         error_msg({"functionX", expected, actual});
@@ -304,7 +317,7 @@
     * left associative
     * As a result, if a function returns a pointer, reference or object of class type, **we can use the result of a call to call a member of the resulting object.**
 
-    ```C++
+    ```cpp
     // call the sizemember ofthe string returned by shorterString 
     auto sz = shorterString(s1, s2).size();
     ```
@@ -318,7 +331,7 @@
 * Whether a function call is an lvalue (§ 4.1.1, p. 135) depends on the return type of the function.
     * return reference 就是 lvalue，其他都是 rvalue
 * 所以如果是 return reference，就可以把 function call 放在 assignment 左邊
-    ```C++
+    ```cpp
     char &get_val(string &str, string::size_type ix) {
         return str[ix]; // get_valassumes the given index is valid 
     }
@@ -333,7 +346,7 @@
         * 看起來很ㄎㄧㄤ，可是真的可以這樣寫
 #### List Initializing the Return Value
 * C++11 的...(我還)不知道可以拿來幹嘛的功能
-    ```C++
+    ```cpp
     vector<string> process() {
     // ... // expected and actual are strings 
         if (expected.empty()) 
@@ -344,8 +357,10 @@
             return {"functionX", expected, actual};
     }
     ```
-    * 反正 return value 就跟宣告變數很像，宣告變數可以被怎麼宣告，return value 就可以怎麼給值；宣告可以給 initializer_list，return value 也可以
-    * 如果 return value 是 built-in type，你就是放一個 element 數量為 1 的 list，總之就跟變數宣告一樣啦
+    * 反正 return value 就跟宣告變數很像，變數可以被怎麼宣告，return value 就可以怎麼給值；宣告可以給 initializer_list，return value 也可以
+        * 嚴格上來說是因為 vector 的 ctor 有一種是可以吃 initializer_list 的，所以才合法
+    * 如果 return value 是 built-in type，你就是放一個 element 數量為 1 的 initializer_list，總之就跟變數宣告一樣啦
+        * return {1};
 
 #### Return from main
 * 唯一一個 return non void 可是可以不用寫 return 的 function
@@ -355,7 +370,7 @@
 
 #### Recursion
 * a function that calls itself directly or indirectly
-```C++
+```cpp
 // calculate val!,which is 1*2*3.. . *val 
 int factorial(int val) {
     if (val > 1) 
@@ -371,14 +386,14 @@ int factorial(int val) {
 * return 也是一樣的規則
     * 不過因為語法上的限制，function 要宣告 return pointer/reference to array 會變得很醜(C姊姊
     * 可以用之前學的 typedef 或 using 解決
-    ```C++
+    ```cpp
     typedef int arrT[10]; // arrTis a synonym for the type array often ints 
     using arrT = int[10]; // equivalent declaration ofarrT; see § 2.5.1 (p. 68)
     arrT* func(int i); // func returns a pointer to an array often ints
     ```
 * 如果不用 type alias 呢?
 * 首先我們要先記得 array 的 type 是跟在 identifier 之後的
-    ```C++
+    ```cpp
     int arr[10]; // arr is an array often ints 
     int *p1[10]; // p1 is an array of ten pointers
     int (*p2)[10] = &arr; // p2 points to an array often ints
@@ -390,7 +405,7 @@ int factorial(int val) {
     * 括號因為優先權的關係一樣是必須的
 
 * 來點例子ㄅ..
-    ```C++
+    ```cpp
     int (*func(int i))[10];
     ```
     ![](https://i.imgur.com/PegwV0T.png)
@@ -402,7 +417,7 @@ int factorial(int val) {
 
 #### Using decltype
 * 你可以直接在 function return type 那邊用 decltype(obj)，然後 function name 前面加 * ，這樣 return type 就是 pointer to obj
-    ```C++
+    ```cpp
     int odd[] = {1,3,5,7,9}; 
     int even[] = {0,2,4,6,8}; 
     // returns a pointer to an array of five int elements 
@@ -418,13 +433,13 @@ int factorial(int val) {
 ### 6.4 Overloaded Functions
 * Functions that have the **same name** but **different parameter lists** and that appear in the **same scope** are **overloaded**.
 * e.g.
-    ```C++
+    ```cpp
     void print(const char *cp);
     void print(const int *beg, const int *end);
     void print(const int ia[], size_t size);
     ```
 * When we call these functions, the compiler can deduce which function we want based on the argument type we pass:
-    ```C++
+    ```cpp
     int j[2] = {0,1};
     print("Hello World"); // calls print(constchar*)
     print(j, end(j) - begin(j)); // calls print(constint*, size_t)
@@ -432,8 +447,8 @@ int factorial(int val) {
     ```
 #### Defining Overloaded Functions
 * Consider a database application with several functions to find a record based on name, phone number, account number, and so on.
-* Function overloading lets us *define a collection of functions, each named lookup*, that differ in terms of how they do the search.
-    ```C++
+* Function overloading lets us *define a collection of functions, each named `lookup`*, that differ in terms of how they do the search.
+    ```cpp
     Record lookup(const Account&); // find by Account
     Record lookup(const Phone&); // find by Phone
     Record lookup(const Name&); // find by Name Account acct;
@@ -442,13 +457,15 @@ int factorial(int val) {
     Record r2 = lookup(phone); // call version that takes a Phone
     ```
 * The compiler uses the argument type(s) to figure out which function to call.
-* It is an error for two functions to *differ only in terms of their return types*.
+* **It is an error for two functions to *differ only in terms of their return types*.**
+    * 反正 C++ 的 overload 就是不准只有 return type 不同
+    * 某些語言(Perl, Haskell)就可以
 
 #### Determining Whether Two Parameter Types Differ
 * 所以怎樣才叫做不同 type?
 * 傳遞參數給 function 會轉型，包括已經定義好的轉型以及 non-const 轉 const
 * 先來看看 parameter list 其實相同的幾個例子:
-    ```C++
+    ```cpp
     // each pair declares the same function
     Record lookup(const Account &acct);
     Record lookup(const Account&); // parameter names are ignored         
@@ -459,9 +476,9 @@ int factorial(int val) {
     ```
 #### Overloading and const Parameters
 * As we saw in § 6.2.3 (p. 212), **top-level const (§ 2.4.3, p. 63) has no effect on the objects that can be passed to the function.**
-    * 就跟初始化的時候 initailizer 的 top-level const 會被無視一樣
+    * 就跟初始化的時候 initailizer 的 top-level const 會被無視一樣，因為被初始化的變數以及 function parameter 都是複製一份 initializer(或 argument) 的 value，不會影響到 initializer(argument)
 * A parameter that has a top-level const is indistinguishable from one without a top-level const:
-    ```C++
+    ```cpp
     Record lookup(Phone);
     Record lookup(const Phone); // redeclares Recordlookup(Phone) 
     
@@ -470,7 +487,7 @@ int factorial(int val) {
     ```
     * 注意第二對例子，那是指標的 top-level const
 * On the other hand, we can overload based on whether the parameter is a reference (or pointer) to the const or nonconst version of a given type; **such consts are low-level:**
-    ```C++
+    ```cpp
     // functions taking constand nonconstreferences or pointers have different parameters
     // declarations for four independent, overloaded functions
     Record lookup(Account&);  // function that takes a reference to Account
@@ -479,7 +496,7 @@ int factorial(int val) {
     Record lookup(const Account*); // new function, that takes a pointer to const Account
     ```
     * Because there is no conversion (§ 4.11.2, p. 162) from const, *we can pass a const object (or a pointer to const) only to the version with a const parameter.*
-        * 如果你今天要傳 reference 或 pointer to const，這個時候只有 low-level 是 const 版本的函數可以接這個參數，因為根本不存在 const to nonconst 的轉換
+        * 如果你今天要傳 reference 或 pointer to const，這個時候只有 low-level 是 const 版本的函數可以接這個參數，因為根本不存在 (implicit) const to nonconst 的轉換
     * Because there is a conversion to const, we can call either function on a nonconst object or a pointer to nonconst.
         * 如果你今天要傳 reference 或 pointer to nonconst，這時候其實 lowe-level 是或不是 const，函數都可以接，因為存在 nonconst to const 的轉換
     * However, as we’ll see in § 6.6.1 (p. 246), the compiler will prefer the nonconst versions when we pass a nonconst object or pointer to nonconst.
@@ -487,14 +504,14 @@ int factorial(int val) {
 
 #### const_cast and Overloading
 * In § 4.11.3 (p. 163) we noted that const_casts are most useful in the context of overloaded functions.
-    ```C++
+    ```cpp
     // return a reference to the shorter oftwo strings
     const string &shorterString(const string &s1, const string &s2) {
         return s1.size() <= s2.size() ? s1 : s2;
     }
     ```
     * 如果我們只有上面的 function，當我們丟 nonconst 的 string 進去的時候，function 會回傳 const 版本的，這樣其實有點麻煩，因為原本的 string 本來就不是 const
-    ```C++
+    ```cpp
     string &shorterString(string &s1, string &s2) {
         auto &r = shorterString(const_cast<const string&>(s1), const_cast<const string&>(s2));
         return const_cast<string&>(r);
@@ -523,9 +540,10 @@ int factorial(int val) {
 ### 6.4.1 Overloading and Scope
 * 首先，管它是什麼 name，只要一旦被宣告，它就會 **hide** outer scope 相同的 name
     * 管你這個 name 是宣告成 function 還是 object 還是 built-in type
-    * 對你沒想錯，**function 可以宣告在 function 裡面**，雖然很糞
+    * 另外，**function 可以宣告在 function 裡面**，雖然很糞
+        * 以下的 code 是 for demo purpose
     * 所以就會發生以下的情境
-    ```C++
+    ```cpp
     string read();
     void print(const string &);
     void print(double); // overloads the print function
@@ -544,7 +562,7 @@ int factorial(int val) {
     * 反正 compiler 看到你使用一個名字不會先管它是什麼 type，而是管它出現在哪裡，而且會先從最近的 scope 開始找，一旦找到之後就停下來了；
     * 所以這裡就是在 fooBar 這個 scope 內找到了 print 之後就停下來，不會理會 outer scope 定義的 fooBar
     * 這樣就彷彿好像只有一個 print(int) 一樣，所以你 call printf("Value: "); 就會噴 error 了
-    * 其他後面幾個 call 都合法，不過 print(3.14) 一樣是用 print(int)，所以會轉型
+    * 其他後面幾個 call 都合法，不過 print(3.14) 一樣是用 print(int)，因為會轉型
 * **Note: In C++, name lookup happens before type checking.**
 
 
@@ -557,11 +575,11 @@ int factorial(int val) {
 * Functions with default arguments can be called with or without that argument.
 * We may define defaults for one or more parameters. **However, if a parameter has a default argument, all the parameters that follow it must also have default arguments.**
 * 來點例子
-    ```C++
+    ```cpp
     typedef string::size_type sz; // typedef see § 2.5.1 (p. 67)
     string screen(sz ht = 24, sz wid = 80, char backgrnd = ' ');
     ```
-    ```C++
+    ```cpp
     string window;
     window = screen(); // equivalent to screen(24,80,' ')
     window = screen(66); // equivalent to screen(66,80,' ') 
@@ -583,10 +601,10 @@ int factorial(int val) {
     * Part of the work of designing a function with default arguments is ordering the parameters so that **those least likely to use a default value appear first** and **those most likely to use a default appear last.**
         * 最常用到 default argument 的 parameter 要排 parameter list 最右邊，反之最左邊
 #### Default Argument Declarations
-* 你可以宣告多次 function，這是合法的
-* 但是 function 的 default value，在同一個 scope 內，只能指定一次
+* redeclare function 是合法的
+* 但是 function 的每個 parameter 的 default value，在同一個 scope 內，只能指定一次
 * 然後你要指定某個 parameter 有 default value，所有都右邊的 parameter 也都要有 default value 才行
-    ```C++
+    ```cpp
     // no default for the height or width parameters
     string screen(sz, sz, char = ' ');
     string screen(sz, sz, char = '*'); // error: redeclaration
@@ -598,7 +616,7 @@ int factorial(int val) {
 #### Default Argument Initializers
 * 你以為 default argument 只能填一個 literal 嗎? 錯! 除了 function local variable 以外它都可以填!
 * 可是填 function call 或者 depends on global variable 的 function call 整個就會變成地獄...
-    ```C++
+    ```cpp
     // the declarations of wd, def, and ht must appear outside a function
     sz wd = 80;
     char def = ' ';
@@ -606,13 +624,13 @@ int factorial(int val) {
     string screen(sz = ht(), sz = wd, char = def);
     string window = screen(); // calls screen(ht(), 80, ' ');
     ```
-    * Names used as default arguments are resolved in the scope of the function declaration.
+    * **Names used as default arguments are resolved in the scope of the function declaration.**
     * default argument initializer 裡面用到的 name 會先從 function declaration 的 scope 開始找
         * 阿一般來說 function 都是宣告在 global scope，換句話說你會用到的 name 都是 global 的... 噁
     *  The value that those names represent is **evaluated at the time of the call:**
         *  所以是 runtime 決定的!
         
-    ```C++
+    ```cpp
     void f2() {
     def = '*'; // changes the value of a default argument 
     sz wd = 100; // hides the outer definition of wd but does not change the default 
@@ -624,14 +642,14 @@ int factorial(int val) {
 
 ### 6.5.2 Inline and constexpr Functions
 * A function specified as inline (usually) is expanded "in line" at each call. If shorterString were defined as inline, then this call
-    ```C++
+    ```cpp
     cout << shorterString(s1, s2) << endl;
     ```
 (*probably*) would be expanded during compilation into something like
-    ```C++
+    ```cpp
     cout << (s1.size() < s2.size() ? s1 : s2) << endl;
     ```
-* The run-time overhead of making shorterString afunction isthusremoved.
+* The run-time overhead of making shorterString afunction is thus removed.
 * putting the keyword ***inline*** before the function’s return type:
 * Note: The inline specification is **only a request to the compiler.** The compiler may choose to *ignore* this request.
 
@@ -642,25 +660,26 @@ int factorial(int val) {
 * like any other function **but must meet certain restrictions:**
     * The return type and the type of each parameter must be a literal type (§ 2.4.4, p. 66)
     * and the function body must contain exactly one return statement:
-    ```C++
+    ```cpp
     constexpr int new_sz() { return 42; }
     constexpr int foo = new_sz(); // ok: foo is a constant expression
     ```
     * The compiler can verify—**at compile time**—that a call to new_sz returns a constant expression, so we can use new_sz to initialize our constexpr variable, foo
     * 如果可以的話，compiler 會在 compile time 就把 constexpr 都算完，把用到 constexpr 的地方全部替換成 value
-    * 這種替換的動作其實跟 inline 有 87% 像，所以 constexpr functions are implicitly inline.
+    * 這種替換的動作其實跟 inline 有 87% 像 -> **constexpr functions are implicitly inline.**
     * 只要在 runtime 的時候都不會有動作或改變的 statement 都可以出現在 constexpr function 裡面
         * For example, a constexpr function may contain null statements, type aliases (§ 2.5.1, p. 67), and using declarations.
     * A constexpr function is permitted to return a value that is not a constant:
         * 幹..
-        ```C++
+        ```cpp
         // scale(arg)is a constant expression if arg is a constant expression 
         constexpr size_t scale(size_t cnt) { return new_sz() * cnt; }
         ```
-        * 如果 cnt 是 constexpr，那 scale(cnt) 就是 constexpr
+        * 如果 `cnt` 的 initializer 是 constexpr，那 `scale(cnt)` 就是 constexpr
         * 反正如果你傳了不是 constexpr 的 obj 給 constexpr function，那這 function 就變成普通的 function 惹
-        ```C++
-        int arr[scale(2)]; // ok: scale(2)is a constant expression int i = 2;
+        ```cpp
+        int arr[scale(2)]; // ok: scale(2)is a constant expression
+        int i = 2;
         // i is not a constant expression
         int a2[scale(i)]; // error: scale(i)is not a constant expression
         ```
@@ -691,23 +710,24 @@ int factorial(int val) {
 * The assert macro is often used to check for conditions that "cannot happen."
 * 來個例子
     * For example, a program that does some manipulation of input text might know that all words it is given are *always longer than a threshold.* That program might contain a statement such as
-    ```C++
+    ```cpp
     assert(word.size() > threshold);
     ```
     
 ### The NDEBUG Preprocessor Variable
 * 就這個 macro 可以把 assert 給關掉
 * 如果 define 它，assert code 就不會執行
-* 然後 Primer 這裡還提供一個方法
+* 然後大部分的 compiler 會提供類似下面的 option 定義 preprocessor variable
     * CC -D NDEBUG main.c
 * It can be useful as an aid in getting a program debugged but **should not be used to substitute for run-time logic checks or error checking that the program should do.**
     * 不要誤用 assert!
 * P.242 的大便自己看zzz
+    * 哭哭，我現在不覺得他是大便ㄌ
 
 ## 6.6 Function Matching
 * Primer 又標記成選讀惹...
 * It is not so simple when the overloaded functions have the same number of parameters and **when one or more of the parameters have types that are related by conversions.**
-    ```C++
+    ```cpp
     void f();
     void f(int);
     void f(int, int);
@@ -716,21 +736,24 @@ int factorial(int val) {
     ```
 #### Determining the Candidate and Viable Functions
 * 第一步是先找哪先 function 要被考慮
-    * 總之就是 compiler 按照查找 scope 找到的那些 functions
     * 叫做 candidate functions
+        * 反正 candidate functions 就是 compiler 經過 name lookup 後找到的第一個(批) function(s)
     * A candidate function is a function with the same name as the called function and for which a declaration is visible at the point of the call.
-* 第二步就是從 candidate functions 挑出可以被 call 的那些 functions，叫做 **viable functions**
+* 第二步就是從 candidate functions 挑出可以被用該次 caller 給的 argument(s) 呼叫的那些 functions，叫做 **viable functions**
     * The second step selects from the set of candidate functions those functions that can be called with the arguments in the given call.
-    * 要成為 viable function，參數數量要一樣，參數型別也要一樣，或者可以從 given call 轉換成 function call 的 parameters
+    * 要成為 viable function
+        * 參數數量要一樣(要考慮 default argument 的數量)
+        * 參數型別也要一樣
+            * 或者可以從 given call 轉換成 function call 的 parameters
     * 上面的例子，由 f(5.6) 就可以先刪掉參數數量不同的兩個 (f(); 跟 f(int, int);)
     * 剩下的兩個
         * 一個是收一個 int，argument 給的 5.6 可以轉成 int，所以是 viable
-        * 另一個是收兩個 double，右邊那個可以不給，所以左邊的 double 直接 match argument 給的 5.6，所以是 viable
+        * 另一個是收兩個 double，第一個的 double 直接 match argument 給的 5.6，第二個 parameter 有 default argument 所以可以不給，所以是 viable
 * Note: If there are **no viable functions,** the **compiler will complain** that there is no matching function.
 #### Finding the Best Match, If Any
 * 第三步就是從 viable functions 裡面挑一個 best match 的 function(如果有的話)
     * We'll explain the details of "best" in the next section, but the idea is that the closer the types of the argument and parameter are to each other, the better the match.
-    * 在這個例子，因為 call f(int) 要做轉換，call f(double, double = 3.14) 不用，所以 f(double, dounle = 3.14) 比 f(int) 好。
+    * 在這個例子，因為 call f(int) 要做轉換，call f(double, double = 3.14) 不用，所以 f(double, double = 3.14) 比 f(int) 好。
         * 之後會詳細講到底什麼是 best match
 
 #### Function Matching with Multiple Parameters
@@ -739,10 +762,10 @@ int factorial(int val) {
 * viable function 選法還是一樣，所以剩下 f(int, int) 跟 f(doube, double = 3.14) 這兩個 viable functions
 * **The compiler then determines, argument by argument, which function is (or functions *are*) the best match.**
 
-* <a name="head1234">There</a> is an overall best match if there is one and only one function for which
+* There is an overall best match if there is one and only one function for which
     * The match for each argument is **no worse than the match** required by any other viable function
+        * 否定說明..
     * **There is at least one argument** for which the match is **better than the match provided by any other viable function**
-    * 這裡的說明有夠數學用語的...
 * If after looking at each argument **there is no single function that is preferable, then the call is in error.**
     * The compiler will complain that **the call is ambiguous.**
 
@@ -752,12 +775,12 @@ int factorial(int val) {
 * 結論是這個 call 是 ambiguous!
     * Each viable function is a better match than the other on one of the arguments to the call.
     * 根據上面那個 overall best match 的規則，這裡存在了兩個 function，他們各自擁有一個比其 function 都還要 better match 的參數，這樣 compiler 就會沒辦法決定這兩個該 call 哪一個了
-* 你可以用 cast 來強迫選其中一個 function，不過這樣寫就代表你的 overloading 寫爛了
+* 你可以用 cast 來強迫選其中一個 function，不過這樣寫就代表你的 overloading design 寫爛了
 * Casts should not be needed to call an overloaded function. **The need for a cast suggests that the parameter sets are designed poorly.**
 
 ### 6.6.1 Argument Type Conversions
-* 你的 function call 某些 argument 的 type，沒有一個 overloaded function 可以 exactly match，但是都可以轉換，這時候怎麼辦?
-    * compiler 這時候會對這些 type 做排名
+* caller 給的某些 argument 的 type，沒有一個 overloaded function 可以 exactly match，但是都可以轉換，這時候怎麼辦?
+    * compiler 實際上會對不同形式的 conversion 做排名
 * 按照下列規則排名
     1. An exact match. An exact match happens when: 
         * The argument and parameter types are identical.
@@ -768,7 +791,7 @@ int factorial(int val) {
     3. Match through a promotion (§ 4.11.1, p. 160).
     4. Match through an arithmetic (§ 4.11.1, p. 159) or pointer conversion (§ 4.11.2, p. 161).
     5. Match through a class-type conversion. (§ 14.9 (p. 579) covers these conversions.)
-* 這真的是需要再看就好...
+* 這個第一次看可能會黑人問號，不過很久以後回來看一定會有 fu
 
 #### Matches Requiring Promotion or Arithmetic Conversion
 * 哎喲 Primer 用放大鏡，你也知道這很積八?
@@ -776,16 +799,17 @@ int factorial(int val) {
 * In order to analyze a call, **it is important to remember that the small integral types always promote to int or to a larger integral type.** Given two functions, one of which takes an *int* and the other a *short*, **the short version will be called only on values of type short.** 
 
 * Even though the smaller integral values might appear to be a closer match, those values are promoted to int, whereas calling the short version would require a conversion:
-    ```C++
+    ```cpp
     void ff(int); void ff(short);
     ff('a'); // charpromotes to int; calls f(int)
     ```
-    * 上面會 call ff(int); !
+    * 上面會 call ff(int); 
+    * 因為 promotion 比 built-in conversion 的 rank 高
 
 * 此外，All the arithmetic conversions are treated as equivalent to each other.
     * 反正轉一次就好了，管你從什麼型別轉成什麼型別，你們的 rank 都是一樣的
     * The conversion from **int to unsigned int** , for example, **does not take precedence over** the conversion from **int to double.**
-    ```C++
+    ```cpp
     void manip(long); 
     void manip(float);
     manip(3.14); // error: ambiguous call
@@ -793,7 +817,7 @@ int factorial(int val) {
     
 #### Function Matching and const Arguments
 * 當你 API 長這樣:
-    ```C++
+    ```cpp
     void f(int&);
     void f(const int&);
     int a;
@@ -813,13 +837,13 @@ int factorial(int val) {
 #### Using Function Pointers
 * When we use the name of a function as a value, **the function is automatically converted to a pointer.**
 
-    ```C++
+    ```cpp
     bool (*pf)(const string &, const string &); // uninitialized
     pf = lengthCompare; (一個 type 跟 *pf 一樣的 function)
     pf = &lengthCompare; (跟上一行等價)
     ```
 * Moreover, we can use a pointer to a function to call the function to which the pointer points.
-    ```C++
+    ```cpp
     bool b1 = pf("hello", "goodbye"); // calls lengthCompare 
     bool b2 = (*pf)("hello", "goodbye"); // equivalent call
     bool b3 = lengthCompare("hello", "goodbye"); // equivalent call
@@ -842,12 +866,12 @@ int factorial(int val) {
     * 所以那些在 parameter list 裡面寫起來像是 function 的鬼東西其實都是 function pointer，不要以為是 function!
         * 就好像你可以寫 void f(int arr[10]); 一樣，那個 10 是假的!
 
-    ```C++
+    ```cpp
     void useBigger(const string &s1, const string &s2, 
         bool pf(const string &, const string &));
     ```
     * 第三個看起來像是 function 的參數其實是 function pointer
-    ```C++
+    ```cpp
     // equivalent declaration: explicitly define the parameter as a pointer to function void useBigger(const string &s1, const string &s2,
     bool (*pf)(const string &, const string &));
     ```
@@ -859,7 +883,7 @@ int factorial(int val) {
 
 * 但這就跟 pointer to array 一樣，你的宣告會變的很噁心，於是就用 alias 或 decltype
 
-    ```C++
+    ```cpp
     // Func and Func2 have function type 
     typedef bool Func(const string&, const string&); 
     typedef decltype(lengthCompare) Func2; // equivalent type 
@@ -870,42 +894,42 @@ int factorial(int val) {
     * Both Func and Func2 are function types, whereas FuncP and FuncP2 are pointer types.
     * 這邊用 decltype 也是少數幾個 function name 不會被轉成 pointer 的例子之一
 
-    ```C++
+    ```cpp
     // equivalent declarations of useBigger using type aliases
     void useBigger(const string&, const string&, Func);
     void useBigger(const string&, const string&, FuncP2);
     ```
-    
+    * 放 `Func` 進去可以過就只是因為 compiler 會自動把它當成 pointer type
 #### Returning a Pointer to Function
 * 醜死...
 * 請用 using
-    ```C++
+    ```cpp
     using F = int(int*, int); // F is a function type, not a pointer 
     using PF = int(*)(int*, int); // PF is a pointer type
     ```
 * 雖然在參數列表裡面你可以直接寫一個 function type 然後讓 compiler 自動轉換成 function pointer，可是 return type 不會，我們一定要寫成 pointer type
 
-    ```C++
+    ```cpp
     PF f1(int); // ok: PF is a pointer to function; f1 returns a pointer to function
     F f1(int); // error: F is a function type; f1 can’t return a function
     F *f1(int); // ok: explicitly specify that the return type is a pointer to function
     ```
 * 你也可以直接硬幹 jserv 流
-    ```C++
+    ```cpp
     int (*f1(int))(int*, int);
     ```
 * 也可以用 C++11 的 trailing return
-    ```C++
+    ```cpp
     auto f1(int) -> int (*)(int*, int);
     ```
     
 #### Using auto or decltype for Function Pointer Types
 * 反正就是用 decltype 來寫 return type
 * 記得 function 傳進去不會被轉換成 pointer
-    ```C++
+    ```cpp
     string::size_type sumLength(const string&, const string&); 
     string::size_type largerLength(const string&, const string&); 
     // depending on the value of its stringparameter, /
     decltype(sumLength) *getFcn(const string &);
-    / getFcn returns a pointer to sumLengthor to largerLength
+    // getFcn returns a pointer to sumLengthor to largerLength
     ```

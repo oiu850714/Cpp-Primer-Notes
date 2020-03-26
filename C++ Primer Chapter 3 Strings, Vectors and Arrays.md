@@ -1,3 +1,7 @@
+---
+tags: C++
+---
+
 # C++ Primer Chapter 3 Strings, Vectors and Arrays
 ## 3.1 Namespace using Declarations
 * 大概會用了
@@ -14,7 +18,7 @@
 * 這章先講最基本使用，§9.5 再詳細講
 ### 3.2.1 Defining and Initializing strings
 * 一般初始化 string 的幾個方式：
-    ```C++
+    ```cpp
     #include <string>
     using std::string;
 
@@ -26,7 +30,7 @@
     }
     ```
 * 這裡突然遇見了大魔王，**Direct and Copy Forms of Initialization**
-    ```C++
+    ```cpp
       string s5 = "hiya"; // copy initialization
       string s6("hiya");  // direct initialization
       string s7(10, 'c'); // direct initialization; s7is cccccccccc
@@ -40,7 +44,7 @@
 * reference 是你的好朋友
 * Reading an Unknown Number of strings
     * 這裡有個經點寫法是拿來讀取未知數量的字串的：
-    ```C++
+    ```cpp
     int main() {
       string word;
       while (cin >> word) {   // read until end-of-file
@@ -49,12 +53,12 @@
       return 0;
     }
     ```
-* Using getline to Read an Entire Line
-    * The getline function takes an input stream and a string.
+* Using `getline` to Read an Entire Line
+    * The `getline` function takes an input stream and a string.
     *  This function reads the given stream up to and including the first newline and stores what it read—**not including the newline**—in its string argument.
     * Like the input operator, getline returns its istream argument.
         * 所以如果你要讀取未知行數的字串的話可以寫成這樣：
-        ```C++
+        ```cpp
         int main() {
           string line;
           while (getline(istream, line)) {   // read until end-of-file
@@ -63,7 +67,8 @@
           return 0;
         }
         ```
-        記得，換行字元不會被塞到 string 裡，如果要換行要自己印
+        * 記得，換行字元不會被塞到 string 裡，如果要換行要自己印
+        * 不塞換行到變數的原因很簡單，因為你知道你已經遇到換行了
 * empty, size 之類的
     * 介紹個 size_type：
     * The string::size_type Type
@@ -79,17 +84,16 @@
     * 等等，string::size_type，所以可以在 class 內定義型別？
         * 可以!可以在 class 的 public 區域用 using 或者 typedef
     * 另一個重點，**既然他是 unsigned，你就要記得之前說的，mix signed and unsigned data can have surprising results**：
-        ```C++
+        ```cpp
         int n = -10;
         string s = "9487";
         s.size() < n; // true!!!!
         ```
-    * 不然你也可以很ㄎㄧㄤ用 int 去接 size() 的 return value 啦...
-
+    
 * Add two strings
     * trivial
 * Adding Literals and strings
-```C++
+```cpp
 string s1 = "hello", s2 = "world"; // no punctuation in s1 or s2 
 string s3 = s1 + ", " + s2 + ’\n’;
 ```
@@ -97,7 +101,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
     * 所以上面的各種 literal 都會先被轉成 string 再用 adding two strings 的方式來處理
 * When we mix strings and string or character literals, at least one operand to each + operator must be of string type:
     * operator+ 至少要有一邊是 string，這樣另一邊才會被轉成 string
-        ```C++
+        ```cpp
         int main() {
           string s1 = "www";
           string s2 = "wtf " + s1;
@@ -107,12 +111,13 @@ string s3 = s1 + ", " + s2 + ’\n’;
           string s7 = "hello" + ", " + s2; // error: can’t add string literals
         }
         ```
-    * 注意上面的 s6，第二個 operator+ 看起來貌似沒有符合，但是加法是 left associative，會先算完第一個 +，然後 value 是 string，這個 value 再當作第二個 + 的 operand，所以第二個 + 還是有一個 operand 是 string
+    * 注意上面的 s6，第二個 operator+ 看起來貌似沒有符合，但是加法是 left associative，會先算完第一個 +，然後 value 是 string，這個 value 再當作第二個 + 的 operand，所以第二個 + 左邊 operand 還是一個 string
 
 ### 3.2.3 Dealing with the Characters in a string
 * Advice: 用 c*name* 來 include C header，這種 header 定義的 name 會在 std 裡面，可是 C 那種 name.h 的 header 定義的 name 就沒有在 std 內。
 * 這裡還突然殺出來介紹 range for
     * 有沒有 reference 差很多
+
 
 ## 3.3 Library vector Type
 * 基礎自己看
@@ -120,10 +125,10 @@ string s3 = s1 + ", " + s2 + ’\n’;
 * template 可以想像成是給 compiler 的一串指令，一種食譜(?)，compiler 會看著這串指令以及你提供的額外資訊(additional information，也就是角括號<>內的東西)來 **generate** 程式碼
 * C++11 List initialization
 * 一個以前沒注意到的：
-    * If our vector holds objects of a type that we cannot default initialize, then we must supply an initial element value; it is not possible to create vectorsof such types by supplying only a size.
-    * 如果你提供的 type 不能 default initial ，一定要提供一個 initializer，那塞這種 type 的 vector 就一定要給第二個參數當作 initializer；這種 error 在 syntax level 還檢查不出來w
+    * If our vector holds objects of a type that we cannot default initialize, then we must supply an initial element value; it is not possible to create vectors of such types by supplying only a size.
+    * 如果你提供的 type 不能 default initialize ，一定要提供一個 initializer，那塞這種 type 的 vector 就一定要給第二個參數當作 initializer；這種 error 在 syntax level 還檢查不出來w
 * List initialization 還有個ㄎㄧㄤ點：
-    ```C++
+    ```cpp
     vector<string> v1{"yoo"}; //list initialized
     vector<string> v2("yoo"); //error
     vector<string> v3{10};  // construct vector of ten default empty string!!!
@@ -140,10 +145,10 @@ string s3 = s1 + ", " + s2 + ’\n’;
 
 ### 3.3.3 Other vector Operations
 很多都跟 string 有 87% 像，但是有幾點要注意：
-1. vector 是 container，有很多 operation 其實是 depends on element type 的，例如 relational operator，如果 element 不支援 relational operator，那 vector<T> 就不能比較
+1. vector 是 container，有很多 operation 其實是 depends on element type 的，例如 relational operator，如果 element 不支援 relational operator，那 vector\<T> 就不能比較
 
 2. 而且更機掰的是，這是編譯時期才能決定的朋友呢
-    ```C++
+    ```cpp
     class no_default_constructor_class {
       int integer;
 
@@ -163,7 +168,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
     }
     ```
 * vector 的 assignment operator 還支援 list_initializer(string 也可以，應該 container 都支援):
-    ```C++
+    ```cpp
     int main() {
       vector<int> intv{1, 2, 3, 4, 5};
       intv = {6, 7, 8, 9, 10};
@@ -184,7 +189,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
         * element in a container
 * 題外話，string 不是 container，但是它支援大部分的 container 操作，包括 iterator
 * 那些有 begin 跟 end 的 type 就可以使用 iterator
-    ```C++
+    ```cpp
     auto it = v.begin(); // v is vector<T>
     ```
     * 在 C++11 之後請用 auto 宣告 iterator
@@ -194,7 +199,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
 * 跟 pointer 一樣，用 dereference operator 取 object
     * 所以要注意 iterator 是否為 valid
     * 給個確認是否為 valid 的例子：
-    ```C++
+    ```cpp
     string s("some string");
     if (s.begin() != s.end()) { // make sure s is not empty
         auto it = s.begin(); // itdenotes the first character in s 
@@ -220,7 +225,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
 *  Any operation, such as push_back, **that changes the size of a vector** potentially invalidates all iterators into that vector.
 *  到底怎麼變成 invalid 在第九章會講
 ### 3.4.2 Iterator Arithmetic
-* 所有 container 都支援 ++ 跟 --，
+* 所有 container iterator 都支援 ++ 跟 --，
 * 少數如 vector 跟 string 支援一次 + 或 - n
 * 少數如 vector 跟 string 支援 relational operators
 * iter 相減，
@@ -232,7 +237,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
 ### 3.5.1 Defining and Initializing Built-in Arrays
 * array is an object!
     * So there are pointer or reference to arrays
-    ```C++
+    ```cpp
     int main() {
       int arr[10];
       int *ptrs[10];           // ptrs is an array of ten pointers to int
@@ -252,7 +257,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
 ### 3.5.3 Pointers and Arrays
 * 陣列跟 pointer 的淵源ㄏㄏ
 * **When we use an array, the compiler ordinarily converts the array to a pointer.**
-    ```C++
+    ```cpp
     int main() {
       int a[100] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
       int i = 10;
@@ -261,20 +266,20 @@ string s3 = s1 + ", " + s2 + ’\n’;
       //互相傷害的噁心 array indexing
     }
     ```
-    ```C++
+    ```cpp
     * string *p = &nums[0]; // ppoints to the first element in nums
     * string *p2 = nums; // equivalent to p2=&nums[0]
     ```
     * in *most* places whenwe use an array, the compiler automatically substitutes a pointer to the first element:
 * There are various implications of the fact that operations on arrays are often really operations on pointers.
     * 例如 auto，如果你的 initializer 是 array，型別會推斷成 pointer to element
-        ```C++
+        ```cpp
         int ia[10] = {};
         auto ia2(ia); // ia2 is int* that points to first element in ia
         auto ia2(&ia[0]); // equivalent to above; now it’s clear that ia2has type int*
         ```
     * 不過如果是用 decltype，就還是會維持 array type
-        ```C++
+        ```cpp
         int main() {
           int ia[10] = {};
           int *p = ia;
@@ -289,7 +294,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
 * 因為 pointer 都支援當初 iterator 定義的那幾個 operations，所以他是 iterator
 * C++11 的 std::begin() 跟 std::end()
     * 你自己去算 array 的頭尾真的太ㄎㄧㄤ，很容易錯(請看 Primer P.118)，所以新標準就給了這兩個 function，好用
-    ```C++
+    ```cpp
     int main() {
       int ia[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}; // ia is an array of ten ints
       int *beg = begin(ia); // pointer to the first element in ia
@@ -321,9 +326,9 @@ string s3 = s1 + ", " + s2 + ’\n’;
         * If a program needs continuing access to the contents of the array returned by str(), the programmust copy the array returned by c_st
 #### Using an Array to Initialize a vector
 * 用 begin() 跟 end() 把頭尾傳進去
-    * vector<int> v1(begin(int_arr), end(int_arr));
+    * `vector<int>` v1(begin(int_arr), end(int_arr));
 * 也可以只傳部分的 array
-    * vector<int> v1(int_arr+87, int_arr+94);
+    * `vector<int>` v1(int_arr+87, int_arr+94);
 
 #### Note
 Modern C++ programs should use vectors and iterators instead of built-in arrays and pointers, and use strings rather than C-style array-based character strings.
@@ -337,17 +342,21 @@ Modern C++ programs should use vectors and iterators instead of built-in arrays 
 * 但如果是只要讀呢?
 * 除了最內層的 loop 其他也必須要用 reference 宣告
     * why?
-    ```C++
+    ```cpp
     for (auto row : ia)
         for (auto col : row)
             ;
     ```
     * Because row is not a reference, **when the compiler initializes row it will convert each array element (like any other object of array type) to a pointer to that array’s first element.**
-    * 因為如果你外層迴圈不是用 reference，那內部的迴圈會把 row 轉成 pointer to first element(就是普通的把陣列 decay 成指標的轉法)，那 col 就會 loops on 一個 type 為指標的 object，他不是 sequence，所以會噴 error。
+    * 因為如果你外層迴圈不是用 reference，那會這樣:
+        1. ia 的每個 element 的 type 是 array
+        2. 直接 assign 給 row 是會發生 decay，會轉成指標
+        3. 所以 row 的 type 就會是 pointer，在這個情境下是 `int*`
+        4. 然後內層迴圈就會 loop 在 `int*` 上，就會噴 error
 #### Pointers and Multidimensional Arrays
 * 管你幾維陣列，就跟一維的一樣，大部分的時候 array 都會被轉成 pointer to first element
 * 只是這裡 first element 的 type 一樣是 array，所以這個 pointer 的 type 就是 pointer to first inner array
-    ```C++
+    ```cpp
     int main() {
       int ia[3][4]; // array of size 3; each element is an array of ints of size 4
       int(*p)[4] = ia; // ppoints to an array off our ints
@@ -356,21 +365,19 @@ Modern C++ programs should use vectors and iterators instead of built-in arrays 
     ```
     * 一樣，p 宣告時的括號是必須的
 * C++11 請用 auto 或 decltype
-```C++
+```cpp
 int main() {
   int ia[3][4] = {};
-  for (auto p = ia; p != ia + 3; ++p) { // q points to the first element of an
-                                        // array of four ints; that is, q points
-                                        // to an int
+  for (auto p = ia; p != ia + 3; ++p) { 
     for (auto q = *p; q != *p + 4; ++q)
       cout << *q << ' ';
     cout << endl;
   }
 }
 ```
+* **注意上面這段到底什麼時候每個階段 p, \*p, q 跟 \*q 的型態是什麼，宣告時又是因為從什麼 array decay 成什麼 pointer 導致他們有這些型態**
 * 看起來還是很麻煩，可以用 C++11 的 begin() 跟 end()
-```C++
-
+```cpp
 int main() {
   int ia[3][4] = {};
   // p points to the first array in ia
@@ -384,7 +391,7 @@ int main() {
 ```
 * 這樣寫還真的比較清楚，因為你就不用去想到底什麼時候 array name 會被轉成 pointer to first element 了，你知道 begin() 跟 end() 一定傳 pointer to element 給你，讚讚
 #### Type Aliases Simplify Pointers to Multidimensional Arrays
-```C++
+```cpp
 using int_array = int[4]; // new style type alias declaration; see § 2.5.1 (p. 68) 
 typedef int int_array[4]; // equivalent typedefdeclaration; § 2.5.1 (p. 67)
 // print the value of each element in ia, with each inner array on its own line 

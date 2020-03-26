@@ -1,3 +1,7 @@
+---
+tags: C++
+---
+
 # C++ Primer Chapter 4 Expressions
 * **An** expression is composed of one or more **operands** and **yields a result** when it is evaluated. 
 * More complicated expressions are formed from an operator and one or more operands.
@@ -37,7 +41,7 @@
 * 幹，同樣 type，l/r 不同，用在 decltype 也會不一樣
     * 媽的他真的好用嗎= =
     * 如果 operand 是 lvalue，那 type 就會推斷為 reference
-    ```C++
+    ```cpp
     int i = 0;
     int *p = i;
     decltype(*p) i_ref = i; // *p is lvalue，decltype(*p) is int&
@@ -60,12 +64,12 @@
     * 我們知道 f1() 跟 f2() 一定會在做 * 之前被算完，但是 f1() 跟 f2() 哪個會先算是沒有被定義的
     * For operators that do not specify evaluation order, **it is an error for an expression to refer to and change thesameobject.**
     * **Expressions that do so have undefined behavior (§ 2.1.2, p. 36).**
-    ```C++
+    ```cpp
     int i = 0; cout << i /*refer to*/<< " " << ++i/*and change*/ << endl; // undefined
     ```
 * 不過雖然大部分的 operator 都沒有指定運算順序，但有四個有指定，分別是 &&(logic AND), ||(logic OR), ? : (ternary),  跟 ,(comma operator)
 ### 結論是 Order of operand evaluation is independent of precedence and associativity.
-```C++
+```cpp
  f() + g() * h() + j();
 ```
 * 我們只知道 * 一定會在 g() 跟 h() 做完之後才被運算，其他兩個 + 亦然
@@ -77,7 +81,7 @@
     1. When in doubt, parenthesize expressions to force the grouping that the logic of your program requires.
     2. **If you change the value of an operand, don’t use that operand elsewhere in the same expresion.**
         * 但是第二點有例外：
-            ```C++
+            ```cpp
             *++iter
             ```
         * 這樣寫的話 iter 會被 ++ 先改變，之後 * 又運作在被改變的 iter 上。這樣符合第二點(eleswhere in the same exp)，但是因為你這樣寫，你一定會先算 ++ 再算 *，所以不會造成什麼問題，這感覺有點類似 f1() * f2() 一定會把 f1() 跟 f2() 都算完再算 *，不過稍微有點不同
@@ -90,7 +94,7 @@
 * small integral types are **promoted to a larger integral type**, and all operands may be **converted to a common type** as part of evaluating these operators.
 * unary + and arith + and - may also be applied to pointers
 * 你只要對某個 operand 用了 operator，你都要注意 operand 有可能會被 promoted，之後會講。
-```C++
+```cpp
 int i = 1024; int k = -i; // i is -1024
 bool b = true;
 bool b2 = -b; // b2is true!
@@ -111,7 +115,7 @@ bool b2 = -b; // b2is true!
             * (100/3)*3 + 100%3 = 100，由 / 的定義知道 + 左邊的值是 99，所以 100%3 是 1，100 跟 1 同 sign
             * (-100)/3*3 + (-100)%3 = -100，由 / 的定義知道 + 左邊的值是 -99，所以 (-100)%3 是 -1，-100 跟 -1 同 sign
     * 還有，除了一些ㄎㄧㄤ例子例如 -m overflow 之類的，(-m)/n 跟 m/(-n) 總是跟 -(m/n) 相同，m%(-n) 跟 m%n 相同，(-m)%n 跟 -(m%n) 相同
-        ```C++
+        ```cpp
         21 % 6; /* result is 3 */      21 / 6; /* result is 3 */ 
         21 % 7; /* result is 0 */      21 / 7; /* result is 3 */  
         -21 % -8; /* result is -5 */  -21 / -8; /* result is 2 */
@@ -158,7 +162,7 @@ bool b2 = -b; // b2is true!
 ## 4.4 Assignment Operators
 * 注意，宣告時用的 = 是 initialization，不是 assignment
 * lhs must be **modifiable lvalue**
-    ```C++
+    ```cpp
     int i=0, j=0, k= 0; // initializations, not assignment
     const int ci = i; // initialization, not assignment
     1024 = k; // error: literals are rvalues
@@ -168,12 +172,12 @@ bool b2 = -b; // b2is true!
 * result of assignment is lhs, which is an lvale
 * type is type of lhs
     * if type of rhs and lhs differ, rhs is converted to type of lfs
-    ```C++
+    ```cpp
     k = 0; // result: type int,value 0
     k = 3.14159; // result: type int,value 3
     ```
     * 如果用新標準的 initializer list，如果 rhs 的型別要被轉到 lhs 的型別會 narrowing down 的話，就會噴 error。
-```C++
+```cpp
 k = {3.14};  // error: "narrowing conversion"
 vector<int> vi; // initially empty
 vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
@@ -183,7 +187,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 #### Assignment Has Low Precedence
 * assignment 的優先權很低，常常需要括號，尤其你用很 C/C++ 的把 assignment 放在 condition 的寫法的時候。
 #### Compound Assignment Operators
-```C++
+```cpp
 += -= *=/=%= <<= >>= &= ^= |=
 // arithmetic operators
 // bitwise operators; see § 4.8 (p. 152)
@@ -200,7 +204,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 * **postfix version's result is rvalue**
 #### Combining Dereference and Increment in a Single Expression
 * 這是常用技巧!
-    ```C++
+    ```cpp
     *ptr++;
     ```
     * postfix increment 優先權比 dereference 高，所以 ++ 會先作用在 ptr 上
@@ -210,7 +214,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 #### **Remember That Operands Can Be Evaluated in Any Order**
 * Because the increment and decrement operators change their operands, it is easy to misuse these operators in compound expressions.
 * increment operator 就是屬於那種會改變 operand value 的 operator，所以在 exp 內用它們的時候要小心不要有其他的 subexp 也用到它們作用到的 operand。
-    ```C++
+    ```cpp
     string s = "9487_I_LOVE_hsilu"
     for (auto s_it = s.begin(); s_it != s.end(); s_it++)
         *s_it = toupper(*s_it);
@@ -238,7 +242,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 * **That result of the conditional operator is an lvalue if both expressions are lvalues or if they convert to a common lvalue type. Otherwise the result is an rvalue.**
 * 但基本上不會把 ?: 放在 lvalue 可以放的地方吧... 你寫這種 code 會讓讀的人很想死
 * ? : 的優先權非常低，比 << 跟 >> 還低，請無腦的直接在 ? : 兩邊用括號
-    ```C++
+    ```cpp
 
     int main() {
       int grade = 87;
@@ -272,7 +276,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
     * 可以拿來諸如宣告陣列之類的
 * The sizeof operator is unusual in that **it does not evaluate its operand**:
     * 他不會在 runtime 時真的算，畢竟他可以回傳 constexpr
-    ```C++
+    ```cpp
     int main() {
       int a = 94, b = 87;
       int c = sizeof(a + b);
@@ -306,7 +310,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 ## 4.11 Type Conversions
 * Some types are related to each other
     * There is a conversion between them
-    ```C++
+    ```cpp
     int ival = 3.541 + 3; // the compiler might warn about loss ofprecision
     ```
     1. 3 先被轉成 double
@@ -353,7 +357,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 * 指標間的轉換
     * 0 跟 nullptr 可以被轉成任何型態的指標
     * pointer to non-const type 可以轉成 void*
-    * pointer to const type 可以轉成 const void*
+    * pointer to any type 可以轉成 const void*
     * 還有噁心的跟繼承(inheritance)有關的指標型態轉換...
 
 * whatever 轉成 bool
@@ -369,7 +373,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 #### static_cast
 * Any well-defined type conversion, other than those involving low-level const, can be requested using a static_cast. 
     * 如果你想要的型態可以用既有型態轉過來可是沒有辦法用 implicit conversions，那你就要用 static_cast
-    ```C++
+    ```cpp
     // cast used to force floating-point division 
     double slope = static_cast<double>(j) / i;
     ```
@@ -378,7 +382,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 * A static_cast is often useful when a larger arithmetic type is assigned to a smaller type.
 * informs both the reader of the program and the compiler
 * A static_cast is also useful to perform a conversion that the compiler will not generate automatically.
-    ```C++
+    ```cpp
     void* p = &d; // ok: address ofany nonconstobject can be stored in a void* // ok: converts void*back to the original pointer type
     double *dp = static_cast<double*>(p);
     ```
@@ -391,7 +395,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
         * 如果你 cast 回不同的 type，是 UB。
 #### const_cast
 * change low-level const
-    ```C++
+    ```cpp
     const char *pc;
     char *p = const_cast<char*>(pc); // ok: but writing through p is undefined
     ```
@@ -399,7 +403,9 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
     * "casts away the const."
 *  If the object was originally not a const, using a cast to obtain write access is legal. **However, using a const_cast in order to write to a const object is undefined.**
 * const_cast 只能把 pointer 或 reference 的 low-level const 拿掉而已，用他來做其他的轉換會噴 error
-* A const_cast is most useful in the context of overloaded functions, which we’ll describe in § 6.4 (p. 232).
+    * **同樣的你也不能用其他種 cast 來轉換 expression 的 `const`ness
+    * **`const char* p; static_cast<char*>(p)` 會噴 error**
+* A `const_cast` is most useful in the context of overloaded functions, which we’ll describe in § 6.4 (p. 232).
 
 #### reinterpret_cast
 * 噁

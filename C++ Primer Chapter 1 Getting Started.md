@@ -1,3 +1,7 @@
+---
+tags: C++
+---
+
 # C++ Primer Chapter 1 Getting Started
 
 ## 1.1
@@ -14,7 +18,7 @@
 
 
 * 接下來用一個簡單例子說明 C++ I/O 的使用：
-```C++
+```cpp
 #include <iostream> 
 int main() {
     std::cout << "Enter two numbers:" << std::endl;
@@ -57,7 +61,7 @@ int main() {
 ## 1.4
 介紹一些 flow control statement
  * while 是由一個 condition 跟 statement 組成
-     ```C++ 
+     ```cpp 
          while (condition)
             statement
     ```
@@ -66,7 +70,7 @@ int main() {
 
 * for
     * for 是由一個 header 跟 statement 組成
-    ```C++
+    ```cpp
         for(header)
             statement
     ```
@@ -74,7 +78,7 @@ int main() {
         * 注意 init-statement, condition, expression 他們各自的精確定義
 
 * 接下來介紹使用 loop 來讀取未知數量的 input
-    ```C++
+    ```cpp
         while (std::cin >> value)
     ```
     * 94這樣啦!
@@ -87,7 +91,7 @@ int main() {
     * valid|invalid 就會計算成 true|false
 
 * if statement
-    ```C++
+    ```cpp
     if(condition)
         statement_1
     else if(condition)

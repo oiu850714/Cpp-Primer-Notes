@@ -1,3 +1,7 @@
+---
+tags: C++
+---
+
 # C++ Primer Chapter 8 The IO Library
 
 * 十幾頁而已，爽
@@ -29,10 +33,10 @@
 * 其實有 wcin, wcout, wcerr 這種東西
 
 #### Relationships among the IO Types
-* 概念上，我現在要對某個裝置或檔案，或者 string 做 IO 操作，我都希望我使用的操作方式可以不用去理會操作的對象；亦即我可以用一模一樣的寫法來操作這些東西
+* 概念上，我現在要對某個裝置或檔案，或者 string 做 IO 操作，我都希望我使用的操作方式可以不用去理會我到底操作什麼裝置/檔案；亦即我可以用一模一樣的寫法來操作這些東西
 * C++ **利用繼承來達成**，繼承之後章節會講
 * 如同 template，我們一樣可以不用很了解繼承在幹嘛，可是一樣可以使用繼承的好處
-* 簡單說，一個 class B 繼承 class A，我們說 class B **也是** class A，**class B 可以用 class A 的方式操作**
+* 簡單說，一個 class B 繼承 class A，我們說 class B **也是** class A，**可以用使用 class A 的方式使用 B**
     * ifstream 跟 istringstream 繼承 istream
     * ofstream 跟 ostringstream 繼承 ostream
     * fstream 跟 stringstream 繼承 iostream
@@ -44,7 +48,7 @@
 
 ### 8.1.1 No Copy or Assign for IO Objects
 * 之前說過， IO object 不能 copy(雖然我還是不知道怎樣弄才會不能 copy lol)
-    ```C++
+    ```cpp
     ofstream out1, out2;
     out1 = out2; // error: cannot assign stream objects
     ofstream print(ofstream); // error: can’t initialize the 
@@ -64,18 +68,18 @@
     * IO class 定義了一系列的 interface 可以讓我們看 IO object 對應的 stream 的狀態
 
 * 下面的例子
-    ```C++
+    ```cpp
     int ival; cin >> ival;
     ```
 * 如果這時鍵盤打 Boo 再 enter，那 cin >> ival 會 fail
 * **As a result, cin will be put in an error state.**
 * 相似的，如果這時候打 Eof 對應的 key，那 cin 一樣也會變成 error state
 * ***只要 IO object 變成 error state，之後對它做的讀寫全部都會 fail***
-* Because a streammight be in an error state, code ordinarily should check whether a stream is okay before attempting to use it.
+* Because a stream might be in an error state, code ordinarily should check whether a stream is okay before attempting to use it.
     * 其實 while(cin >> i) 就是一種檢查惹
 
 #### Interrogating the State of a Stream
-* 只用上面 condition 的方式檢查 stream 只能看到 stream 是否 valid，我們常常需要更進一步了解 stream 處於什麼 state，**如果 invalid，為什麼會 invalid**
+* 只用上面 condition 的方式檢查 stream 只能看到 stream 是否 valid，我們常常需要更進一步了解 stream 處於什麼 state，**具體發生什麼事情導致 invalid**
     * For example, what we do after hitting end-of-file is likely to differ from what we’d do if we encounter an error on the IO device.
     * The IO library **defines a machine-dependent integral type named *iostate*** that it uses to c**onvey information about the state of a stream.**
 
@@ -89,7 +93,7 @@
     * failbit 在那種可復原的錯誤發生之後會被 set，例如要吃一個數字結果 input 卻是字串
         * 通常可以把問題解決然後重新使用對應的 stream
     * Reaching end-of-file **sets both eofbit and failbit**
-    * goodbit 標準保證它的 value 是 ，並且 stream 是在 goodbit 時，stream 沒有 error
+    * goodbit 標準保證它的 value 是 0，並且 stream 是在 goodbit 時，stream 沒有 error
 * **If any of badbit, failbit,or eofbit are set, then a condition that evaluates that stream will fail.**
 
 * Library 除了定義這些 constexpr value 之外，還有定義一系列的 member function 來得知 stream 的狀態
@@ -97,17 +101,15 @@
     * bad(), fail(), 跟 eof() return true 如果對應的 iostate value 發生的話
         * 此外，如果 bad 是 true，那 fail 也會是 true
 
-* By implication, the right way to **determine the overall state** of a stream is to use either good or fail.
+* By implication, the right way to **determine the overall state** of a stream is to use either `good()` or `fail()`.
 * 其實把一個 stream 當 condition 就如同寫成 !stream_obj.fail() 一樣
 * 如果真的 fail 了再去檢查到底是因為 eof 還是普通 fail 還是更慘，bad
-    * fail 在 failbit 或 badbit set 是都會 return true；奇怪，阿不是說 EOF 時 fail 也會 true? 可是 fail 沒看 eofbit 啊?
-    * 那是因為 EOF 是會把 eofbit **跟 failbit** 都設起來!
-
+    
 #### Managing the Condition State
-* rdstate 回傳 stream 當前 state 對應的 iostate value
+* `stream_obj.rdstate()` 回傳 stream 當前 state 對應的 iostate value
 * setstate 有點像 bitwise OR，把給定的(多個) state(s) 打開
 * clear 有兩種，一種是不給參數，把 state reset 成 good，第二種是吃一個參數，把 state 設成跟參數一樣的 value
-    ```C++
+    ```cpp
     // remember the current state ofcin
     auto old_state = cin.rdstate();
     // remember the current state of
@@ -118,10 +120,11 @@
     ```
     * 上面又在一次 demo 用 auto 的好處，你可以不用記得標準定義的物件或是 value 是什麼型態
     * 不過我對上面的 code 一點感覺都沒有.. 如果 old_state 已經 fail，不管它 fail 直接進行 input 操作不會出事ㄇ
+    * 可能只是純 demo
 
 * 你還可以用 bitwise operator 來設定你想要的特定的 state
-    ```C++
-    // turns offfailbitand badbit but all other bits unchanged
+    ```cpp
+    // turns off fail bit and badbit but all other bits unchanged
     cin.clear(cin.rdstate() & ~cin.failbit & ~cin.badbit);
     ```
     * 上面的 code 只把 failbit 跟 badbit 關掉，但是不會動到 eofbit 原本的狀態
@@ -137,8 +140,8 @@
 * There are several conditions that cause the buffer to be flushed—**that is, to be written—*to the actual output device* or file:**
     * 程式正常關閉時，也就是 return from main 時
     * buffer 滿了的時候
-    * 把 endl 這種 IO manipulator 丟給 cout 時
-    * We can use the **unitbuf** *manipulator* to set the stream’s internal state to empty the buffer after each output operation. By default, unitbuf is set for cerr,so that writes to cerr are flushed immediately.
+    * 把 endl 這種 IO manipulator 丟給 ostream 時
+    * We can use the **unitbuf** *manipulator* to set the stream’s internal state to empty the buffer after each output operation. By default, unitbuf is set for `cerr`,so that writes to cerr are flushed immediately.
     * An output stream might be **tied to** another stream.
         * In this case, the output stream is flushed whenever the stream to which it is tied is read or written.
         * 一個 output stream 可以綁住(tie) 另一個 stream，當這個 stream 有做讀寫時，output stream 就會 flush
@@ -153,28 +156,31 @@
 #### The unitbuf Manipulator
 * 我們想要從某個時間點開始都不要把資料 buf 住的話，可以用 unitbuf manipulator
     * ostream_obj << unitbuf;
-* nounitbuf 會把 stream 的 buffer 機制重設成預設方式
+* nounitbuf 會把 stream 的 buffer 機制設回有 buffer 的狀態
 
-* CAUTION: BUFFERS ARE NOT FLUSHED IFTHE PROGRAM CRASHES
+:::warning
+CAUTION: BUFFERS ARE NOT FLUSHED IF THE PROGRAM CRASHES
     * 如果你的程式不正常結束，那些還在 buffer 的資料是不會被 flush 的!
-    * **當你在 debug 的時候記得把 buffer 調整成會立即 flush，這樣才不會有以為程式沒正常執行殊不知只是資料待在 buffer 沒印出來的情況**
-
+    * **當你在 debug 的時候記得把 buffer 調整成會立即 flush，這樣才不會以為程式沒正常執行，殊不知只是資料待在 buffer 沒印出來**
+:::
 #### Tying Input and Output Streams Together
 * 幹我看不懂 Primer 說的 "tie" 這個動詞怎麼用.. 到底誰 tie 誰==
-* 如果你把一個 input stream tie 到一個 output stream，每次你讀東西到 input stream，**C++ 會把跟 output stream 有關聯的 stream 都 flush**
+    * 我兩年後還是看不懂
+    * 不過 tie 的參數只會是 ostream(ptr)，所以說 some stream ties to some ostream 應該比較順
+* 如果你把一個 (i/o)stream tie 到一個 output stream，每次你對該 (i/o)stream 做讀寫，都會導致該 output stream flush
     * 請注意看我到底是寫誰會被 flush
-    * 預設 cin 跟 cout 綁在一起
-    * 所以類似 cin >> ival; 的操作就會 flush 跟 cout tie 在一起的物件
+    * 預設 cin tie cout
+    * 所以類似 cin >> ival; 的操作就會 flush cout buffer
 
 * Note: Interactive systems usually should tie their input stream to their output stream. *Doing so means that all output, which might include prompts to the user, will be written before attempting to read the input.*
 
 * tie 有兩種 overloaded member functions
     * 一個不吃參數，回傳 pointer to output stream，指向目前 tie 住的 stream(如果有的話)，否則 return nullptr
     * 第二個是給一個 pointer to ostream 參數，然後**把自己 tie 到那個 ostream**；一樣回傳舊的 tie 著的 stream，如果有的話
-        * That is, x.tie(&o) ties the streamx to the output stream o.
-* 我們要把 i 或 ostream tie 到 ostream 都可以
+        * That is, x.tie(&o) ties the stream `x` to the output stream `o`.
+* 我們要把 (i/o)stream tie 到 ostream 都可以
 
-```C++
+```cpp
 cin.tie(&cout); // illustration only: the library ties cin and cout for us
 // old_tie points to the stream (if any) currently tied to cin
 ostream *old_tie = cin.tie(nullptr); // cin is no longer tied
@@ -186,6 +192,7 @@ cin.tie(old_tie); // reestablish normal tie between cinand cout
 * 如果要把某個 stream 給解 tie，我們就要傳入 nullptr
     * stream_obj.tie(nullptr);
 * 還記得競程超愛寫的 cin.tie(0); 嗎? 0 等價 nullptr(或 NULL)，所以就是把 cin 解 tie 的意思!
+    * 這樣 cin 在讀取時就不會導致 cout flush，效率可能更好
 
 * 一個 stream 同時最多只能 tie 一個 ostream
 * 但是可以同時有多個 stream tie 住一個 ostream
@@ -203,16 +210,16 @@ cin.tie(old_tie); // reestablish normal tie between cinand cout
 
 ### 8.2.1 Using File Stream Objects
 * We define a file stream object and associate that object with the file.
-* Each file stream class defines a member function named open *that does whatever system-specific operations are required to locate the given file* and open it for reading or writing as appropriate
-* 可以宣告 object 時就給 filename，這樣 open 會自動被 call
-* 或者 default init，之後再用 open member function
-* C++11 之前 filename 只能是 C string，超ㄎㄧㄤ，現在可以給 string
+* Each file stream class defines a member function named `open` *that does whatever system-specific operations are required to locate the given file and open it* for reading or writing as appropriate
+* 可以宣告 fstream object 時就給 filename，這樣 `open` 會間接被呼叫
+* 或者 default init fstream obj，之後再自己呼叫 `open` member function
+* C++11 之前 filename 只能是 C style string，超ㄎㄧㄤ，現在可以給 `string`
 
 #### Using an fstream in Place of an iostream&
 * 之前講過，因為繼承的特性，我們可以把 fstream 物件放到需要 iostream 的地方
 * 還記得很久以前為了 Sales_data 寫過 print 跟 read 嗎? 我們這時候可以傳 fstream 給他們，這樣就可以從檔案讀寫啦!
 * 下面的 code 假設 input 跟 output file 當成 command line arg 傳進來
-    ```C++
+    ```cpp
     ifstream input(argv[1]); // open the file of sales transactions 
     ofstream output(argv[2]); // open the output file
     Sales_data total;           // variable to hold running sum
@@ -232,29 +239,29 @@ cin.tie(old_tie); // reestablish normal tie between cinand cout
         cerr << "No data?!" << endl;
 * Aside from using named files, this code is nearly identical to the version of the addition program on page 255.
 
-#### The open and close Members
-* When we define an empty file stream object(沒給 string 參數的), we can subsequently associate that object with a file by calling open:
-    ```C++
+#### The `open` and `close` Members
+* When we define an empty file stream object(沒給 string 參數的), we can subsequently associate that object with a file by calling `open`:
+    ```cpp
     ifstream in(ifile);
     ofstream out;
     out.open(ifile + ".copy");
 
-* 別忘了 fstream 是繼承 iostream 的，所以那些檢查 stream 狀態的功能都可以用
-* 例如如果檔案開啟失敗，failbit 會被 set
+* 別忘了 fstream 是繼承 iostream 的，所以那些檢查 stream 狀態的功能(`iostate` 跟一些 member functions)都可以用
+* 例如如果檔案開啟失敗，`failbit` 會被 set
 * 挖操，感覺比 FILE* == NULL 好用(ry
-    ```C++
+    ```cpp
     if (out)
         ;   // check that the opensucceeded // the opensucceeded, so we can use the file
     ```
-* 直接這樣的 code 就可以確認 fstream 的狀態，讚
+    * 這樣的 code 就可以確認 fstream 的狀態，讚
 
 * Once a file stream has been opened, *it remains associated with the specified file.*
-* Indeed, calling open on a file stream that is already open will fail and set failbit.
-* 你要開新檔案，必須先 call close() 這個 member function
+* Indeed, calling `open` on a file stream that is already open will fail and set `failbit`.
+* 你要開新檔案，必須先把已經呼叫 `open` 成功的 fstream obje 呼叫 `close()` 這個 member function 才能開
 
 #### Automatic Construction and Destruction
 * 下面的 code 是一個 fstream 可能的使用場景
-```C++
+```cpp
 // for each file passed to the program
 for (auto p = argv + 1; p != argv + argc; ++p) { 
     ifstream input(*p); // create input and open the file 
@@ -265,33 +272,34 @@ for (auto p = argv + 1; p != argv + argc; ++p) {
 }// input goes out of scope and is destroyed on each iteration
 ```
 * As usual, we check that the open succeeded.
-* Because input is defined inside the block that forms the for body, **it is created and destroyed on each iteration (§ 6.1.1, p. 205).**
+* Because `input` ifstream is defined inside the block that forms the for body, **it is created and destroyed on each iteration (§ 6.1.1, p. 205).**
 * When an fstream object **goes out of scope, the file it is bound to is *automatically closed*.**
     * 所以不會發生表面上看到的連續 open 多次
-    * 還有這裡又再次強調，在 for 裡面宣告的變數，每次 iteration 會 in scope，然後又馬上被消滅，又 in scope，and so on
+        * dtor 會呼叫 `close`
+    * 還有這裡又再次強調，在 for 裡面宣告的變數，每次 iteration in scope 後會初始化，然後 out of scope 又馬上被消滅，又 in scope 初始化，and so on
 
 #### 8.2.2 File Modes
 * Each stream has an associated file mode that represents how the file may be used.
 * ![](https://i.imgur.com/wJQ3fWY.png)
 * We can supply a file mode whenever we open a file—either when we call open or when we indirectly open the file when we initialize a stream from a file name.
 * 這些 file mode 有一些限制
-    * out 只能用在 ofstream 跟 fstream
-    * in 只能用在 ifstream 跟 fstream
-    * trunc 只有在 out 有給的時候才能給
-    * app 在 trunc 給的時候不能給，亦即 app 跟 trunc 只能選一個
-    * 預設行為，當檔案用 out mode 開啟時也會被 truncated 就算我們沒有指定 trunc
-        * 要改變這個預設行為就要額外給 app，記得上面講的 app trunc 不能同時出現，所以給了 app trunc 就不會開啟；但是這樣我們就只能從檔案尾巴開始寫資料了
-        * 或者同時給 in，不過同時給 in 跟 out 在 17章才會詳細講
-    * ate 跟 binary 只能配其他的一起用
+    * `out` 只能用在 `ofstream` 跟 `fstream`
+    * `in` 只能用在 `ifstream` 跟 `fstream`
+    * `trunc` 只有在 `out` 有給的時候才能給
+    * `app` 跟 `trunc` 是互斥的，亦即 `app` 跟 `trunc` 只能選一個
+    * 預設行為，當檔案用 `out` mode 開啟時也會被 `truncated`，就算我們沒有指定 `trunc`
+        * 要改變這個預設行為，給 `out` 時就要額外給 `app`，記得上面講的 `app` `trunc` 不能同時出現，所以給了 `app` `trunc` 就不會開啟；但是這樣我們就只能從檔案尾巴開始寫資料了
+        * 或者同時給 `in`，不過同時給 `in` 跟 `out` 在 17章才會詳細講
+    * ate 跟 binary 可以配其他的 file mode 一起用
 
 * 這些 stream type 都有預設的 file mode，每個有不同
 * fstream 是 in|out
 * ifstream 是 in
-* ofstream 是 out
+* ofstream 是 out(|trunc)
 
 
-#### Opening a File in out Mode Discards Existing Data
-```C++
+#### Opening a File in `out` Mode Discards Existing Data
+```cpp
 // file1 is truncated in each of these cases 
 ofstream out("file1"); // out and trunc are implicit ofstream 
 out2("file1", ofstream::out); // trunc is implicit ofstream 
@@ -300,49 +308,51 @@ out3("file1", ofstream::out | ofstream::trunc);
 ofstream app("file2", ofstream::app); // out is implicit
 ofstream app2("file2", ofstream::out | ofstream::app);
 ```
-* 注意上面那個 mode 只有給 app 的宣告還是合法的，因為 out 會隱性的給
+* 注意上面那個 mode 只有給 `app` 的宣告也是合法的，因為 `out` 會隱性的給
 
 #### File Mode *Is Determined Each Time* open Is Called
 
-```C++
+```cpp
 ofstream out; // no file mode is set
-out.open("scratchpad"); // mode implicitly outand trunc
-out.close(); // close outso we can use it for a different file 
-out.open("precious", ofstream::app); // mode is outand app
+out.open("scratchpad"); // mode implicitly out and trunc
+out.close(); // close out so we can use it for a different file 
+out.open("precious", ofstream::app); // mode is out and app
 out.close();
 ```
-* 每次開檔案時的 file mode 不會繼承之前開檔案時的 file mode，每次 mode 都是獨立的
+* **每次開檔案時的 file mode 不會繼承之前開檔案時的 file mode，每次 mode 都是獨立的**
 
 ## 8.3 string Streams
 
-* The sstream header defines three types to support in-memory IO; these types read from or write to a string **as if the string were an IO stream.**
+* The `<sstream>` header defines three types to support in-memory IO; these types read from or write to a string **as if the string were an IO stream.**
 * istringstream read from string
 * ostringstream write to string
 * stringstream both
 * 繼承 iostream，所有 operation 都可以用
-* In addition to the operations they inherit, **the types defined in sstream addmembers to manage the string associated with the stream.**
-* 注意雖然 stringstream 跟 fstream 跟 iostream 有相同 interface，但他們也只有這層關聯而已，沒有其他共同的地方惹
-    * 比方說 stringstream 沒有 open，fstream 沒有 str
+* In addition to the operations they inherit, **the types defined in sstream add members to manage the string associated with the stream.**
+* 注意雖然 `stringstream` 跟 `fstream` 有共同 parent  `iostream`，但他們也只有這層關聯而已，沒有其他共同的地方惹
+    * 比方說 `stringstream` 沒有 `fstream` 的 `open`，`fstream` 沒有 `stringstream` 的 `str`
 * stringstream 獨有的 interface
     * ![](https://i.imgur.com/z9bnEpc.png)
 
-### 8.3.1 Using an istringstream
-* An istringstream is often used when we have some work to do on an entire line, and other work to do with individual words within a line.
-    * 先用 getline 把一行資料讀到 string，再用 istringstream 讀 string
+### 8.3.1 Using an `istringstream`
+* An `istringstream` is often used when we have some work to do on an entire line, and other work to do with individual words within a line.
+    * 先用 getline 把一行資料讀到 string，再用這個 temp string 初始化 `istringstream`，用 IO 的方式讀取那個 string
 
-* 例子: 現在有一份檔案，每一行是一筆資料，每筆資料第一個字是人名，之後會有一筆或多筆字是電話號碼
+* 例子: 現在有一份檔案，每一行是一筆資料
+    * 每筆資料第一個字是人名
+    * 之後的會有一筆或多筆電話號碼
     morgan 2015552368 8625550123 
     drew  9735550130
     lee 6095550132 2015550175 8005550000
 * 我們用一個 struct 來存每一筆資料
-    ```C++
+    ```cpp
     struct PersonInfo { 
         string name;
         vector<string> phones;
     };
     ```
 * 可以這樣寫 code
-    ```C++
+    ```cpp
     string line, word; // will hold a line and word from input, respectively
     vector<PersonInfo> people; // will hold all the records from the input
     // read the input a line at a time until cin hits end-of-file (or another error)
@@ -360,15 +370,15 @@ out.close();
     * 例如這邊是以行為單位擺放，那最外層就一次讀一行，內層迴圈再對這行慢慢處理
     * 不要發生那種明明是以行為單位，卻一次讀一個字的狀況，這樣你程式的"狀態機"會很難定義，而且很難懂
 * 注意上面使用的一些專屬 stringstream 的 member function
-    * 先創一個 istringstream，把 line 丟進去，這樣就可以用 >> 把 word 從 istringstream object 裡面讀出來
-    * When the string has been completely read, **"end-of-file" is signaled** and the next input operation on record will fail.
+    * 先創一個 `istringstream`，把 line 丟進去，這樣就可以用 >> 把 word 從 istringstream object 裡面讀出來
+    * When the string has been completely read(from the `istringstream`), **"end-of-file" is signaled** and the next input operation on record will fail.
     
-### 8.3.2 Using ostringstreams
-* An ostringstream is useful when we need to build up our output a little at a time but do not want to print the output until later.
+### 8.3.2 Using `ostringstreams`
+* An `ostringstream` is useful when we need to build up our output a little at a time but do not want to print the output until later.
 * 例如上面 phone number 的例子，我們可能需要對 number 做一些格式上的驗證，然後再寫到新的檔案裡，不符格式的那一行就不輸出
 * 這樣我們定要把一整行的所有電話都確認完之後才能輸出到新檔案
 * 可以把 output 內容先塞到 ostringstream，最後再輸出到檔案(輸出 osstream_obj.str())
-```C++
+```cpp
 for (const auto &entry : people) { // for each entry in people
     ostringstream formatted, badNums; // objects created on each loop
     for (const auto &nums : entry.phones) { // for each number
