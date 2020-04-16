@@ -482,8 +482,8 @@ void recoup(int) throw(); // **equivalent declaration**
 	* 裡面可以放各種 type 的 name，class, function, variable 等等
 * 例子:
 	```C++
-	namespace cplusplus_primer { 
-		class Sales_data { /* .. . */}; 
+	namespace cplusplus_primer {
+		class Sales_data { /* .. . */};
 		Sales_data operator+(const Sales_data&, const Sales_data&);
 		class Query { /* .. . */}; class Query_base { /* .. . */};
 	}// like blocks, namespaces do not end with a semicolon
@@ -500,7 +500,7 @@ void recoup(int) throw(); // **equivalent declaration**
 * namespace 的某個 name 可以被同 namespace 內的其他 names(或者同 namespace 內再定義的 namespace 內的 names) 給存取
 * 而在 namespace 之外要存取 namespace 內的 name 就需要用 scope operator 了
 	```C++
-	cplusplus_primer::Query q = 
+	cplusplus_primer::Query q =
 			cplusplus_primer::Query("hello");
 	```
 * 假設有另一個 namespace `AddisonWesley` 也定義了 `Query`，我們要使用這個 `Query` 可以改成這樣:
@@ -510,7 +510,7 @@ void recoup(int) throw(); // **equivalent declaration**
 #### Namespaces Can Be Discontiguous
 * 16.5(p.709) 有說到，**同一個** namespace 可以被定義在好幾個地方:
 	```C++
-	namespace nsp { 
+	namespace nsp {
 		// declarations
 	}
 	```
@@ -536,31 +536,31 @@ void recoup(int) throw(); // **equivalent declaration**
 * 以下是 code 結構:
 	```C++
 	// ---- Sales_data.h---
-	// #includes should appear before opening the namespace 
-	#include <string> 
-	namespace cplusplus_primer { 
-		class Sales_data { /* .. . */}; 
+	// #includes should appear before opening the namespace
+	#include <string>
+	namespace cplusplus_primer {
+		class Sales_data { /* .. . */};
 		Sales_data operator+(const Sales_data&, const Sales_data&);
-		// declarations for the remaining functions in the Sales_data interface 
+		// declarations for the remaining functions in the Sales_data interface
 	}
 	```
 	```C++
 	// ---- Sales_data.cc ---
-	// be sure any #includes appear before opening the namespace 
-	#include "Sales_data.h" 
-	namespace cplusplus_primer { 
+	// be sure any #includes appear before opening the namespace
+	#include "Sales_data.h"
+	namespace cplusplus_primer {
 		// definitions for Sales_data members and overloaded operators
 	}
 	```
 * 而這時 user code 要用我們的 lib 就會有好處了，他想要用什麼功能就 include 什麼 header，而且這些 name 全部都屬於 `cplusplus_primer`，所以前面全部都只要加上 `cplusplus_primer::` 就行了:
 	```C++
 	// ---- user.cc ---
-	// names in the Sales_data.h header are in the cplusplus_primer namespace 
-	#include "Sales_data.h" 
+	// names in the Sales_data.h header are in the cplusplus_primer namespace
+	#include "Sales_data.h"
 	int main() {
-		using cplusplus_primer::Sales_data; 
-		Sales_data trans1, trans2; 
-		// ... 
+		using cplusplus_primer::Sales_data;
+		Sales_data trans1, trans2;
+		// ...
 		return 0;
 	}
 	```
@@ -572,9 +572,9 @@ void recoup(int) throw(); // **equivalent declaration**
 #### Defining Namespace Members
 * 你在命名空間內可以直接使用其他同空間內的名字，不用加 scope:
 	```c++
-	#include "Sales_data.h" 
-	namespace cplusplus_primer { // reopen cplusplus_primer 
-		// members defined inside the namespace may use unqualified names 
+	#include "Sales_data.h"
+	namespace cplusplus_primer { // reopen cplusplus_primer
+		// members defined inside the namespace may use unqualified names
 		std::istream&
 		operator>>(std::istream& in,  Sales_data& s) { /* .. . */}
 	}
@@ -583,9 +583,9 @@ void recoup(int) throw(); // **equivalent declaration**
 * 除此之外也可以在命名空間外**定義** 空間內的 name:
 	* 不過 name 的**宣告**還是要出現在命名空間內才可以
 	```c++
-	// namespace members defined outside the namespace must use qualified names 
-	cplusplus_primer::Sales_data 
-	cplusplus_primer::operator+(const Sales_data& lhs, 
+	// namespace members defined outside the namespace must use qualified names
+	cplusplus_primer::Sales_data
+	cplusplus_primer::operator+(const Sales_data& lhs,
 								const Sales_data& rhs)
 	{
 		Sales_data ret(lhs); // ...
@@ -600,17 +600,17 @@ void recoup(int) throw(); // **equivalent declaration**
 * 當時是為了自己寫一個 `Sales_data` 版本的 `hash`，而 `hash` 這個 template 定義在 `std` 內，所以當時寫了一段 code 把 `std` **打開**，然後將 `hash<Sales_data>` specialization 定義在裡面
 * specialization 跟前面的例子一樣，只要我們先在空間內**宣告** name，我們還是可以把它定義在空間外面:
 	```c++
-	// we must declare the specialization as a member of std 
-	namespace std { 
+	// we must declare the specialization as a member of std
+	namespace std {
 		template <> struct hash<Sales_data>;
 	}
-	// having added the declaration for the specialization to std 
-	// we can define the specialization outside the std namespace 
+	// having added the declaration for the specialization to std
+	// we can define the specialization outside the std namespace
 	template <> struct std::hash<Sales_data> {
-		size_t operator()(const Sales_data& s) const 
+		size_t operator()(const Sales_data& s) const
 		{
-			return hash<string>()(s.bookNo) ^ 
-				   hash<unsigned>()(s.units_sold) ^ 
+			return hash<string>()(s.bookNo) ^
+				   hash<unsigned>()(s.units_sold) ^
 				   hash<double>()(s.revenue); }
 	// other members as before
 	};
@@ -625,17 +625,17 @@ void recoup(int) throw(); // **equivalent declaration**
 #### Nested Namespaces
 * 定義在命名空間的命名空間 lol
 	```c++
-	namespace cplusplus_primer { 
-		// first nested namespace: defines the Query portion of the library 
-		namespace QueryLib { 
-			class Query { /* .. . */}; 
-			Query operator&(const Query&, const Query&); 
+	namespace cplusplus_primer {
+		// first nested namespace: defines the Query portion of the library
+		namespace QueryLib {
+			class Query { /* .. . */};
+			Query operator&(const Query&, const Query&);
 			// ...
 		}
-		// second nested namespace: defines the Sales_data portion of the library 
-		namespace Bookstore { 
-			class Quote { /* ... */}; 
-			class Disc_quote : public Quote { /* .. . */}; 
+		// second nested namespace: defines the Sales_data portion of the library
+		namespace Bookstore {
+			class Quote { /* ... */};
+			class Disc_quote : public Quote { /* .. . */};
 			// ...
 		}
 	}
@@ -650,12 +650,12 @@ void recoup(int) throw(); // **equivalent declaration**
 * 最大的特點: **可以在某個 inline 命名空間的 enclosing namepsace 內使用 inline 命名空間的名字**
 * 用 `inline` keyword 宣告:
 	```c++
-	inline namespace FifthEd { 
+	inline namespace FifthEd {
 		// namespace for the code from the Primer Fifth Edition
 	}
-	namespace FifthEd { 
-		// implicitly inline 
-		class Query_base { /* .. . */}; 
+	namespace FifthEd {
+		// implicitly inline
+		class Query_base { /* .. . */};
 		// other Query-related declarations
 	}
 	```
@@ -666,16 +666,16 @@ void recoup(int) throw(); // **equivalent declaration**
 * inline 命名空間可以解決 code 版本變更時會出現的一些問題，詳見下面:
 * 例如我們可以把第五版的 code 定義在一個 `inline` 命名空間，叫做 `FifthEd`；然後有關前面版本的 code 則是定義成 non-`inline`:
 	```c++
-	namespace FourthEd { 
-		class Item_base { /* ... */}; 
-		class Query_base { /* .. . */}; 
+	namespace FourthEd {
+		class Item_base { /* ... */};
+		class Query_base { /* .. . */};
 		// other code from the Fourth Edition
 	}
 	```
 * 然後在 `cplusplus_primer` 內 **include** 這些命名空間:
 	```c++
-	namespace cplusplus_primer { 
-	#include "FifthEd.h" 
+	namespace cplusplus_primer {
+	#include "FifthEd.h"
 	#include "FourthEd.h"
 	}
 	```
@@ -698,11 +698,11 @@ void recoup(int) throw(); // **equivalent declaration**
 	* 例如你在 global scope 定義無名空間，則無名空間的 names 的 scope 就是 global scope
 * 因此下面的 code 會造成 ambiguous:
 	```c++
-	int i; // global declaration for i 
-	namespace { 
+	int i; // global declaration for i
+	namespace {
 		int i;
 	}
-	
+
 	int main(){
 		// ambiguous: defined globally and in an unnested, unnamed namespace
 		i = 10;
@@ -713,10 +713,10 @@ void recoup(int) throw(); // **equivalent declaration**
 * 無名空間也跟其他命名空間一樣，可以 nest 在其他命名空間內
 * 如上這樣定義的話，code 就會長類似這樣:
 	```c++
-	namespace local { 
-		namespace { 
+	namespace local {
+		namespace {
 			int i;
-		} 
+		}
 	}
 	// ok: i defined in a nested unnamed namespace is distinct from global i
 	local::i = 42;
@@ -743,7 +743,7 @@ void recoup(int) throw(); // **equivalent declaration**
 * It is an **error** if the original namespace name has not already been defined as a namespace.
 * 你也可以直接對某個空間的 nested 空間取別名:
 	```c++
-	namespace Qlib = cplusplus_primer::QueryLib; 
+	namespace Qlib = cplusplus_primer::QueryLib;
 	Qlib::Query q;
 	```
 	`Qlib::Query` 其實是 `cplusplus_primer::QueryLib::Query`
@@ -782,34 +782,34 @@ the declaration appears.
 	* 所以解決方法就是把被 using 的 namespace 的 names 丟到同時包含 namespace 跟 `using` directive 的地方
 * 舉例，假設我們有 namespace `A` 跟 function `f`，如果在 `f` 內寫 `using namespace A;` 的話，這樣在 `f` 內就宛如 `A` 的 members 是在 global scope，也就是包含 `A` 跟 `f` 的 scope:
 	```c++
-	// namespace A and function f are defined at global scope 
-	namespace A { 
+	// namespace A and function f are defined at global scope
+	namespace A {
 		int i, j;
 	}
 	void f() {
-		using namespace A; // injects the names from A into the global scope 
-		cout << i * j << endl; // uses i and j from namespace A 
+		using namespace A; // injects the names from A into the global scope
+		cout << i * j << endl; // uses i and j from namespace A
 		// ...
 	}
 	```
 #### using Directives Example
 * 看更複雜的例子"
 	```c++
-	namespace blip { 
-		int i = 16, j = 15, k = 23; 
+	namespace blip {
+		int i = 16, j = 15, k = 23;
 		// other declarations
 	}
-	int j = 0; // ok: j inside blip is hidden inside a namespace 
+	int j = 0; // ok: j inside blip is hidden inside a namespace
 	void manip() {
-		// using directive; the names in blip are ‘‘added’’ to the global scope 
-		using namespace blip; 
-		// clash between ::j and blip::j 
+		// using directive; the names in blip are ‘‘added’’ to the global scope
+		using namespace blip;
+		// clash between ::j and blip::j
 		// detected only if j is used
 		++i; // sets blip::ito 17
 		++j; // error ambiguous: global j or blip::j?
 		++::j; // ok: sets global j to 1
-		++blip::j; // ok: sets blip::j to 16 
-		int k = 97; // local k hides blip::k 
+		++blip::j; // ok: sets blip::j to 16
+		int k = 97; // local k hides blip::k
 		++k; // sets local kto 98
 	}
 	```
@@ -836,19 +836,19 @@ the declaration appears.
 #### 18.2.3 Classes, Namespaces, and Scope
 * 看例子比較快，反正 namespace 的 look up rule 就跟以前一樣:
 	```c++
-	namespace A { 
+	namespace A {
 		int i;
-		namespace B { 
+		namespace B {
 			int i; // hides A::i within B
-			int j; 
+			int j;
 			int f1() {
-				int j; // j is local to f1 and hides A::B::j 
+				int j; // j is local to f1 and hides A::B::j
 				return i; // returns B::i
 			}
-		} // namespace B is closed and names in it are no longer visible 
-		int f2() { return j; 
+		} // namespace B is closed and names in it are no longer visible
+		int f2() { return j;
 			// error: j is not defined
-		} 
+		}
 		int j = i;  // initialized from A::i
 	}
 	```
@@ -857,21 +857,21 @@ the declaration appears.
 * 當 class 定義在 namespace ，一樣還是用 normal lookup
 	* 某 member function 使用 name 時，先找 function 內的 name；再找 class 內的 member(包含 base class)，再來是 enclosing scope:
 	```c++
-	namespace A { 
-		int i; 
-		int k; 
-		class C1 { 
+	namespace A {
+		int i;
+		int k;
+		class C1 {
 		public:
-			C1(): i(0), j(0) { } // ok: initializes C1::i and C1::j 
-			int f1() { return k; } // returns A::k 
-			int f2() { return h; } // error: h is not defined 
+			C1(): i(0), j(0) { } // ok: initializes C1::i and C1::j
+			int f1() { return k; } // returns A::k
+			int f2() { return h; } // error: h is not defined
 			int f3();
-		private: 
+		private:
 			int i;  // hides A::i within C1
-			int j; 
+			int j;
 		};
 		int h = i; // initialized from A::i
-	} 
+	}
 	// member f3 is defined outside class C1 and outside namespace A
 	int A::C1::f3() { return h; } // ok: returns A::h
 	```
@@ -884,7 +884,7 @@ the declaration appears.
 ## 超級重要
 * 看下面這段 code:
 	```d++
-	std::string s; 
+	std::string s;
 	std::cin >> s;
 	```
 * 第二行會呼叫 `operator>>(std::cin, s);`
@@ -915,11 +915,11 @@ the declaration appears.
 * **但是在 class 內宣告的 friend，會被認為是包含這個 class 的最近的 namespace 的 member**
 * 這個規則跟 ADL 結合起來會有意想不到的結果:
 	```c++
-	namespace A { 
-		class C { 
-			// two friends; neither is declared apart from a friend declaration 
-			// these functions implicitly are members of namespace A 
-			friend void f2(); // won’t be found, unless otherwise declared 
+	namespace A {
+		class C {
+			// two friends; neither is declared apart from a friend declaration
+			// these functions implicitly are members of namespace A
+			friend void f2(); // won’t be found, unless otherwise declared
 			friend void f(const C&); // found by argument-dependent lookup
 		};
 	}
@@ -928,8 +928,8 @@ the declaration appears.
 	* 如果這樣寫:
 	```c++
 	int main() {
-		A::C cobj; 
-		f(cobj); // ok: finds A::f through the friend declaration in  A::C 
+		A::C cobj;
+		f(cobj); // ok: finds A::f through the friend declaration in  A::C
 		f2(); // error: A::f2not declared
 	}
 	```
@@ -948,14 +948,14 @@ the declaration appears.
 * 看以下例子，**就算 base class 這時根本不可見，可是 base class 所在的 namespace 還是會被搜尋，超ㄎㄧㄤ**(不過我認為這應該100%是糞code啦):
 	```c++
 	namespace NS {
-		class Quote { /* .. . */}; 
+		class Quote { /* .. . */};
 		void display(const Quote&) { /* ... */}
 	}
-	// Bulk_item’s base class is declared in namespace NS 
-	class Bulk_item : public NS::Quote { /* .. . */}; 
-	int main() { 
-		Bulk_item book1; 
-		display(book1); 
+	// Bulk_item’s base class is declared in namespace NS
+	class Bulk_item : public NS::Quote { /* .. . */};
+	int main() {
+		Bulk_item book1;
+		display(book1);
 		return 0;
 	}
 	```
@@ -964,7 +964,7 @@ the declaration appears.
 #### Overloading and `using` Declarations
 * 首先要注意，**`using` 是宣告一個*名字*，不是一個 function**:
 	```c++
-	using NS::print(int); // error: cannot specify a parameter list 
+	using NS::print(int); // error: cannot specify a parameter list
 	using NS::print; // ok: using declarations specify names only
 	```
 * 如果用 `using` declaration 引入 name 是 function，那所有版本的 functions 都會被引入到當前 scope
@@ -980,20 +980,20 @@ the declaration appears.
 	* 不過就如同很有以前前面說的，用 `using` directive 的話，一般的 name collision 只有在真的使用到這個 name 時才會噴 error，function parameter list 的 collision 也是，只有在真的使用到這個 function 時才會噴 ambiguous error，很靠北很機掰
 * 看例子...:
 	```c++
-	namespace libs_R_us { 
-		extern void print(int); 
+	namespace libs_R_us {
+		extern void print(int);
 		extern void print(double);
 	}
-	// ordinary declaration 
+	// ordinary declaration
 	void print(const std::string &);
-	// this using directive adds names to the candidate set for calls to print: 
-	using namespace libs_R_us; 
-	// the candidates for calls to print at this point in the program are: 
-	// print(int) from libs_R_us 
-	// print(double) from libs_R_us 
-	// print(const std::string &) declared explicitly 
+	// this using directive adds names to the candidate set for calls to print:
+	using namespace libs_R_us;
+	// the candidates for calls to print at this point in the program are:
+	// print(int) from libs_R_us
+	// print(double) from libs_R_us
+	// print(const std::string &) declared explicitly
 	void fooBar(int ival) {
-		print("Value: "); // calls global print(const string &) 
+		print("Value: "); // calls global print(const string &)
 		print(ival); // calls libs_R_us::print(int)
 	}
 	```
@@ -1002,21 +1002,18 @@ the declaration appears.
 	```c++
 	namespace AW { int print(int);
 	}
-		namespace Primer { 
+		namespace Primer {
 			double print(double);
 		}
-	// using directives create an overload set off unctions from different namespaces 
-	using namespace AW; 
+	// using directives create an overload set off unctions from different namespaces
+	using namespace AW;
 	using namespace Primer; // 靠，這行有夠雞巴，是 depends on 上一行，導致看的到 Primer 之後才可以 using namespace Primer 的
-	long double print(long double); 
-	int main() { 
-		print(1); // calls AW::print(int) 
-		print(3.1); // calls Primer::print(double) 
+	long double print(long double);
+	int main() {
+		print(1); // calls AW::print(int)
+		print(3.1); // calls Primer::print(double)
 		return 0;
 	}
 	```
 	* 總之按照上面的 `using` directive 寫之後，global scope 就有三個 `print` 版本當作 candidates function 了
 	* 再強調一次這樣亂 `using` 是糞 code
-
-## 18.3 Multiple and Virtual Inheritance
-

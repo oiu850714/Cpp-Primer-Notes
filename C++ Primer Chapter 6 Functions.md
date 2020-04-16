@@ -50,8 +50,8 @@ tags: C++
     * 新手殺
 * Parameters and variables defined inside a function body are referred to as **local variables.**
     * "local" to that function and **hide** declarations of the same name made in an outer scope
-* Objects defined outside any function exist throughout the program’s execution. 
-    * Such objects are created when the program starts and are not destroyed until the program ends. 
+* Objects defined outside any function exist throughout the program’s execution.
+    * Such objects are created when the program starts and are not destroyed until the program ends.
 
 #### Automatic Objects
 * Objects that exist only while a block is executing
@@ -122,11 +122,11 @@ tags: C++
     * can pass either const int or int to fcn
 * 這件事情還會牽扯到之後會講的 function overloading
     ```cpp
-    void fcn(const int i) { /* fcn can read but not write to i */} 
+    void fcn(const int i) { /* fcn can read but not write to i */}
     void fcn(int i) { /* .. . */} // error: redefines fcn(int)
     ```
     * 上面的 overload 是錯的，compiler 沒辦法知道當你 call fcn 並給它特定參數時，到底該呼叫哪個 function。
-    * In C++, we can define several different functions that have the same name. However, we can do so only if their **parameter lists are sufficiently different.** 
+    * In C++, we can define several different functions that have the same name. However, we can do so only if their **parameter lists are sufficiently different.**
     * 因為 pass argument 的時候 parameter 的 top-level const 會被無視，這樣根本就不知道該呼叫哪個版本的 function
 #### Pointer or Reference Parameters and const
 * 記得 reference 跟 pointer 都不能指向或綁定不同的 base type
@@ -154,7 +154,7 @@ tags: C++
 * Primer 還 demo 了一個不夠了解問題而做的 workaround，結果導致更慘的 code
     ```cpp
     bool is_sentence(const string &s) {
-    // if there’s a single period at the end of s,then s is a sentence 
+    // if there’s a single period at the end of s,then s is a sentence
     string::size_type ctr = 0;
     return find_char(s, ’.’, ctr) == s.size() - 1 && ctr == 1;
     }
@@ -199,7 +199,7 @@ tags: C++
         * 不過這個方法就要保證說，你的 array 內放的 data 不會用到這個 "marker"
             * 例如你是傳 int array 的話就有點怪，因為 any int value 本質上應該都是合法的
     2. Using the Standard Library Conventions
-        * A second technique used to manage array arguments is to pass pointers to the first and one past the last element in the array. 
+        * A second technique used to manage array arguments is to pass pointers to the first and one past the last element in the array.
         * 也就是把 array 的起始跟結束位置都當作 argument 傳進 function
         * standard lib 常常這樣搞，有點像是 begin() end() 那樣
         * interface: void func(T*, T*);
@@ -209,7 +209,7 @@ tags: C++
             * 這個ㄎㄧㄤ物可以看
     3. Explicitly Passing a Size Parameter
         * Common in C and older C++... QQ
-        * interface: void func(T*, size_t size); 
+        * interface: void func(T*, size_t size);
         * caller: func(arr, arr_len);
         * alternative caller: func(arr, end(arr)-begin(arr));
 #### Array Parameters and const
@@ -217,9 +217,9 @@ tags: C++
 #### Array Reference Parameters
 * 你宣告 reference 時的 type 可以是 ref to array，parameter 當然也可以宣告成 reference to array
     ```cpp
-    // ok: parameter is a reference to an array; the dimension is part of the type 
+    // ok: parameter is a reference to an array; the dimension is part of the type
     void print(int (&arr)[10]) {
-    for (auto elem : arr) 
+    for (auto elem : arr)
         cout << elem << endl;
     }
     ```
@@ -269,7 +269,7 @@ tags: C++
 * 實際上用起來像這樣:
     ```cpp
     void error_msg(initializer_list<string> il) {
-    for (auto beg = il.begin(); beg != il.end(); ++beg)    
+    for (auto beg = il.begin(); beg != il.end(); ++beg)
         cout << *beg << " " ;
     cout << endl;
     }
@@ -277,7 +277,7 @@ tags: C++
     * 有 begin end 其實也可以用 range for
 * caller 要 call function 時長這樣:
     ```cpp
-    // expected, actualare strings 
+    // expected, actualare strings
     if (expected != actual)
         error_msg({"functionX", expected, actual});
     else
@@ -312,16 +312,16 @@ tags: C++
 * After a function terminates, references to local objects refer to memory that **is no longer valid:**
 
 #### Functions That Return Class Types and the Call Operator
-* Like any operator the call operator has associativity and precedence 
+* Like any operator the call operator has associativity and precedence
     * The call operator has the same precedence as the dot and arrow operators
     * left associative
     * As a result, if a function returns a pointer, reference or object of class type, **we can use the result of a call to call a member of the resulting object.**
 
     ```cpp
-    // call the sizemember ofthe string returned by shorterString 
+    // call the sizemember ofthe string returned by shorterString
     auto sz = shorterString(s1, s2).size();
     ```
-    
+
     * 直接用 shorterString 回傳的 object 用 member selector 選擇 size
     * shorterString(s1, s2)
     * shorterString(s1, s2).size
@@ -333,12 +333,12 @@ tags: C++
 * 所以如果是 return reference，就可以把 function call 放在 assignment 左邊
     ```cpp
     char &get_val(string &str, string::size_type ix) {
-        return str[ix]; // get_valassumes the given index is valid 
+        return str[ix]; // get_valassumes the given index is valid
     }
     int main() {
-        string s("a value"); 
-        cout << s << endl; // prints a value 
-        get_val(s, 0) = 'A'; // changes s[0]to 
+        string s("a value");
+        cout << s << endl; // prints a value
+        get_val(s, 0) = 'A'; // changes s[0]to
         A cout << s << endl; // prints A value return 0;
     }
     ```
@@ -348,12 +348,12 @@ tags: C++
 * C++11 的...(我還)不知道可以拿來幹嘛的功能
     ```cpp
     vector<string> process() {
-    // ... // expected and actual are strings 
-        if (expected.empty()) 
+    // ... // expected and actual are strings
+        if (expected.empty())
             return {}; // return an empty vector
-        else if (expected == actual) 
+        else if (expected == actual)
             return {"functionX", "okay"}; // return list-initialized vector
-        else 
+        else
             return {"functionX", expected, actual};
     }
     ```
@@ -371,9 +371,9 @@ tags: C++
 #### Recursion
 * a function that calls itself directly or indirectly
 ```cpp
-// calculate val!,which is 1*2*3.. . *val 
+// calculate val!,which is 1*2*3.. . *val
 int factorial(int val) {
-    if (val > 1) 
+    if (val > 1)
         return factorial(val-1) * val;
     return 1;
 }
@@ -387,14 +387,14 @@ int factorial(int val) {
     * 不過因為語法上的限制，function 要宣告 return pointer/reference to array 會變得很醜(C姊姊
     * 可以用之前學的 typedef 或 using 解決
     ```cpp
-    typedef int arrT[10]; // arrTis a synonym for the type array often ints 
+    typedef int arrT[10]; // arrTis a synonym for the type array often ints
     using arrT = int[10]; // equivalent declaration ofarrT; see § 2.5.1 (p. 68)
     arrT* func(int i); // func returns a pointer to an array often ints
     ```
 * 如果不用 type alias 呢?
 * 首先我們要先記得 array 的 type 是跟在 identifier 之後的
     ```cpp
-    int arr[10]; // arr is an array often ints 
+    int arr[10]; // arr is an array often ints
     int *p1[10]; // p1 is an array of ten pointers
     int (*p2)[10] = &arr; // p2 points to an array often ints
     ```
@@ -418,16 +418,16 @@ int factorial(int val) {
 #### Using decltype
 * 你可以直接在 function return type 那邊用 decltype(obj)，然後 function name 前面加 * ，這樣 return type 就是 pointer to obj
     ```cpp
-    int odd[] = {1,3,5,7,9}; 
-    int even[] = {0,2,4,6,8}; 
-    // returns a pointer to an array of five int elements 
+    int odd[] = {1,3,5,7,9};
+    int even[] = {0,2,4,6,8};
+    // returns a pointer to an array of five int elements
     decltype(odd) *arrPtr(int i) {
         return (i % 2) ? &odd : &even; // returns a pointer to the array
     }
     ```
     * The return type for arrPtr uses decltype to say that the function returns a pointer to whatever type odd has.
     * 記得 decltype 是少數不會把 array 當成 pointer 看的
-        * The only tricky part is that we must remember that decltype does not automatically convert an array to its corresponding pointer type.  
+        * The only tricky part is that we must remember that decltype does not automatically convert an array to its corresponding pointer type.
 
 
 ### 6.4 Overloaded Functions
@@ -468,8 +468,8 @@ int factorial(int val) {
     ```cpp
     // each pair declares the same function
     Record lookup(const Account &acct);
-    Record lookup(const Account&); // parameter names are ignored         
-    
+    Record lookup(const Account&); // parameter names are ignored
+
     typedef Phone Telno;
     Record lookup(const Phone&);
     Record lookup(const Telno&); // Telnoand Phone are the same type
@@ -480,8 +480,8 @@ int factorial(int val) {
 * A parameter that has a top-level const is indistinguishable from one without a top-level const:
     ```cpp
     Record lookup(Phone);
-    Record lookup(const Phone); // redeclares Recordlookup(Phone) 
-    
+    Record lookup(const Phone); // redeclares Recordlookup(Phone)
+
     Record lookup(Phone*);
     Record lookup(Phone* const); // redeclares Recordlookup(Phone*)
     ```
@@ -548,11 +548,11 @@ int factorial(int val) {
     void print(const string &);
     void print(double); // overloads the print function
     void fooBar(int ival) {
-        bool read = false; // new scope: hides the outer declaration of read                         
-        string s = read(); // error: read is a bool variable, not a function     
-        // bad practice: usually it’s a bad idea to declare functions at local scope 
-        void print(int); // new scope: hides previous instances of print     
-        print("Value: "); // error: print(const string &)is hidden 
+        bool read = false; // new scope: hides the outer declaration of read
+        string s = read(); // error: read is a bool variable, not a function
+        // bad practice: usually it’s a bad idea to declare functions at local scope
+        void print(int); // new scope: hides previous instances of print
+        print("Value: "); // error: print(const string &)is hidden
         print(ival); // ok: print(int)is visible
         print(3.14); // ok: calls print(int); print(double)is hidden
     }
@@ -582,7 +582,7 @@ int factorial(int val) {
     ```cpp
     string window;
     window = screen(); // equivalent to screen(24,80,' ')
-    window = screen(66); // equivalent to screen(66,80,' ') 
+    window = screen(66); // equivalent to screen(66,80,' ')
     window = screen(66, 256); // screen(66,256,' ')
     window = screen(66, 256, '#'); // screen(66,256,'#')
     ```
@@ -629,11 +629,11 @@ int factorial(int val) {
         * 阿一般來說 function 都是宣告在 global scope，換句話說你會用到的 name 都是 global 的... 噁
     *  The value that those names represent is **evaluated at the time of the call:**
         *  所以是 runtime 決定的!
-        
+
     ```cpp
     void f2() {
-    def = '*'; // changes the value of a default argument 
-    sz wd = 100; // hides the outer definition of wd but does not change the default 
+    def = '*'; // changes the value of a default argument
+    sz wd = 100; // hides the outer definition of wd but does not change the default
     window = screen(); // calls screen(ht(), 80, '*')
     }
     ```
@@ -672,7 +672,7 @@ int factorial(int val) {
     * A constexpr function is permitted to return a value that is not a constant:
         * 幹..
         ```cpp
-        // scale(arg)is a constant expression if arg is a constant expression 
+        // scale(arg)is a constant expression if arg is a constant expression
         constexpr size_t scale(size_t cnt) { return new_sz() * cnt; }
         ```
         * 如果 `cnt` 的 initializer 是 constexpr，那 `scale(cnt)` 就是 constexpr
@@ -683,7 +683,7 @@ int factorial(int val) {
         // i is not a constant expression
         int a2[scale(i)]; // error: scale(i)is not a constant expression
         ```
-        
+
 #### Put inline and constexpr Functions in Header Files
 * 你想想嘛，compiler 看到這兩種 function 需要把 function 展開，所以他只有宣告是不夠的，它需要 definition；**所以 C++ 允許這兩種 function 被定義多次，可是都要長的一模一樣**
 * 所以你還是把他們兩個都定義在 header file 吧...
@@ -691,7 +691,7 @@ int factorial(int val) {
 
 ### 6.5.3 Aids for Debugging
 * The idea is that the program will contain debugging code that is executed only while the program is being developed.
-* When the application is completed and ready to ship, the debugging code is turned off. 
+* When the application is completed and ready to ship, the debugging code is turned off.
 * uses two preprocessor facilities: **assert and NDEBUG.**
 
 #### The assert Preprocessor Macro
@@ -713,7 +713,7 @@ int factorial(int val) {
     ```cpp
     assert(word.size() > threshold);
     ```
-    
+
 ### The NDEBUG Preprocessor Variable
 * 就這個 macro 可以把 assert 給關掉
 * 如果 define 它，assert code 就不會執行
@@ -782,7 +782,7 @@ int factorial(int val) {
 * caller 給的某些 argument 的 type，沒有一個 overloaded function 可以 exactly match，但是都可以轉換，這時候怎麼辦?
     * compiler 實際上會對不同形式的 conversion 做排名
 * 按照下列規則排名
-    1. An exact match. An exact match happens when: 
+    1. An exact match. An exact match happens when:
         * The argument and parameter types are identical.
         * The argument is converted from an array or function type to the corresponding pointer type. (§ 6.7 (p. 247) covers function pointers.)
         * A top-level const is added to or discarded from the argument.
@@ -796,25 +796,25 @@ int factorial(int val) {
 #### Matches Requiring Promotion or Arithmetic Conversion
 * 哎喲 Primer 用放大鏡，你也知道這很積八?
 * 你本來就不該寫這種 closely-related type 的 overloading，很雷
-* In order to analyze a call, **it is important to remember that the small integral types always promote to int or to a larger integral type.** Given two functions, one of which takes an *int* and the other a *short*, **the short version will be called only on values of type short.** 
+* In order to analyze a call, **it is important to remember that the small integral types always promote to int or to a larger integral type.** Given two functions, one of which takes an *int* and the other a *short*, **the short version will be called only on values of type short.**
 
 * Even though the smaller integral values might appear to be a closer match, those values are promoted to int, whereas calling the short version would require a conversion:
     ```cpp
     void ff(int); void ff(short);
     ff('a'); // charpromotes to int; calls f(int)
     ```
-    * 上面會 call ff(int); 
+    * 上面會 call ff(int);
     * 因為 promotion 比 built-in conversion 的 rank 高
 
 * 此外，All the arithmetic conversions are treated as equivalent to each other.
     * 反正轉一次就好了，管你從什麼型別轉成什麼型別，你們的 rank 都是一樣的
     * The conversion from **int to unsigned int** , for example, **does not take precedence over** the conversion from **int to double.**
     ```cpp
-    void manip(long); 
+    void manip(long);
     void manip(float);
     manip(3.14); // error: ambiguous call
     ```
-    
+
 #### Function Matching and const Arguments
 * 當你 API 長這樣:
     ```cpp
@@ -844,7 +844,7 @@ int factorial(int val) {
     ```
 * Moreover, we can use a pointer to a function to call the function to which the pointer points.
     ```cpp
-    bool b1 = pf("hello", "goodbye"); // calls lengthCompare 
+    bool b1 = pf("hello", "goodbye"); // calls lengthCompare
     bool b2 = (*pf)("hello", "goodbye"); // equivalent call
     bool b3 = lengthCompare("hello", "goodbye"); // equivalent call
     ```
@@ -867,7 +867,7 @@ int factorial(int val) {
         * 就好像你可以寫 void f(int arr[10]); 一樣，那個 10 是假的!
 
     ```cpp
-    void useBigger(const string &s1, const string &s2, 
+    void useBigger(const string &s1, const string &s2,
         bool pf(const string &, const string &));
     ```
     * 第三個看起來像是 function 的參數其實是 function pointer
@@ -884,10 +884,10 @@ int factorial(int val) {
 * 但這就跟 pointer to array 一樣，你的宣告會變的很噁心，於是就用 alias 或 decltype
 
     ```cpp
-    // Func and Func2 have function type 
-    typedef bool Func(const string&, const string&); 
-    typedef decltype(lengthCompare) Func2; // equivalent type 
-    // FuncPand FuncP2have pointer to function type 
+    // Func and Func2 have function type
+    typedef bool Func(const string&, const string&);
+    typedef decltype(lengthCompare) Func2; // equivalent type
+    // FuncPand FuncP2have pointer to function type
     typedef bool(*FuncP)(const string&, const string&);
     typedef decltype(lengthCompare) *FuncP2; // equivalent type
     ```
@@ -904,7 +904,7 @@ int factorial(int val) {
 * 醜死...
 * 請用 using
     ```cpp
-    using F = int(int*, int); // F is a function type, not a pointer 
+    using F = int(int*, int); // F is a function type, not a pointer
     using PF = int(*)(int*, int); // PF is a pointer type
     ```
 * 雖然在參數列表裡面你可以直接寫一個 function type 然後讓 compiler 自動轉換成 function pointer，可是 return type 不會，我們一定要寫成 pointer type
@@ -922,13 +922,13 @@ int factorial(int val) {
     ```cpp
     auto f1(int) -> int (*)(int*, int);
     ```
-    
+
 #### Using auto or decltype for Function Pointer Types
 * 反正就是用 decltype 來寫 return type
 * 記得 function 傳進去不會被轉換成 pointer
     ```cpp
-    string::size_type sumLength(const string&, const string&); 
-    string::size_type largerLength(const string&, const string&); 
+    string::size_type sumLength(const string&, const string&);
+    string::size_type largerLength(const string&, const string&);
     // depending on the value of its stringparameter, /
     decltype(sumLength) *getFcn(const string &);
     // getFcn returns a pointer to sumLengthor to largerLength

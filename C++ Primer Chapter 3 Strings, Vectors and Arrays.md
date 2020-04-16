@@ -8,7 +8,7 @@ tags: C++
 * **Headers Should Not Include using Declarations**
     * 所以你在寫 header 的時候就不能偷懶，不然不小心發生 collision 就會很想死
     * The reason is that the contents of a header are copied into the including program’s text.
-    * If a header has a using declaration, then every program that includes that header gets that same using declaration. 
+    * If a header has a using declaration, then every program that includes that header gets that same using declaration.
     * As a result, **a program that didn’t intend to use the specified library name might encounter unexpected name conflicts.**
     * using namespace_name::name 其實是把 name 搬到 global scope
 * Primer 之後的例子會假設他們用到的 name 已經用 using 宣告了
@@ -89,12 +89,12 @@ tags: C++
         string s = "9487";
         s.size() < n; // true!!!!
         ```
-    
+
 * Add two strings
     * trivial
 * Adding Literals and strings
 ```cpp
-string s1 = "hello", s2 = "world"; // no punctuation in s1 or s2 
+string s1 = "hello", s2 = "world"; // no punctuation in s1 or s2
 string s3 = s1 + ", " + s2 + ’\n’;
 ```
 * As we saw in § 2.1.2 (p. 35), we can use one type where another type is expected if there is a conversion from the given type to the expected type.
@@ -134,7 +134,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
     vector<string> v3{10};  // construct vector of ten default empty string!!!
     vector<string> v4{10, "hi"}; // construct vector of ten "hi" string!!!
     ```
-    * In order to list initialize the vector, the values inside braces must match the element type. 
+    * In order to list initialize the vector, the values inside braces must match the element type.
     * 如果 list 裡面提供的 initializer 不能拿來做 list initialization，那 compiler 會嘗試使用括號的方式來解讀
     * 別寫這種糞 code...
 
@@ -194,7 +194,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
     ```
     * 在 C++11 之後請用 auto 宣告 iterator
         * 還記得沒用 auto 有多痛苦ㄇ? stable_vector
-    
+
 * 如果 container 為 empty 則 v.begin() == v.end() // both point to one pass the end of the associated container
 * 跟 pointer 一樣，用 dereference operator 取 object
     * 所以要注意 iterator 是否為 valid
@@ -202,7 +202,7 @@ string s3 = s1 + ", " + s2 + ’\n’;
     ```cpp
     string s("some string");
     if (s.begin() != s.end()) { // make sure s is not empty
-        auto it = s.begin(); // itdenotes the first character in s 
+        auto it = s.begin(); // itdenotes the first character in s
         *it = toupper(*it); // make that character uppercase
     }
     ```
@@ -368,7 +368,7 @@ Modern C++ programs should use vectors and iterators instead of built-in arrays 
 ```cpp
 int main() {
   int ia[3][4] = {};
-  for (auto p = ia; p != ia + 3; ++p) { 
+  for (auto p = ia; p != ia + 3; ++p) {
     for (auto q = *p; q != *p + 4; ++q)
       cout << *q << ' ';
     cout << endl;
@@ -392,11 +392,11 @@ int main() {
 * 這樣寫還真的比較清楚，因為你就不用去想到底什麼時候 array name 會被轉成 pointer to first element 了，你知道 begin() 跟 end() 一定傳 pointer to element 給你，讚讚
 #### Type Aliases Simplify Pointers to Multidimensional Arrays
 ```cpp
-using int_array = int[4]; // new style type alias declaration; see § 2.5.1 (p. 68) 
+using int_array = int[4]; // new style type alias declaration; see § 2.5.1 (p. 68)
 typedef int int_array[4]; // equivalent typedefdeclaration; § 2.5.1 (p. 67)
-// print the value of each element in ia, with each inner array on its own line 
-for (int_array *p = ia; p != ia + 3; ++p) { 
-    for (int *q= *p; q != *p + 4; ++q) 
+// print the value of each element in ia, with each inner array on its own line
+for (int_array *p = ia; p != ia + 3; ++p) {
+    for (int *q= *p; q != *p + 4; ++q)
         cout << *q << '';
     cout << endl;
 }

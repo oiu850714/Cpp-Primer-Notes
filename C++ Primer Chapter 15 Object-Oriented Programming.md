@@ -42,7 +42,7 @@ tags: C++
     * derived class **defines those members that are specific to the derived class itself**
 
 * 為了舉例，Primer 要改寫 bookstore program
-    * 會有多種決定書的價格的策略，有的原價賣，有的打折賣，and so on 
+    * 會有多種決定書的價格的策略，有的原價賣，有的打折賣，and so on
     * 定義 base class - `Quote`，他代表了按照原價賣的書籍；
     * 再定義一個 `Bulk_quote`，derived from `Quite`，代表了打折賣的書籍
 * 他們都有以下 members:
@@ -192,7 +192,7 @@ tags: C++
         b_ref.print(); // 這裡也是靜態就知道要呼叫 bar::print
     }
     ```
-    * 上面的 code 可以看 
+    * 上面的 code 可以看
         * http://www.cs.technion.ac.il/users/yechiel/c++-faq/redefining-nonvirtuals.html
         * https://stackoverflow.com/questions/2124836/redefine-a-non-virtual-function-in-c
 
@@ -222,14 +222,14 @@ tags: C++
     * 例如 `Bulk_quote` 就要宣告 `net_price`
 
     ```cpp
-    class Bulk_quote : public Quote { // Bulk_quote inherits from Quote 
+    class Bulk_quote : public Quote { // Bulk_quote inherits from Quote
     public:
         Bulk_quote() = default;
-        Bulk_quote(const std::string&, double, std::size_t, double); 
+        Bulk_quote(const std::string&, double, std::size_t, double);
         // overrides the base version in order to implement the bulk purchase discount policy
         double net_price(std::size_t) const override;
     private:
-        std::size_t min_qty = 0; // minimum purchase for the discount to apply 
+        std::size_t min_qty = 0; // minimum purchase for the discount to apply
         double discount = 0.0; // fractional discount to apply
     };
     ```
@@ -288,8 +288,8 @@ tags: C++
     * **可以在 derived class 的 ctor init list 呼叫 base class 的 ctor**
     ```cpp
     Bulk_quote(const std::string& book, double p,
-            std::size_t qty, double disc) : 
-            Quote(book, p), min_qty(qty), discount(disc) { 
+            std::size_t qty, double disc) :
+            Quote(book, p), min_qty(qty), discount(disc) {
         // as before
     };
     ```
@@ -303,7 +303,7 @@ tags: C++
 #### Using Members of the Base Class from the Derived Class
 * can access `public`/`protected` member of base class:
     ```cpp
-    // if the specified number of items are purchased, use the discounted price 
+    // if the specified number of items are purchased, use the discounted price
     double Bulk_quote::net_price(size_t cnt) const {
         if (cnt >= min_qty)
             return cnt * (1 - discount) * price;
@@ -346,18 +346,18 @@ tags: C++
     * 下面全部都合法:
     ```cpp
     void Derived::f(const Derived &derived_obj) {
-        Base::statmem(); // ok: Base defines statmem 
+        Base::statmem(); // ok: Base defines statmem
         Derived::statmem(); // ok: Derived inherits statmem
-        // ok: derived objects can be used to access static from base     
+        // ok: derived objects can be used to access static from base
         derived_obj.statmem(); // accessed through a Derived object
         statmem(); // accessed through this object
     }
     ```
-    
+
 #### Declarations of Derived Classes
 * 如果只是要單純宣告某個 derived class 的話，不能加上 class derivation list:
     ```cpp
-    class Bulk_quote : public Quote; // error: derivation list can’t appear here 
+    class Bulk_quote : public Quote; // error: derivation list can’t appear here
     class Bulk_quote; // ok: right way to declare a derived class
     ```
     * derivation list 只能跟 class body 一同出現
@@ -394,14 +394,14 @@ tags: C++
 #### Preventing Inheritance
 * 新標準可以指定某個 class 不能被繼承: 使用 `final` keyword
     ```cpp
-    class NoDerived final { /**/}; // NoDerived can’t be a base class 
+    class NoDerived final { /**/}; // NoDerived can’t be a base class
     class Base { /**/};
     // Last is final; we cannot inherit from Last class
     Last final : Base { /**/}; // Last can’t be a base class
-    class Bad : NoDerived { /**/}; // error: NoDerived is final 
+    class Bad : NoDerived { /**/}; // error: NoDerived is final
     class Bad2 : Last { /**/}; // error: Last is final
     ```
-    
+
 ### 15.2.3 Conversions and Inheritance
 :::warning
 WARNING: Understanding conversions between base and derived classes is essential to understanding how object-oriented programming works in C++.
@@ -496,7 +496,7 @@ WARNING: Understanding conversions between base and derived classes is essential
 * 舉個例子:
     ```cpp
     Bulk_quote bulk; // object of derived type
-    Quote item(bulk); // uses the ctor of the static type of item, that is, Quote::Quote(const Quote&) constructor 
+    Quote item(bulk); // uses the ctor of the static type of item, that is, Quote::Quote(const Quote&) constructor
     item = bulk; // calls the operator= of the static type of lhs, that is, Quote::operator=(const Quote&)
     ```
 * 題外話，這裡 `Quote` 的 copy-control 是用 compiler 合成的
@@ -600,9 +600,9 @@ WARNING: Understanding conversions between base and derived classes is essential
 * 另一個 C++11 新定義的是 `final` keyword
     * 簡單說就是不准 derived class override 這個 member:
     ```cpp
-    struct D2 : B { 
+    struct D2 : B {
         // inherits f2() and f3() from B and overrides f1(int)
-        void f1(int) const final; // subsequent classes can’t override     
+        void f1(int) const final; // subsequent classes can’t override
         f1(int)
     };
     struct D3 : D2 {
@@ -627,7 +627,7 @@ BEST PRACTICE: Virtual functions that **have default arguments should use the *s
 #### Circumventing the Virtual Mechanism
 * 有時候我們不希望用 dynamic binding，希望用 base class 的 virtual member，可以這樣寫:
     ```cpp
-    // calls the version from the base class regardless of the dynamic type of baseP 
+    // calls the version from the base class regardless of the dynamic type of baseP
     double undiscounted = baseP->Quote::net_price(42);
     ```
     * 用 scope operator 強制使用 base class 的 member
@@ -672,17 +672,17 @@ BEST PRACTICE: Virtual functions that **have default arguments should use the *s
 * 其實定義 abstract base class 就是**為了定義一個通用的且必須實作的 interface**
 
     ```cpp
-    // class to hold the discount rate and quantity         
+    // class to hold the discount rate and quantity
     // derived classes will implement pricing strategies using these data
     class Disc_quote : public Quote {
     public:
         Disc_quote() = default;
-        Disc_quote(const std::string& book, double price, 
-                    std::size_t qty, double disc): 
+        Disc_quote(const std::string& book, double price,
+                    std::size_t qty, double disc):
                     Quote(book, price), quantity(qty), discount(disc) { }
         double net_price(std::size_t) const = 0;
     protected:
-        std::size_t quantity = 0; // purchase size for the discount to apply 
+        std::size_t quantity = 0; // purchase size for the discount to apply
         double discount = 0.0; // fractional discount to apply
     };
     ```
@@ -714,7 +714,7 @@ BEST PRACTICE: Virtual functions that **have default arguments should use the *s
     Disc_quote discounted; // error: can’t define a Disc_quote object
     Bulk_quote bulk; // ok: Bulk_quote has no pure virtual functions
     ```
-    
+
 #### A Derived Class Constructor (can only) Initializes Its Direct Base Class Only
 * 上面已經定義了 `Bulk_quote` 這個 abstract class
     * 這時原本實作的 `Bulk_quote` 可以改成從 `Disc_quote` 繼承而不是 `Quote`
@@ -724,7 +724,7 @@ BEST PRACTICE: Virtual functions that **have default arguments should use the *s
     class Bulk_quote : public Disc_quote {
     public:
         Bulk_quote() = default;
-        Bulk_quote(const std::string& book, double price, std::size_t qty, double disc):     
+        Bulk_quote(const std::string& book, double price, std::size_t qty, double disc):
             Disc_quote(book, price, qty, disc) { }
         // overrides the base version to implement the bulk purchase discount policy
         double net_price(std::size_t) const override;
@@ -793,7 +793,7 @@ BEST PRACTICE: Virtual functions that **have default arguments should use the *s
 
 #### `public`, `private`,and `protected` Inheritance
 * derived class 從 base class 繼承來的 member 的存取權限取決於
-    * 那個 member 在 base class 宣告的 access specifier 
+    * 那個 member 在 base class 宣告的 access specifier
     * derived class 宣告 base class 時給定的 access specifier
 
 * consider the following hierarchy:
@@ -809,7 +809,7 @@ BEST PRACTICE: Virtual functions that **have default arguments should use the *s
     struct Pub_Derv : public Base {
         // ok: derived classes can access protected members
         int f() { return prot_mem; }
-        // error: private members are inaccessible to derived classes 
+        // error: private members are inaccessible to derived classes
         char g() { return priv_mem; }
     };
     struct Priv_Derv : private Base {
@@ -836,11 +836,11 @@ BEST PRACTICE: Virtual functions that **have default arguments should use the *s
 
 * 另外上面有說 user code 包含 base class 的子孫:
     ```cpp
-    struct Derived_from_Public : public Pub_Derv { 
+    struct Derived_from_Public : public Pub_Derv {
         // ok: Base::prot_mem remains protected in Pub_Derv
         int use_base() { return prot_mem; }
     };
-    struct Derived_from_Private : public Priv_Derv { 
+    struct Derived_from_Private : public Priv_Derv {
         // error: Base::prot_mem is private in Priv_Derv
         int use_base() { return prot_mem; }
     };
@@ -886,14 +886,14 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 * base 的 friend 沒有對 derived 有額外的存取權限
     * derived 的 friend 也沒有對 base 的額外存取權限:
     ```cpp
-    class Base { 
+    class Base {
         // added friend declaration; other members as before
         friend class Pal; // Pal has no access to classes derived from Base
     };
     class Pal {
     public:
         int f(Base b) { return b.prot_mem; } // ok: Pal is a friend of Base
-        int f2(Sneaky s) { return s.j; } // error: Pal not friend of Sneaky 
+        int f2(Sneaky s) { return s.j; } // error: Pal not friend of Sneaky
         // access to a base class is controlled by the base class, even inside a derived object
         int f3(Sneaky s) { return s.prot_mem; } // ok: Pal is a friend
     };
@@ -959,13 +959,13 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 
 * 舉例:
     ```cpp
-    Bulk_quote bulk; 
+    Bulk_quote bulk;
     cout << bulk.isbn();
     ```
     * 先從 `Bulk_quote` 找 `isbn`，沒找到；
     * 換從 `Bulk_quote` 的 base `Disc_quote` 找，沒找到；
     * 最後找 `Disc_quote` 的 base `Quote` 找，找到惹
-    
+
 #### Name Lookup Happens at Compile Time
 * The **static type** (§ 15.2.3, p. 601) of an object, reference, or pointer **determines which members of that object are visible.**
     * 查找名字的*起點*是由被查找的物件(或ref/ptr)的 static type 決定的
@@ -976,7 +976,7 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     ```cpp
     class Disc_quote : public Quote {
     public:
-        std::pair<size_t, double> discount_policy() const 
+        std::pair<size_t, double> discount_policy() const
             { return {quantity, discount}; }
         // other members as before
     };
@@ -984,8 +984,8 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     * 你如果要使用 ptr/ref 來呼叫 `Disc_quote::discount_policy`，你這個 ptr/ref 只能指向 `Disc_quote` 或它的 derived 才有可能將 `Disc_quote::discount_policy` 考慮進去(也就是才有可能 visible)；
     * 如果用 `Disc_quote` 的 (indirect) base 的 ptr/ref 是不會把這個 `Disc_quote::discount_policy` 考慮進去的:
     ```cpp
-    Bulk_quote bulk; 
-    Bulk_quote *bulkP = &bulk; // static and dynamic types are the same 
+    Bulk_quote bulk;
+    Bulk_quote *bulkP = &bulk; // static and dynamic types are the same
     Quote *itemP = &bulk; // static and dynamic types differ
     bulkP->discount_policy(); // ok: bulkP has type Bulk_quote*
     itemP->discount_policy(); // error: itemP has type Quote*
@@ -1003,7 +1003,7 @@ would be accessible, then the derived-to-base conversion is also accessible, and
         int mem;
     };
     struct Derived : Base {
-        Derived(int i): mem(i) { } // initializes Derived::mem to i 
+        Derived(int i): mem(i) { } // initializes Derived::mem to i
         // Base::mem is default initialized
         int get_mem() { return mem; } // returns Derived::mem
     protected: int mem; // hides mem in the base
@@ -1014,12 +1014,12 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     * 注意上面 `Derived` 有重定義 `mem`；會隱藏 `Base::mem`；
     * 如果 `Derived` 沒有重定義 `mem`，那在 `Derived` 的 ctor init list 初始化 `mem` 就是錯的
         * 不可能在 ctor 直接初始化 base 的 member
-    
+
 #### Using the Scope Operator to Use Hidden Members
 * 還是可以用 scope operator 直接使用 base class 內的 hidden name
     ```cpp
-    struct Derived : Base { 
-        int get_base_mem() { return Base::mem; } 
+    struct Derived : Base {
+        int get_base_mem() { return Base::mem; }
         // ...
     };
     ```
@@ -1049,12 +1049,12 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     struct Base {
         int memfcn();
     };
-    struct Derived : Base { 
+    struct Derived : Base {
         int memfcn(int); // hides memfcn in the base
     };
-    Derived d; Base b; 
+    Derived d; Base b;
     b.memfcn(); // calls Base::memfcn
-    d.memfcn(10); // calls Derived::memfcn 
+    d.memfcn(10); // calls Derived::memfcn
     d.memfcn();  // **error: memfcn with no arguments is hidden**
     d.Base::memfcn();  // ok: calls Base::memfcn
     ```
@@ -1085,7 +1085,7 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     class D2 : public D1 {
     public:
         int fcn(int); // nonvirtual function hides D1::fcn(int)
-        int fcn(); // overrides virtual fcn from Base 
+        int fcn(); // overrides virtual fcn from Base
         void f2(); // overrides virtual f2 from D1
     };
     ```
@@ -1099,12 +1099,12 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 * 有上面的 demo code 我們就可以來看怎麼寫會有什麼行為:
     ```cpp
     Base bobj; D1 d1obj; D2 d2obj;
-    Base *bp1 = &bobj, *bp2 = &d1obj, *bp3 = &d2obj; 
-    bp1->fcn(); // virtual call, will call Base::fcn at run time 
-    bp2->fcn(); // virtual call, will call Base::fcn at run time 
+    Base *bp1 = &bobj, *bp2 = &d1obj, *bp3 = &d2obj;
+    bp1->fcn(); // virtual call, will call Base::fcn at run time
+    bp2->fcn(); // virtual call, will call Base::fcn at run time
     bp3->fcn(); // virtual call, will call D2::fcn at run time
     D1 *d1p = &d1obj; D2 *d2p = &d2obj;
-    bp2->f2(); // error: Base has no member named f2 
+    bp2->f2(); // error: Base has no member named f2
     d1p->f2(); // virtual call, will call D1::f2() at run time
     d2p->f2(); // virtual call, will call D2::f2() at run time
     ```
@@ -1120,10 +1120,10 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 
 * 在來看呼叫 non`virtual` function 會發生的情況:
     ```cpp
-    Base *p1 = &d2obj; 
-    D1 *p2 = &d2obj; 
-    D2 *p3 = &d2obj; 
-    p1->fcn(42); // error: Base has no version of fcn that takes an int 
+    Base *p1 = &d2obj;
+    D1 *p2 = &d2obj;
+    D2 *p3 = &d2obj;
+    p1->fcn(42); // error: Base has no version of fcn that takes an int
     p2->fcn(42); // statically bound, calls D1::fcn(int)
     p3->fcn(42); // statically bound, calls D2::fcn(int)
     ```
@@ -1165,8 +1165,8 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 * 來看怎麼定義 hierarchy 中的 dtor:
     ```cpp
     class Quote {
-    public: // virtual destructor needed if a base pointer pointing to a derived object is deleted 
-        virtual ~Quote() = default; 
+    public: // virtual destructor needed if a base pointer pointing to a derived object is deleted
+        virtual ~Quote() = default;
         // dynamic binding for the destructor
     };
     ```
@@ -1174,9 +1174,9 @@ would be accessible, then the derived-to-base conversion is also accessible, and
         * dtor 也不例外
     * 所以只要把 hierarchy root 的 base class dtor 定義成 `virtual` 就可以用 `base*` (動態)正確決定要呼叫哪個 dtor 了
     ```cpp
-    Quote *itemP = new Quote; // same static and dynamic type 
+    Quote *itemP = new Quote; // same static and dynamic type
     delete itemP; // destructor for Quote called
-    itemP = new Bulk_quote; // static and dynamic types differ 
+    itemP = new Bulk_quote; // static and dynamic types differ
     delete itemP; // destructor for Bulk_quotecalled
     ```
     * 注意 `new` 的時候是一樣可以把 derived object 的指標丟給 `base*`
@@ -1241,7 +1241,7 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     };
     class D : public B {
     // no constructors
-    }; 
+    };
     D d; // ok: D's synthesized default constructor uses B’s default constructor
     D d2(d); // error: D's synthesized copy constructor is deleted
     D d3(std::move(d)); // error: implicitly uses D’s deleted copy constructor
@@ -1266,9 +1266,9 @@ would be accessible, then the derived-to-base conversion is also accessible, and
         Quote() = default; // memberwise default initialize
         Quote(const Quote&) = default; // memberwise copy
         Quote(Quote&&) = default; // memberwise move
-        Quote& operator=(const Quote&) = default; // copy assign Quote& 
+        Quote& operator=(const Quote&) = default; // copy assign Quote&
         operator=(Quote&&) = default; // move assign
-        virtual ~Quote() = default; 
+        virtual ~Quote() = default;
         // other members as before
     };
     ```
@@ -1293,12 +1293,12 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     class Base { /* .. . */};
     class D: public Base {
     public:
-        // by default, the base class default constructor initializes the base part of an object 
-        // to use the copy or move constructor, we must explicitly call that 
+        // by default, the base class default constructor initializes the base part of an object
+        // to use the copy or move constructor, we must explicitly call that
         // constructor in the constructor initializer list
-        D(const D& d): Base(d) // copy the base members 
+        D(const D& d): Base(d) // copy the base members
                 /* initializers for members ofD */{ /* ... */ }
-        D(D&& d): Base(std::move(d)) // move the base members 
+        D(D&& d): Base(std::move(d)) // move the base members
                 /* initializers for members of D */{ /* ... */ }
     };
     ```
@@ -1312,8 +1312,8 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     ```cpp
     // Base::operator=(const Base&) is not invoked automatically
     D &D::operator=(const D &rhs) {
-        Base::operator=(rhs); // assigns the base part 
-        // assign the members in the derived class, as usual, 
+        Base::operator=(rhs); // assigns the base part
+        // assign the members in the derived class, as usual,
         // handling self-assignment and freeing existing resources as appropriate
         return *this;
     }
@@ -1330,8 +1330,8 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     public:
         ~D() {
             /* do what it takes to clean up derived members */
-            
-            // Base::~Base invoked automatically 
+
+            // Base::~Base invoked automatically
         }
     };
     ```
@@ -1378,7 +1378,7 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     ```cpp
     class Bulk_quote : public Disc_quote {
     public:
-        using Disc_quote::Disc_quote; // inherit Disc_quote’s constructors 
+        using Disc_quote::Disc_quote; // inherit Disc_quote’s constructors
         double net_price(std::size_t) const;
     };
     ```
@@ -1439,10 +1439,10 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     * 這樣只會呼叫 base 的 copy/move ctor
         * **然後把 `derived_obj` 的 base-class part copy/move 過去:**
     ```cpp
-    vector<Quote> basket;     
-    basket.push_back(Quote("0-201-82470-1", 50));     
-    // ok, but copies only the Quote part of the object into basket 
-    basket.push_back(Bulk_quote("0-201-54848-8", 50, 10, .25)); 
+    vector<Quote> basket;
+    basket.push_back(Quote("0-201-82470-1", 50));
+    // ok, but copies only the Quote part of the object into basket
+    basket.push_back(Bulk_quote("0-201-54848-8", 50, 10, .25));
     // calls version defined by Quote, prints 750, i.e., 15 * $50
     cout << basket.back().net_price(15) << endl;
     ```
@@ -1453,8 +1453,8 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 * 這是唯一解法...，你也不能用 reference，因為 container 不能用 reference 當 elements
 * 這樣 copy 的就是 smart ptr 而不是物件:
     ```cpp
-    vector<shared_ptr<Quote>> basket; 
-    basket.push_back(make_shared<Quote>("0-201-82470-1", 50)); 
+    vector<shared_ptr<Quote>> basket;
+    basket.push_back(make_shared<Quote>("0-201-82470-1", 50));
     basket.push_back(make_shared<Bulk_quote>("0-201-54848-8", 50, 10, .25));
     // calls the version defined by BulkQuote; prints 562.5, i.e., 15 * $50 less the discount
     cout << basket.back()->net_price(15) << endl;
@@ -1475,17 +1475,17 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     ```cpp
     class Basket {
     public:
-        // Basket uses synthesized default constructor and copy-control members 
-        void addItem(const std::shared_ptr<Quote> &Sale) 
+        // Basket uses synthesized default constructor and copy-control members
+        void addItem(const std::shared_ptr<Quote> &Sale)
             { Items_.insert(Sale); }
-        // prints the total price for each book and the overall total for all items in the basket 
+        // prints the total price for each book and the overall total for all items in the basket
         double totalReceipt(std::ostream&) const;
     private:
-        // function to compare shared_ptrs needed by the multiset member 
-        static bool compare_(const std::shared_ptr<Quote> &Lhs, 
+        // function to compare shared_ptrs needed by the multiset member
+        static bool compare_(const std::shared_ptr<Quote> &Lhs,
                             const std::shared_ptr<Quote> &Rhs)
-        { return Hhs->isbn() < Rhs->isbn(); } 
-        // multiset to hold multiple quotes, ordered by the compare member 
+        { return Hhs->isbn() < Rhs->isbn(); }
+        // multiset to hold multiple quotes, ordered by the compare member
         std::multiset<std::shared_ptr<Quote>, decltype(Compare)*> Items_{compare_};
     };
     ```
@@ -1505,14 +1505,14 @@ would be accessible, then the derived-to-base conversion is also accessible, and
         double Sum = 0.0; // holds the running total
         // Iter refers to the **first element in a batch of elements with the same ISBN**
         // upper_bound returns an iterator to the element **just past the end of that batch**
-        for (auto Iter = Items_.cbegin(); 
-                  Iter != Items_.cend(); 
+        for (auto Iter = Items_.cbegin();
+                  Iter != Items_.cend();
                   Iter = Items_.upper_bound(*Iter)) {
             // we know there’s at least one element with this key in the Basket
-            // print the line item for this book 
+            // print the line item for this book
             Sum += print_total(os, **iter, items.count(*iter));
         }
-        Os << "Total Sale: " << Sum << endl; // print the final overall total 
+        Os << "Total Sale: " << Sum << endl; // print the final overall total
         return Sum;
     }
     ```
@@ -1534,18 +1534,18 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     * 通常 API 會需要傳遞 (smart) pointer 可能會是種 code smell
 * 這樣沒有把 ptr 藏起來，所以 user code 還是得寫這種東西:
     ```cpp
-    Basket bsk; 
+    Basket bsk;
     bsk.addItem(make_shared<Quote>("123", 45));
     bsk.addItem(make_shared<Bulk_quote>("345", 45, 3, .15));
     ```
 * 所以要重定義 `addItem`
     * 它會 handle memory allocation，user code 不用自己做
     ```cpp
-    void addItem(const Quote& sale); // copy the given object 
+    void addItem(const Quote& sale); // copy the given object
     void addItem(Quote&& sale); // move the given object
     ```
     * 而且同時定義 copy 跟 move 的版本
-    
+
 * 在新版的 `addItem` 內，大概會出現這種東西:
     ```cpp
     new Quote(Sale)
@@ -1559,20 +1559,20 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     * **並且是 `virtual`**
     ```cpp
     class Quote {
-    public: 
-        // virtual function to return a dynamically allocated copy of itself 
-        // these members use **reference qualifiers**; see § 13.6.3 (p. 546) 
-        virtual Quote* clone() const & 
+    public:
+        // virtual function to return a dynamically allocated copy of itself
+        // these members use **reference qualifiers**; see § 13.6.3 (p. 546)
+        virtual Quote* clone() const &
             {return new Quote(*this);}
-        virtual Quote* clone() && 
+        virtual Quote* clone() &&
             {return new Quote(std::move(*this));}
         // other members as before
     };
     class Bulk_quote : public Quote {
     public:
-        Bulk_quote* clone() const & 
-            {return new Bulk_quote(*this);} 
-        Bulk_quote* clone() && 
+        Bulk_quote* clone() const &
+            {return new Bulk_quote(*this);}
+        Bulk_quote* clone() &&
             {return new Bulk_quote(std::move(*this));}
         // other members as before
     };
@@ -1582,13 +1582,13 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 
 * 用 `clone` 就可以寫 `addItem` 惹:
     ```cpp
-    class Basket { 
-    public: 
-        void addItem(const Quote& Sale) { // copy the given object    
-            Items_.insert(std::shared_ptr<Quote>(Sale.clone())); 
-        } 
+    class Basket {
+    public:
+        void addItem(const Quote& Sale) { // copy the given object
+            Items_.insert(std::shared_ptr<Quote>(Sale.clone()));
+        }
         void addItem(Quote&& Sale) { // move the given object
-            Items_.insert(std::shared_ptr<Quote>(std::move(Sale).clone())); 
+            Items_.insert(std::shared_ptr<Quote>(std::move(Sale).clone()));
         } // other members as before
     };
     ```
@@ -1611,10 +1611,10 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     * 希望對 3. 再建立一層 interface
         1. 可以查各種文字的 and or not(看下面)
         2. 但是如何建立 "查詢 DB" 還是給 `TextQuery` 管理
-        
+
 * 範例文章:
     `Alice Emma has long flowing red hair. Her Daddy says when the wind blows through her hair, it looks almost alive, like a fiery bird in flight. A beautiful fiery bird, he tells her, magical but untamed. "Daddy, shush, there is no such thing," she tells him, at the same time wanting him to tell her more. Shyly, she asks, "I mean, Daddy, is there?"`
-    
+
 * 總共有以下幾種查詢
     1. 12章的基本查字功能
     2. `NotQuery`，寫做 `~(word)`，回傳沒有出現 `word` 的行數
@@ -1700,7 +1700,7 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 * 以下是比較適當的解法
 * 定義一個 common base class，他定義了查詢的 API
 * 再定義每種查詢功能對應的 derived class:
-    * `WordQuery` e.g. `Daddy` 
+    * `WordQuery` e.g. `Daddy`
     * `NotQuery` e.g. `~Alice`
     * `OrQuery` e.g. `hair | Alice`
     * `AndQuery` e.g. `hair & Alice`
@@ -1781,15 +1781,15 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     ```cpp
     // abstract class acts as a base class for concrete query types;
     // ***all members are private***
-    class Query_base { 
+    class Query_base {
         friend class Query;
     protected:
-        using line_no = TextQuery::line_no; // used in the eval functions 
+        using line_no = TextQuery::line_no; // used in the eval functions
         virtual ~Query_base() = default;
-    private: 
-        // eval returns the QueryResult that matches this Query 
-        virtual QueryResult eval(const TextQuery&) const = 0; 
-        // rep is a string representation of the query 
+    private:
+        // eval returns the QueryResult that matches this Query
+        virtual QueryResult eval(const TextQuery&) const = 0;
+        // rep is a string representation of the query
         virtual std::string rep() const = 0;
     };
     ```
@@ -1800,7 +1800,7 @@ would be accessible, then the derived-to-base conversion is also accessible, and
     * `Query` 會呼叫 `Query_base` 的 (`private`)`virtual`，所以把 `Query` 宣告成 `Query_base` 的 `friend`
     * `line_no` 跟 dtor 都宣告成 `protected`，因為 `Query_base` derived class 會用到
         * `line_no` 拿來宣告 derived class 內拿來存查詢結果的行數的 `std::set`
-        * `virtual` `dtor` 是因為 derived class 一定要可以 access，不然不能刪 derived class 物件 
+        * `virtual` `dtor` 是因為 derived class 一定要可以 access，不然不能刪 derived class 物件
 
 #### The `Query` Class
 * The Query class provides the interface to (*and hides*) the `Query_base` inheritance hierarchy.
@@ -1819,19 +1819,19 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 * 總之 `Query` 長這樣啦:
     ```cpp
     // interface class to manage the Query_base inheritance hierarchy
-    class Query { 
+    class Query {
         // these operators need access to the shared_ptr constructor
         friend Query operator~(const Query &);
         friend Query operator|(const Query&, const Query&);
         friend Query operator&(const Query&, const Query&);
-    public: 
-        Query(const std::string&); // builds a new WordQuery 
-        // interface functions: call the corresponding Query_base operations 
-        QueryResult eval(const TextQuery &t) const     
+    public:
+        Query(const std::string&); // builds a new WordQuery
+        // interface functions: call the corresponding Query_base operations
+        QueryResult eval(const TextQuery &t) const
             { return q->eval(t); }
-        std::string rep() const { return q->rep(); } 
+        std::string rep() const { return q->rep(); }
     private:
-        Query(std::shared_ptr<Query_base> query): q(query) { } 
+        Query(std::shared_ptr<Query_base> query): q(query) { }
         std::shared_ptr<Query_base> q;
     };
     ```
@@ -1843,7 +1843,7 @@ would be accessible, then the derived-to-base conversion is also accessible, and
 #### The `Query` Output Operator
 ```cpp
 std::ostream & operator<<(std::ostream &os, const Query &query) {
-    // Query::rep makes a virtual call through its Query_base pointer to rep() 
+    // Query::rep makes a virtual call through its Query_base pointer to rep()
     return os << query.rep();
 }
 ```
@@ -1851,7 +1851,7 @@ std::ostream & operator<<(std::ostream &os, const Query &query) {
     * runtime 決定要 call 哪種版本的 `rep`
 * 例如:
     ```cpp
-    Query andq = Query(sought1) & Query(sought2); 
+    Query andq = Query(sought1) & Query(sought2);
     cout << andq << endl;
     ```
     * `cout << andq` 會呼叫 `Query::rep`
@@ -1877,10 +1877,10 @@ std::ostream & operator<<(std::ostream &os, const Query &query) {
     class WordQuery: public Query_base {
         friend class Query; // **Query uses the WordQuery constructor**
         WordQuery(const std::string &s): query_word(s) { }
-        // concrete class: WordQuery defines all inherited pure virtual functions 
-        QueryResult eval(const TextQuery &t) const override 
+        // concrete class: WordQuery defines all inherited pure virtual functions
+        QueryResult eval(const TextQuery &t) const override
                 { return t.query(query_word); }
-        std::string rep() const override 
+        std::string rep() const override
                 { return query_word; }
         std::string query_word; // word for which to search
     };
@@ -1905,9 +1905,9 @@ std::ostream & operator<<(std::ostream &os, const Query &query) {
     ```cpp
     class NotQuery: public Query_base {
         friend Query operator~(const Query &);
-        NotQuery(const Query &q): query(q) { } 
-        // concrete class: NotQuery defines all inherited pure virtual functions 
-        std::string rep() const {return "~(" + query.rep() + ")";} 
+        NotQuery(const Query &q): query(q) { }
+        // concrete class: NotQuery defines all inherited pure virtual functions
+        std::string rep() const {return "~(" + query.rep() + ")";}
         QueryResult eval(const TextQuery&) const;
         Query query;
     };
@@ -1931,7 +1931,7 @@ std::ostream & operator<<(std::ostream &os, const Query &query) {
     ```cpp
     class BinaryQuery: public Query_base {
     protected:
-        BinaryQuery(const Query &l, const Query &r, std::string symbol): 
+        BinaryQuery(const Query &l, const Query &r, std::string symbol):
                 lhs(l), rhs(r), opSym(symbol) { }
         // abstract class: BinaryQuery doesn’t define eval
         std::string rep() const override
@@ -1953,14 +1953,14 @@ std::ostream & operator<<(std::ostream &os, const Query &query) {
     ```cpp
     class AndQuery: public BinaryQuery {
         friend Query operator&(const Query&, const Query&);
-        
-        AndQuery(const Query &left, const Query &right): 
+
+        AndQuery(const Query &left, const Query &right):
             BinaryQuery(left, right, "&") { }
         // concrete class: AndQuery inherits rep and defines the remaining pure virtual
         QueryResult eval(const TextQuery&) const;
     };
     inline Query operator&(const Query &lhs, const Query &rhs) {
-        return std::shared_ptr<Query_base>(new AndQuery(lhs, rhs)); 
+        return std::shared_ptr<Query_base>(new AndQuery(lhs, rhs));
     }
     class OrQuery: public BinaryQuery {
         friend Query operator|(const Query&, const Query&);
@@ -2005,11 +2005,11 @@ std::ostream & operator<<(std::ostream &os, const Query &query) {
         // virtual calls through the Query members, lhs and rhs
         // the calls to eval return the QueryResult for each operand
         auto right = rhs.eval(text), left = lhs.eval(text);
-        // copy the line numbers from the left-hand operand into the result set 
+        // copy the line numbers from the left-hand operand into the result set
         auto ret_lines = make_shared<set<line_no>>(left.begin(), left.end());
-        // insert lines from the right-hand operand 
-        ret_lines->insert(right.begin(), right.end()); 
-        // return the new QueryResult representing the union of lhs and rhs 
+        // insert lines from the right-hand operand
+        ret_lines->insert(right.begin(), right.end());
+        // return the new QueryResult representing the union of lhs and rhs
         return QueryResult(rep(), ret_lines, left.get_file());
     }
     ```
@@ -2024,16 +2024,16 @@ std::ostream & operator<<(std::ostream &os, const Query &query) {
 #### `AndQuery::eval`
 * 跟 `OrQuery::eval` 很像，不過會用 STL algorithm 的 `set_intersection` 來找共同的 `line_no`:
     ```cpp
-    // returns the intersection of its operands' result sets 
+    // returns the intersection of its operands' result sets
     QueryResult
     AndQuery::eval(const TextQuery& text) const {
-        // virtual calls through the Query operands to get result sets for the operands 
+        // virtual calls through the Query operands to get result sets for the operands
         auto left = lhs.eval(text), right = rhs.eval(text);
         // set to hold the intersection of left and right
         auto ret_lines = make_shared<set<line_no>>();
-        // writes the intersection of two ranges to a destination iterator     
-        // destination iterator in this call adds elements to ret     
-        set_intersection(left.begin(), left.end(), 
+        // writes the intersection of two ranges to a destination iterator
+        // destination iterator in this call adds elements to ret
+        set_intersection(left.begin(), left.end(),
             right.begin(), right.end(), inserter(*ret_lines, ret_lines->begin()));
         return QueryResult(rep(), ret_lines, left.get_file());
     }
@@ -2053,10 +2053,10 @@ std::ostream & operator<<(std::ostream &os, const Query &query) {
         // start out with an empty result set
         auto eval_not_result = make_shared<set<line_no>>();
 
-        // we have to iterate through the lines on which our operand appears 
+        // we have to iterate through the lines on which our operand appears
         auto beg = operand_result.begin(), end = operand_result.end();
 
-        // for each line in the input file, if that line is not in result,     
+        // for each line in the input file, if that line is not in result,
         // add that line number to ret_lines
         auto sz = operand_result.get_file()->size();
         for (size_t n = 0; n != sz; ++n) {

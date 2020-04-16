@@ -37,7 +37,7 @@ tags: C++
 * Tip: Ordinarily, it is best to use vector unless there is a good reason to prefer another container.
 
 * rules of thumb
-    * Unless you have a reason to use another container, use a vector. 
+    * Unless you have a reason to use another container, use a vector.
     * If your program has lots of small elements and space overhead matters, don’t use list or forward_list.
     * If the program requires random access to elements, use a vector or a deque.
     * If the program needs to insert or delete elements in the middle of the container, use a list or forward_list.
@@ -96,7 +96,7 @@ vector<noDefault> v2(10); // error: must supply an element initializer
 * 根據上面我們可以寫這樣安全又正確的 loop:
 ```cpp
 while (begin != end) {
-    *begin = val; // ok: range isn’t empty so begindenotes an element 
+    *begin = val; // ok: range isn’t empty so begindenotes an element
     ++begin; // advance the iterator to get the next element
 }
 ```
@@ -116,13 +116,13 @@ while (begin != end) {
 * 為了使用這些 type name，我們在宣告這些 type 的物件時需要把 class scope 也打出來
     * class_name::type_name obj;
     ```cpp
-    // iter is the iterator type defined by list<string> 
+    // iter is the iterator type defined by list<string>
     list<string>::iterator iter;
     // count is the difference_type type defined by vector<int>
     vector<int>::difference_type count;
     ```
-    
-    
+
+
 ### 9.2.3 begin and end Members
 * yield iterators that refer to the first and one past the last element in the container.
 * \[c]\[r]begin \[c]\[r]end
@@ -158,11 +158,11 @@ while (begin != end) {
 
     ```cpp
     // each container has three elements, initialized from the given initializers
-    list<string> authors = {"Milton", "Shakespeare", "Austen"}; 
+    list<string> authors = {"Milton", "Shakespeare", "Austen"};
     vector<const char*> articles = {"a", "an", "the"};
-    list<string> list2(authors); // ok: types match deque<string> 
-    authList(authors); // error: container types don’t match 
-    vector<string> words(articles); // error: element types must match 
+    list<string> list2(authors); // ok: types match deque<string>
+    authList(authors); // error: container types don’t match
+    vector<string> words(articles); // error: element types must match
     // ok: converts const char*elements to string
     forward_list<string> words(articles.begin(), articles.end());
     ```
@@ -197,7 +197,7 @@ while (begin != end) {
 * 還有一點，array 可以 copy! 只要 type 完全一樣的話(i.e. 角括號內的兩個參數都一樣)
     ```cpp
     int digs[10] = {0,1,2,3,4,5,6,7,8,9};
-    int cpy[10] = digs; // error: no copy or assignment for built-in arrays 
+    int cpy[10] = digs; // error: no copy or assignment for built-in arrays
     array<int, 10> digits = {0,1,2,3,4,5,6,7,8,9};
     array<int, 10> copy = digits; // ok: so long as array types match
     ```
@@ -215,7 +215,7 @@ c1 = {a,b,c}; // after the assignment c1has size3
 * array 也可以做 assignment 講過ㄌ，給點例子，因為其實寫起來有點ㄎㄧㄤ
 ```cpp
 array<int, 10> a1 = {0,1,2,3,4,5,6,7,8,9};
-array<int, 10> a2 = {0}; // elements all have value 0 
+array<int, 10> a2 = {0}; // elements all have value 0
 a1 = a2; // replaces elements in a1
 a2 = {0}; // error: cannot assign to an array from a braced list
 ```
@@ -232,7 +232,7 @@ a2 = {0}; // error: cannot assign to an array from a braced list
 ```cpp
 list<string> names;
 vector<const char*> oldstyle;
-names = oldstyle; // error: container types don’t match 
+names = oldstyle; // error: container types don’t match
 // ok: can convert from const char*to string
 names.assign(oldstyle.cbegin(), oldstyle.cend());
 ```
@@ -306,7 +306,7 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     :::warning
     It is legal to insert anywhere in a `vector`, `deque`, or `string`. However, doing so can be an expensive operation.
     :::
-    
+
 
 #### Inserting a Range of Elements
 * insert 從第二個參數到最後一個參數長的跟 container constructor 參數有 87% 像
@@ -317,12 +317,12 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     svec.insert(svec.end(), 10, "Anna");
     // 在 svec 最後面插10個 "Anna" string
     vector<string> v = {"quasi", "simba", "frollo", "scar"};
-    // insert the last two elements of v at the beginning of slist 
+    // insert the last two elements of v at the beginning of slist
     slist.insert(slist.begin(), v.end() - 2, v.end());
     slist.insert(slist.end(), {"these", "words", "will", "go", "at", "the", "end"});
     // run-time error: iterators denoting the range to copy from
     // must not refer to the same container as the one we are changing
-    slist.insert(slist.begin(), slist.begin(), slist.end()); 
+    slist.insert(slist.begin(), slist.begin(), slist.end());
     ```
     * 注意最後一個例子，你最後兩個 iter 不能指向同一個 container，這是 runtime error
     * **為什麼不行？一樣的道理，因為你插 element 會改變 container size，所以 iterator 就 fail 了**
@@ -356,7 +356,7 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     * https://stackoverflow.com/questions/6438086/iterator-invalidation-rules 過者參考這篇，可以看哪些 container 經過哪些操作之後 iterator 會失效
 
 * 結論是，如果你要固定插到 container 的第 n 個位置，你每插一次新的 element(s) 你就要更新你的 iterator，可以用 `insert` 回傳的 iter 來更新
-    
+
 #### Using the `emplace` Operations
 * C++11:
     * `emplace_front`, `emplace`, and `emplace_back`
@@ -368,9 +368,9 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
 
     ```cpp
     // construct a Sales_data object at the end of c
-    // uses the three-argument Sales_data constructor 
+    // uses the three-argument Sales_data constructor
     c.emplace_back("978-0590353403", 25, 15.99);
-    // error: there is no version of push_back that takes three arguments 
+    // error: there is no version of push_back that takes three arguments
     c.push_back("978-0590353403", 25, 15.99);
     // ok: we create a temporary Sales_dataobject to pass to push_back
     c.push_back(Sales_data("978-0590353403", 25, 15.99));
@@ -401,7 +401,7 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     cout << svec[0]; // run-time error: there are no elements in svec!
     cout << svec.at(0); // throws an out_of_range exception
     ```
-    
+
 ### 9.3.3 Erasing Elements
 * there are also several ways to remove elements.
 * ![](https://i.imgur.com/64TtXH8.png)
@@ -430,7 +430,7 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
 
 * remove all elements:
     ```cpp
-    slist.clear(); // delete all the elements within the container     
+    slist.clear(); // delete all the elements within the container
     slist.erase(slist.begin(), slist.end()); // equivalent
     ```
 #### 9.3.4 Specialized forward_list Operations
@@ -453,20 +453,20 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     * 可以用 `before_begin` 跟 `begin` 達成
     ```cpp
     forward_list<int> flst = {0,1,2,3,4,5,6,7,8,9};
-    auto prev = flst.before_begin(); // denotes element "off=the start" offlst 
+    auto prev = flst.before_begin(); // denotes element "off=the start" offlst
     auto curr = flst.begin(); // denotes the first element in flst
-    while (curr != flst.end()) { // while there are still elements to process 
+    while (curr != flst.end()) { // while there are still elements to process
         if (*curr % 2) // if the element is odd
             curr = flst.erase_after(prev); // erase it and move curr
-            
+
         else {
             prev = curr; /*prev++? */  // move the iterators to denote the next
             ++curr;        // element and one before the next element
-            
+
         }
     }
     ```
-    
+
 ### 9.3.5 Resizing a Container
 ![](https://i.imgur.com/ZMMvvz8.png)
 * 可變大變小，變小的話後面的 elements 丟掉，變大的話塞 value-initialized elements，或者用提供的 initializer 填 elements
@@ -518,7 +518,7 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     ```cpp
     // silly loop to remove even-valued elements and insert a duplicate of odd-valued elements
     vector<int> vi = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-    auto iter = vi.begin(); // call begin, not cbegin because we’re changing vi 
+    auto iter = vi.begin(); // call begin, not cbegin because we’re changing vi
     while (iter != vi.end()) {
     if (*iter % 2) {
         iter = vi.insert(iter, *iter); // duplicate the current element
@@ -572,10 +572,10 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
         * However, **the implementation is free to ignore this request.** There is no guarantee that a call to `shrink_to_fit` will return memory.
 
 * `capacity()` and `size()`
-    * The size of a container is the number of elements it already holds; 
+    * The size of a container is the number of elements it already holds;
     * Its capacity is how many elements it can hold before more space must be allocated.
     ```cpp
-    vector<int> ivec; 
+    vector<int> ivec;
     // size should be zero;
     // capacity is implementation defined
     cout << "ivec: size: " << ivec.size() << " capacity: " << ivec.capacity() << endl;
@@ -585,7 +585,7 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     // size should be 24;
     // capacity will be >= 24 and is implementation defined
     cout << "ivec: size: " << ivec.size() << " capacity: " << ivec.capacity() << endl;
-    ivec.reserve(50); // sets capacity to at least 50; might be more 
+    ivec.reserve(50); // sets capacity to at least 50; might be more
     // size should be 24; capacity will be >= 50 and is implementation defined
     cout << "ivec: size: " << ivec.size() << " capacity: " << ivec.capacity() << endl;
     ```
@@ -603,9 +603,9 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
 * In fact, **as long as no operation exceeds the vector’s capacity, the vector must not reallocate its elements.**
 * 接續上面的 code
     ```cpp
-    ivec.push_back(42); 
-    // add one more element 
-    // size should be 51; capacity will be >= 51 and is implementation defined 
+    ivec.push_back(42);
+    // add one more element
+    // size should be 51; capacity will be >= 51 and is implementation defined
     cout << "ivec: size: " << ivec.size()
     << " capacity: " << ivec.capacity() << endl;
     ```
@@ -613,7 +613,7 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
 
 * 最後你可以用用看 `shrink_to_fit`，看看你用的實作會不會理你
     ```cpp
-    ivec.shrink_to_fit(); // ask for the memory to be returned 
+    ivec.shrink_to_fit(); // ask for the memory to be returned
     // size should be unchanged; capacity is implementation defined
     cout << "ivec: size: " << ivec.size() << " capacity: " << ivec.capacity() << endl;
     ```
@@ -671,14 +671,14 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     ```cpp
     stack<int> stk(deq); // copies elements from deq into stk
     ```
-    
+
 * By default both `stack` and `queue` are implemented in terms of `deque`, and a `priority_queue` is implemented on a `vector`.
     * 為何這些 adapter 底層預設是這樣選可以看這篇
     * https://stackoverflow.com/questions/102459/why-does-stdstack-use-stddeque-by-default
 * We can override the default container type by naming a sequential container as a second (template) type argument when we create the adaptor:
     ```cpp
-    // empty stack implemented on top of vector 
-    stack<string, vector<string>> str_stk; 
+    // empty stack implemented on top of vector
+    stack<string, vector<string>> str_stk;
     // str_stk2 is implemented on top of vector and initially holds a copy of svec
     stack<string, vector<string>> str_stk2(svec);
     ```
@@ -697,16 +697,16 @@ names.assign(oldstyle.cbegin(), oldstyle.cend());
     ```cpp
     stack<int> intStack; // empty stack
     // fill up the stack
-    for (size_t ix = 0; ix != 10; ++ix)         
+    for (size_t ix = 0; ix != 10; ++ix)
         intStack.push(ix); // intStackholds 0 . . . 9 inclusive
     while (!intStack.empty()) {
-        // while there are still values in intStack 
-        int value = intStack.top(); // code that uses value 
+        // while there are still values in intStack
+        int value = intStack.top(); // code that uses value
         intStack.pop(); // pop the top element, and repeat
     }
     ```
-    
-    
+
+
 * 注意，Each container adaptor defines its own operations in terms of operations provided by the underlying container type.
     * 所以你才會看到為什麼 stack 不是用 push/pop_back，而是用 push 跟 pop
     * 這又是 API 設計哲學了，對於 stack 來說，叫 push 比 push_back 好，反正 stack 只能從其中一邊 塞/拿 資料，沒有 back 的問題

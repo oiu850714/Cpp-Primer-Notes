@@ -31,7 +31,7 @@ tags: C++
 * 一個 operator function 一定要馬是 memeber function，要馬是 global function
     * 但是 para list 內至少有一個 parameter 是 class type:
     ```cpp
-    // error: cannot redefine the built-in operator for ints 
+    // error: cannot redefine the built-in operator for ints
     int operator+(int, int);
     ```
     * 這也意味著我們不能改變操作在 buil-in type 上的 operator 的意義(因為你沒辦法定義一個 operator function，其中所有參數都是 built-in type)
@@ -132,7 +132,7 @@ tags: C++
         class_name operator+(clas_name, convertible_type);
         class_name operator+(convertible_type, class_name);
         ```
-        
+
 * 如果你把 operator function 定義成 member，之前說過，第一個 operand 會綁到 this；
     ```cpp
     string s = "world";
@@ -161,7 +161,7 @@ tags: C++
 * 拿 `Sales_data` 來舉例
     ```cpp
     ostream &operator<<(ostream &os, const Sales_data &item) {
-        os << item.isbn() << " " << item.units_sold 
+        os << item.isbn() << " " << item.units_sold
            << " " << item.revenue << " " << item.avg_price();
         return os;
     }
@@ -234,10 +234,10 @@ tags: C++
 * 另外如果定義了某個 relational operator(s)，也會定義對應的 compound assignment
     * **並且 relational operator 通常會利用對應的 compound assignment 來實作**:
     ```cpp
-    // assumes that both objects refer to the same book 
+    // assumes that both objects refer to the same book
     Sales_data
     operator+(const Sales_data &lhs, const Sales_data &rhs) {
-        Sales_data sum = lhs; // copy data members from lhs into sum 
+        Sales_data sum = lhs; // copy data members from lhs into sum
         sum += rhs; // add rhs into sum
         return sum;
     }
@@ -252,8 +252,8 @@ tags: C++
     * 並且通常會一併定義 `operator!=()`
     ```cpp
     bool operator==(const Sales_data &lhs, const Sales_data &rhs) {
-        return lhs.isbn() == rhs.isbn() 
-        && lhs.units_sold == rhs.units_sold 
+        return lhs.isbn() == rhs.isbn()
+        && lhs.units_sold == rhs.units_sold
         && lhs.revenue == rhs.revenue;
     }
     bool operator!=(const Sales_data &lhs, const Sales_data &rhs) {
@@ -261,7 +261,7 @@ tags: C++
     }
     ```
    * 注意又是一個用已定義的 operator(`operator==()`) 來實作另一個 operator(`operator!=()`) 的例子
- 
+
 :::info
 * Design Principle:
     * 如果 class 有等價的概念，請定義 `operator==()`
@@ -311,10 +311,10 @@ tags: C++
 * 記得都要 return rhs&
     ```cpp
     StrVec &StrVec::operator=(initializer_list<string> il) {
-        // alloc_n_copy allocates space and copies elements from the given range 
+        // alloc_n_copy allocates space and copies elements from the given range
         auto data = alloc_n_copy(il.begin(), il.end());
-        free(); // destroy the elements in this object and free the space 
-        elements = data.first; // update data members to point to the new space 
+        free(); // destroy the elements in this object and free the space
+        elements = data.first; // update data members to point to the new space
         first_free = cap = data.second;
         return *this;
     }
@@ -331,7 +331,7 @@ tags: C++
     * 不要自找麻煩，請定義成 member function
 * 一樣 return lhs&
     ```cpp
-    // member binary operator: left-hand operand is bound to the implicit this pointer 
+    // member binary operator: left-hand operand is bound to the implicit this pointer
     Sales_data& Sales_data::operator+=(const Sales_data &rhs) {
         units_sold += rhs.units_sold;
         revenue += rhs.revenue;
@@ -366,9 +366,9 @@ tags: C++
     ```cpp
     // assume svec is a StrVec
     const StrVec cvec = svec; // copy elements from svec into cvec
-    // if svec has any elements, run the string empty function on the first one 
+    // if svec has any elements, run the string empty function on the first one
     if (svec.size() && svec[0].empty()) {
-        svec[0] = "zero"; // ok: subscript returns a reference to a string 
+        svec[0] = "zero"; // ok: subscript returns a reference to a string
         cvec[0] = "Zip"; // error: subscripting cvec returns a reference to const
     }
     ```
@@ -389,14 +389,14 @@ tags: C++
     public:
         // increment and decrement
         StrBlobPtr& operator++();
-        StrBlobPtr& operator--(); 
+        StrBlobPtr& operator--();
         // other members as before
     };
     ```
     * 注意這是 prefix 版本，return reference
 * 實作:
     ```cpp
-    // prefix: return a reference to the incremented/decremented object 
+    // prefix: return a reference to the incremented/decremented object
     StrBlobPtr& StrBlobPtr::operator++() {
         // if curr already points past the end of the container, can’t increment it
         check(curr, "increment past end of StrBlobPtr");
@@ -419,11 +419,11 @@ tags: C++
 * Normal overloading cannot distinguish between these operators.
 * 用很ㄎㄧㄤ的解法: 讓 postfix 版本多吃一個參數:
     ```cpp
-    class StrBlobPtr { 
+    class StrBlobPtr {
     public:
-        // increment and decrement 
-        StrBlobPtr operator++(int); // postfix operators   
-        StrBlobPtr operator--(int); 
+        // increment and decrement
+        StrBlobPtr operator++(int); // postfix operators
+        StrBlobPtr operator--(int);
         // other members as before
     };
     ```
@@ -436,14 +436,14 @@ tags: C++
     // postfix: increment/decrement the object but return the unchanged value
     StrBlobPtr StrBlobPtr::operator++(int) {
         // no check needed here; the call to prefix increment will do the check
-        StrBlobPtr ret = *this; // save the current value 
+        StrBlobPtr ret = *this; // save the current value
         ++*this; // advance one element; ***prefix ++ checks the increment***
         return ret; // return the saved state
     }
     StrBlobPtr StrBlobPtr::operator--(int) {
-        // no check needed here; the call to prefix decrement will do the check 
-        StrBlobPtr ret = *this; // save the current value 
-        --*this; // move backward one element; prefix -- checks the decrement 
+        // no check needed here; the call to prefix decrement will do the check
+        StrBlobPtr ret = *this; // save the current value
+        --*this; // move backward one element; prefix -- checks the decrement
         return ret; // return the saved state
     }
     ```
@@ -459,23 +459,23 @@ tags: C++
     p.operator++(0); // call postfix operator++
     p.operator++(); // call prefix operator++
     ```
-    
+
 ## 14.7 Member Access Operators
 * **高能注意，尤其是 `operator->()`**
 * dereference `operator*()` and arrow `operator->()`
 * 常表示在 iterator 或 smart pointer class
     ```cpp
-    class StrBlobPtr { 
+    class StrBlobPtr {
     public:
-        std::string& operator*() const { 
+        std::string& operator*() const {
             auto p = check(curr, "dereference past end");
             return (*p)[curr]; // (*p)is the vector to which this object points
         }
         // ***注意下面的 return type 是 pointer***
         std::string* operator->() const {
-            // delegate the real work to the dereference operator 
+            // delegate the real work to the dereference operator
             return & this->operator*();
-        } 
+        }
         // other members as before
     };
     ```
@@ -495,17 +495,17 @@ tags: C++
         int main() {
             D d;
             d->foo();
-           
+
             // expands to:
             // (*d.operator->().operator->().operator->()).foo();
             //   D            C            B           A*
         }
         ```
-        * 
+        *
     * 注意**這邊 Primer p.570 頁第二個等價的 expression，格式看起來有誤**
         ```cpp
         (*point).mem; // point is a built-in pointer type
-        
+
         // *** error ***
         point.operator()->mem; // point is an object of class type
         point.operator->().mem; // correct
@@ -570,7 +570,7 @@ tags: C++
     ```cpp
     for_each(vs.begin(), vs.end(), PrintString(cerr, '\n'));
     ```
-    
+
 ### 14.8.1 **Lambdas Are Function Objects**
 * **When we write a lambda, the compiler translates that expression into an *unnamed object of an unnamed class* (§ 10.3.3, p. 392).**
 * 一個沒有名字的 class 的沒有名字的 object
@@ -615,8 +615,8 @@ tags: C++
         ```cpp
         class SizeComp {
         public:
-            SizeComp(size_t n): sz(n) { } // parameter for each captured variable 
-            // call operator with the same return type, parameters, and body as the lambda 
+            SizeComp(size_t n): sz(n) { } // parameter for each captured variable
+            // call operator with the same return type, parameters, and body as the lambda
             bool operator()(const string &s) const
                 { return s.size() >= sz; }
         private:
@@ -630,22 +630,22 @@ tags: C++
     auto wc = find_if(words.begin(), words.end(), SizeComp(sz));
     ```
     * 注意這是把一個 `SizeComp` 的(temp)物件丟給 `std::find_if`，只是用 `SizeComp(size_t)` 初始化
-    
+
 ### 14.8.2 Library-Defined Function Objects
 * 一堆有名子，可以 call 的 class template... 定義在 `<functional>`
 * ![](https://i.imgur.com/983MjA0.png)
 * 拿來呼叫的時候，他會使用你給定的 type 對應的 operation 來運算
     ```cpp
     plus<int> intAdd; // function object that can add two int values
-    negate<int> intNegate; // function object that can negate an int value 
+    negate<int> intNegate; // function object that can negate an int value
     // uses intAdd::operator(int, int)to add 10 and 20
     int sum = intAdd(10, 20); // equivalent to sum = 30
     sum = intNegate(intAdd(10, 20)); // equivalent to sum= -30
-    // uses intNegate::operator(int) to generate -10 as the second parameter 
+    // uses intNegate::operator(int) to generate -10 as the second parameter
     // to intAdd::operator(int, int)
     sum = intAdd(10, intNegate(10)); // sum=0
     ```
-    
+
 #### Using a Library Function Object with the Algorithms
 * 這裡舉例比較快，例如 `sort` `vector<string>` 會按照字點順序排列(也就是使用 string 的 `operator<` 來排列)；你想要倒著排可以這樣寫:
     ```cpp
@@ -663,7 +663,7 @@ tags: C++
     * 一樣，看看就好
     ```cpp
     vector<string *> nameTable; // vector of pointers
-    // error: the pointers in nameTableare unrelated, so < is undefined 
+    // error: the pointers in nameTableare unrelated, so < is undefined
     sort(nameTable.begin(), nameTable.end(), [](string *a, string *b)
                     { return a < b; });
     // ok: library guarantees that less on pointer types iswell defined
@@ -716,12 +716,12 @@ tags: C++
     * 假設這樣定義 `std::map`，且 `add` 跟 `mod` 都是上面定義的:
     ```cpp
     // maps an operator to a pointer to a function
-    // taking two ints and returning an int 
+    // taking two ints and returning an int
     map<string, int(*)(int,int)> binops;
     ```
     * 則這樣合法:
     ```cpp
-    // ok: add is a pointer to function of the appropriate type 
+    // ok: add is a pointer to function of the appropriate type
     binops.insert({"+", add}); // {"+", add} is a pair§ 11.2.3 (p. 426)
     ```
     * 但這樣不合法:
@@ -755,11 +755,11 @@ tags: C++
     cout << f2(4,2) << endl; // prints 2
     cout << f3(4,2) << endl; // prints 8
     ```
-    
+
 * 然後我們的 container 就可以這樣定義:
     ```cpp
-    // table of callable objects corresponding to each binary operator 
-    // all the callables must take two ints and return an int 
+    // table of callable objects corresponding to each binary operator
+    // all the callables must take two ints and return an int
     // ***an element can be a function pointer, function object, or lambda***
     map<string, function<int(int, int)>> binops;
     ```
@@ -776,8 +776,8 @@ tags: C++
     * 也可以這樣寫扣:
     ```cpp
     binops["+"](10, 5); // calls add(10, 5)
-    binops["-"](10, 5); // uses the call operator of the minus<int>object 
-    binops["/"](10, 5); // uses the call operator of the divide object 
+    binops["-"](10, 5); // uses the call operator of the minus<int>object
+    binops["/"](10, 5); // uses the call operator of the divide object
     binops["*"](10, 5); // calls the lambda function object
     binops["%"](10, 5); // calls the lambda function object
     ```
@@ -806,7 +806,7 @@ tags: C++
     binops.insert( {"+", fp} ); // ok: fp points to the right version of add
     ```
     ```cpp
-    // ok: use a lambda to disambiguate which version of add we want to use 
+    // ok: use a lambda to disambiguate which version of add we want to use
     binops.insert( {"+", [](int a, int b) {return add(a, b);} } );
     ```
 * 題外話，其實在這種情境下，你寫 `auto p = add;` 也會錯
@@ -860,7 +860,7 @@ tags: C++
     * **但是這種轉換之前或之後還是可以搭配 built-in 轉換**
 * 換句話說其實 `SmallInt` 已經定義了 arithmetic type 的轉換，因為其他 arithmetic type 可以先轉成 int 再轉成 `SmallInt`，也可以從 `SmallInt` 轉成 int 之後再轉成其他 arithmetic type:
     ```cpp
-    // the double argument is converted to int using the built-in conversion     
+    // the double argument is converted to int using the built-in conversion
     SmallInt si = 3.14; // calls the SmallInt(int) constructor
     // the SmallInt conversion operator converts si to int;
     si + 3.14; // that int is converted to double using the built-in conversion
@@ -870,14 +870,14 @@ tags: C++
     ```cpp
     class SmallInt;
     operator int(SmallInt&); // error: nonmember
-    class SmallInt { 
+    class SmallInt {
     public:
         int operator int() const; // error: return type
         operator int(int = 0) const; // error: parameter list
         operator int*() const { return 42; } // error: 42 is not a pointer
     };
     ```
-    
+
 :::danger
 #### CAUTION: AVOID OVERUSE OF CONVERSION FUNCTIONS
 * 良好設計的轉型介面好棒棒
@@ -919,8 +919,8 @@ tags: C++
 * 所以定義了 `explicit` conversion operators:
     ```cpp
     class SmallInt {
-    public: // the compiler won’t automatically apply this conversion 
-    explicit operator int() const { return val; } 
+    public: // the compiler won’t automatically apply this conversion
+    explicit operator int() const { return val; }
     // other members as before
     };
     ```
@@ -930,7 +930,7 @@ tags: C++
     si + 3; // error: implicit is conversion required, but operatorint is explicit
     static_cast<int>(si) + 3; // ok: explicitly request the conversion
     ```
-    
+
 * 不過唯一的例外就是使用在 condition 時:
     * 你不加 `static_cast`，compiler 也會當成你有加
     * 合理，因為這是常用 idiom
@@ -957,7 +957,7 @@ tags: C++
     class A {
         A(const B&); // 可用這個將 B 轉換成 A
     };
-    
+
     class B {
         operator A(); // 可用這個將 B 轉換成 A
     }
@@ -968,6 +968,6 @@ tags: C++
     class A {
         operator int();
         operator double();
-        // int double 可以互轉，你的 user code 在使用 class A 時會不小心寫出 ambiguous (implicit conversion) call 
+        // int double 可以互轉，你的 user code 在使用 class A 時會不小心寫出 ambiguous (implicit conversion) call
     };
     ```

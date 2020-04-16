@@ -58,7 +58,7 @@ tags: C++
             * 繼承
 
 #### The `std::make_shared<T>` Function
-* The safest way to allocate and use dynamic memory is to call a library function named `std::make_shared`. 
+* The safest way to allocate and use dynamic memory is to call a library function named `std::make_shared`.
 * This function **allocates and initializes an object in dynamic memory and *returns a `shared_ptr<T>`*** that points to that object.
     * 他其實是 function template
     * 一樣在 `<memory>`
@@ -72,7 +72,7 @@ tags: C++
     ```cpp
     // shared_ptr that points to an int with value 42
     shared_ptr<int> p3 = make_shared<int>(42);
-    // p4 points to a string with value 9999999999 
+    // p4 points to a string with value 9999999999
     shared_ptr<string> p4 = make_shared<string>(10, '9');
     // p5 points to an int that is value initialized (§ 3.3.1 (p. 98)) to 0
     shared_ptr<int> p5 = make_shared<int>();
@@ -126,10 +126,10 @@ tags: C++
 * The fact that the `shared_ptr` class automatically frees dynamic objects when they are no longer needed makes it fairly easy to use dynamic memory.
 * 看看下面的範例
     ```cpp
-    // factory returns a shared_ptr pointing to a dynamically allocated object 
+    // factory returns a shared_ptr pointing to a dynamically allocated object
     shared_ptr<Foo> factory(T arg) {
-        // process argas appropriate 
-        // shared_ptr will take care of deleting this memory 
+        // process argas appropriate
+        // shared_ptr will take care of deleting this memory
         return make_shared<Foo>(arg);
     }
     ```
@@ -220,7 +220,7 @@ tags: C++
         // add and remove elements
         void push_back(const std::string &t) {data->push_back(t);}
         void pop_back(); // element access
-        std::string& front();     
+        std::string& front();
         std::string& back();
     private:
         std::shared_ptr<std::vector<std::string>> data;
@@ -231,11 +231,11 @@ tags: C++
     * 其實看一下 interfece，就像是簡化版的存著 string 的 vector
     * **但是這個 class 的 object，一旦用 assignment 之後，i.e. a = b;，a b 兩個 object 的 underlying data 會是相同的(不是單純複製而已)**
     * 注意 private data 是一個 `shared_ptr` to `vector<string>`
-        
+
 #### StrBlob Constructors
 * 下面是 ctor，有兩種，一種 default，另一種吃 initializer_list
     ```cpp
-    StrBlob::StrBlob(): data(make_shared<vector<string>>()) { } 
+    StrBlob::StrBlob(): data(make_shared<vector<string>>()) { }
     StrBlob::StrBlob(initializer_list<string> il):
             data(make_shared<vector<string>>(il)) { }
     ```
@@ -304,7 +304,7 @@ void StrBlob::pop_back() {
 * We can initialize a dynamically allocated object using direct initialization (§ 3.2.1, p. 84).
     * 就是在 new 的 type 後面加上給 ctor 的參數
     ```cpp
-    int *pi = new int(1024); // object to which pi points has value 1024 
+    int *pi = new int(1024); // object to which pi points has value 1024
     string *ps = new string(10, '9');
     // *ps is "9999999999"
     // vector with ten elements with values from 0 to 9
@@ -357,7 +357,7 @@ void StrBlob::pop_back() {
     int *p2 = new (nothrow) int; // if allocation fails, new returns a null pointer
     ```
     * this form of new is referred to as **placement `new`.**
-    * A placement `new` expression lets us **pass additional arguments** to `new`. In this case, we pass an ***object*** named `nothrow` that is defined by the library. 
+    * A placement `new` expression lets us **pass additional arguments** to `new`. In this case, we pass an ***object*** named `nothrow` that is defined by the library.
 * `bad_alloc` 跟 `nothtow` 都定義在 `<new>`
 
 #### Freeing Dynamic Memory
@@ -384,7 +384,7 @@ delete p; // p must point to a dynamically allocated object or be null
     const int *pci = new const int(1024);
     delete pci; // ok: deletes a const object
     ```
-    
+
 #### **Dynamically Allocated Objects Exist until They Are Freed**
 * A dynamic object managed through a built-in pointer exists until it is explicitly deleted.
 * Functions that return pointers (rather than smart pointers) to dynamic memory **put a burden on their callers**—
@@ -393,11 +393,11 @@ delete p; // p must point to a dynamically allocated object or be null
     // factory returns a pointer to a dynamically allocated object
     Foo* factory(T arg) {
         // process arg as appropriate
-        return new Foo(arg); 
+        return new Foo(arg);
         // caller is responsible for deleting this memory
     }
     ```
-    
+
 * **Unfortunately, all too often the caller forgets to do so:**
     ```cpp
     void use_factory(T arg) {
@@ -423,7 +423,7 @@ delete p; // p must point to a dynamically allocated object or be null
         return p; // caller must delete the memory
     }
     ```
-    
+
 #### Resetting the Value of a Pointer after a delete ...
 #### ...Provides Only Limited Protection
 * dangling pointers
@@ -450,7 +450,7 @@ delete p; // p must point to a dynamically allocated object or be null
 * deleter 可以動態改變，酷
 * We can also initialize a smart pointer from a (raw) pointer returned by `new`:
     ```cpp
-    shared_ptr<double> p1; // shared_ptr that can point at a double 
+    shared_ptr<double> p1; // shared_ptr that can point at a double
     shared_ptr<int> p2(new int(42)); // p2 points to an int with value 42
     ```
     * The smart pointer constructors that take pointers are **explicit**
@@ -522,7 +522,7 @@ p.reset(new int(1024)); // ok: p points to a new object
     }
     ```
     * If an exception **happens between the `new` and the `delete`**, and is not caught inside `f`, then this memory can never be freed.
-    
+
 #### Smart Pointers and Dumb Classes
 * 簡單說你寫了一個像 C strcut 的 class，然後裡面會有 ptr 去 new 東西的時候，他一樣會發生 exception 導致 memory leak 的情況
     * 因為(要同時能給 C 用的) C struct 沒有 dtor
@@ -561,7 +561,7 @@ p.reset(new int(1024)); // ok: p points to a new object
 * 最後是用 smart pointer 時的注意事項(convention)
 ![](https://i.imgur.com/BPJqeEN.png)
 :::
-    
+
 ### 12.1.5 `unique_ptr`
 ![](https://i.imgur.com/pfQQzEC.png)
 * 注意 `u2` 要使用 deleter 時，template argument 要給 deleter type，這跟 `shared_ptr` 不同
@@ -575,7 +575,7 @@ p.reset(new int(1024)); // ok: p points to a new object
     * C++14 就有惹，Primer 老ㄌ
     * *所以下面的 code example 如果有用 raw ptr 初始化 `unique_ptr` 的記得要想成是用 make_unique*
     ```cpp
-    unique_ptr<double> p1; // unique_ptr that can point at a double 
+    unique_ptr<double> p1; // unique_ptr that can point at a double
     unique_ptr<int> p2(new int(42)); // p2 points to int with value 42
     ```
 * 阿就說只能有一個 `unique_ptr` 指向某個物件惹，所以 `unique_ptr` 當然不支援 copy 或 assign 阿
@@ -589,7 +589,7 @@ p.reset(new int(1024)); // ok: p points to a new object
     * 經過 transfer ownership 之後還是只會有一個 `unique_ptr` 指向("owns")物件
     ```cpp
     // transfers ownership from p1(which points to the string "Stegosaurus") to p2
-    unique_ptr<string> p2(p1.release()); // release makes p1 null 
+    unique_ptr<string> p2(p1.release()); // release makes p1 null
     unique_ptr<string> p3(new string("Trex"));
     // transfers ownership from p3 to p2
     p2.reset(p3.release()); // reset deletes the memory to which p2 had pointed
@@ -600,7 +600,7 @@ p.reset(new int(1024)); // ok: p points to a new object
     * 接住 `release` 回傳值的人就要負責 `delete` object，如果是用 smart_ptr 去接就交給 smart_ptr，如果是用 raw ptr，program 就要自己 free
         * 而且一定要 assign `release()` return value，否則 memory leak
         ```cpp
-        p2.release(); // WRONG: p2 won’t free the memory and we’ve lost the pointer 
+        p2.release(); // WRONG: p2 won’t free the memory and we’ve lost the pointer
         auto p = p2.release(); // ok, but we must remember to delete(p)
         ```
 
@@ -609,11 +609,11 @@ p.reset(new int(1024)); // ok: p points to a new object
     * 錯! 如果你寫成 return `unique_ptr` 是合法的!
     * 這是另一種 copy(move) 形式，13章會講
     ```cpp
-    unique_ptr<int> clone(int p) { // ok: explicitly create a unique_ptr<int> from int* 
+    unique_ptr<int> clone(int p) { // ok: explicitly create a unique_ptr<int> from int*
         return unique_ptr<int>(new int(p));
     }
-    
-    unique_ptr<int> clone(int p) { 
+
+    unique_ptr<int> clone(int p) {
         unique_ptr<int> ret(new int (p));
         // ...
         return ret;
@@ -689,7 +689,7 @@ https://en.cppreference.com/w/cpp/memory/weak_ptr/weak_ptr
         // 注意那個 wptr 的初始化寫法，會使用到 StrBlob 的 private member，所以需要把 StrBlobPtr 宣告成 StrBlob 的 friend
         std::string& deref() const;
         StrBlobPtr& incr(); // prefix version
-    private: // check returns a shared_ptr to the vector if the check succeeds     
+    private: // check returns a shared_ptr to the vector if the check succeeds
         std::shared_ptr<std::vector<std::string>>
             check(std::size_t, const std::string&) const;
         // store a weak_ptr, which means the underlying vector might be destroyed
@@ -725,26 +725,26 @@ https://en.cppreference.com/w/cpp/memory/weak_ptr/weak_ptr
     ```cpp
     std::string& StrBlobPtr::deref() const {
         auto p = check(curr, "dereference past end");
-        return (*p)[curr]; 
+        return (*p)[curr];
         // (*p)is the vector to which this object points
     }
-    // prefix: return a reference to the incremented object 
+    // prefix: return a reference to the incremented object
     StrBlobPtr& StrBlobPtr::incr() {
-        // if curr already points past the end of the container, can’t increment it 
+        // if curr already points past the end of the container, can’t increment it
         check(curr, "increment past end of StrBlobPtr");
         ++curr;
         // advance the current state
         return *this;
     }
     class StrBlob {
-        friend class StrBlobPtr; 
-        // other members as in § 12.1.1 (p. 456) 
+        friend class StrBlobPtr;
+        // other members as in § 12.1.1 (p. 456)
         StrBlobPtr begin();  // return StrBlobPtrto the first element
         StrBlobPtr end();    // and one past the last element
     };
     // The begin and end members of class StrBlob should be defined outside the class body.
     // They can't be defined until class StrBlobPtr is complete.
-    StrBlobPtr StrBlob::begin() { return StrBlobPtr(*this); } 
+    StrBlobPtr StrBlob::begin() { return StrBlobPtr(*this); }
     StrBlobPtr StrBlob::end() { return StrBlobPtr(*this, data->size()); }
     ```
 * 還會給 `begin` 跟 `end`，自己研究一下
@@ -781,7 +781,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
 ### 12.2.1 new and Arrays
 * 用 `int new obj_type[num];`
     ```cpp
-    // call get_size to determine how many ints to allocate 
+    // call get_size to determine how many ints to allocate
     int *pia = new int[get_size()]; // pia points to the first of these ints
     ```
     * 注意，這種形式的 `new` 的 return type 還是 pointer to first element，**不是 built-in array**
@@ -810,7 +810,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
 * 預設就是用 default initialize
 * 如果要 value initialize，要加一個 empty parentheses`()`:
     ```cpp
-    int *pia = new int[10]; // block of ten uninitialized ints 
+    int *pia = new int[10]; // block of ten uninitialized ints
     int *pia2 = new int[10](); // block of ten ints value initialized to 0
     string *psa = new string[10]; // block of ten empty strings
     string *psa2 = new string[10](); // block of ten empty strings
@@ -818,7 +818,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
 * C++11 允許使用 list initialization:
     ```cpp
     // block of ten ints each initialized from the corresponding initializer
-    int *pia3 = new int[10]{0,1,2,3,4,5,6,7,8,9};     
+    int *pia3 = new int[10]{0,1,2,3,4,5,6,7,8,9};
     // block of ten strings; the first four are initialized from the given initializers
     // remaining elements are value initialized
     string *psa3 = new string[10]{"a", "an", "the", string(3,'x')};
@@ -878,7 +878,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
     * 也就是宣告 `unique_ptr` 時角括號內的 type 要額外加上 `[]`:
     * 實際上就是 `unique_ptr` 有定義 partial template
     ```cpp
-    // up points to an array of ten uninitialized ints 
+    // up points to an array of ten uninitialized ints
     unique_ptr<int[]> up(new int[10]);
     up.release(); // automatically uses delete[] to destroy its pointer
     ```
@@ -904,7 +904,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
     * C++17 有
 * 你如果要用 `shared_ptr` 指向一個動態陣列，你必須提供 deleter 來做 `delete []`
     ```cpp
-    // to use a shared_ptr we must supply a deleter 
+    // to use a shared_ptr we must supply a deleter
     shared_ptr<int> sp(new int[10], [](int *p) { delete[] p; });
     sp.reset(); // uses the lambda we supplied that uses delete[] to free the array
     ```
@@ -930,7 +930,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
     * Combining initialization with allocation
 * delete 也是在**破壞物件時同時歸還空間**
     * Combining destruction with deallocation
-* 這在只 `new` 一個物件時是合適的，因為這種情境通常會希望把配置記憶體跟初始化一起做 
+* 這在只 `new` 一個物件時是合適的，因為這種情境通常會希望把配置記憶體跟初始化一起做
 * 但是在一次配置多個物件時就不夠彈性，例如 `new T[n]` 就會一次 construct `n` 個物件，可是有時候我們說不定根本用不到 `n` 個物件，這樣沒用到的物件就浪費時間初始化了
 * 而且 `new[]` 除了 initializer list 的寫法也只能 default 初始化，**這意味著沒有 default ctor 的物件不能使用 `new[]`**
 
@@ -942,11 +942,11 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
     string *const p = new string[n]; // construct n empty strings
     string s;
     string *q = p; // q points to the first string
-    while (cin >> s && q != p + n) 
+    while (cin >> s && q != p + n)
         *q++ = s;    // assign a new value to *q
     const size_t size = q - p; //  remember how many stringswe read
     // use the array
-    delete[] p; // p points to an array; 
+    delete[] p; // p points to an array;
     ```
     * 我們雖然配置 `n` 個 string，可是我們不一定會 `n` 個都使用
     * 還有，我們真的有使用的(小於 n 個)strings，在 `new` 使用 default 初始化之後我們又(馬上) assign 一次，這樣就給了兩次值
@@ -965,7 +965,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
     allocator<string> alloc; // object that can allocate strings
     auto const p = alloc.allocate(n); // allocate nunconstructed strings
     ```
-    
+
 #### `allocator`s Allocate **Unconstructed** Memory
 * The memory an `allocator` allocates is **unconstructed**.
 * 要使用 `allocator` 分配的記憶體內的物件，一定要先 `construct`
@@ -1004,7 +1004,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
     alloc.deallocate(p, n);
     ```
     * `p` 一定要是 `allocate` 回傳的指標，n 也要是當出呼叫 allocate 時對應的大小
-        * 宣告這兩個值為 `const` 是你的好朋友 
+        * 宣告這兩個值為 `const` 是你的好朋友
 
 #### Algorithms to `Copy` and `Fill` Uninitialized Memory
 * `construct` 一次一個太累了，可以用下面的類似 `std::copy`, `std::fill` 的 functions，一樣定義在 `<memory>`
@@ -1033,9 +1033,9 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
 * 給定一個 text file，user 可以查詢某個字串出現在哪些行數，並且全部印出來:
     ```
     element occurs 112 times
-    (line 36) A set element contains only a key; 
+    (line 36) A set element contains only a key;
     (line 158) operator creates a new element
-    (line 160) Regardless of whether the element 
+    (line 160) Regardless of whether the element
     (line 168) When we fetch an element from a map, we
     (line 214) If the element is not found, find returns
     ...
@@ -1116,12 +1116,12 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
             string s; // stop if we hit end-of-file on the input or if a 'q' is entered
             if (!(cin >> s) || s == "q")
                 break;
-                // run the query and print the results 
+                // run the query and print the results
                 print(cout, tq.query(s)) << endl;
         }
     }
     ```
-    
+
 #### 12.3.2 Defining the Query Program Classes
 * 來實作 `TetQuery` 跟 `QueryResult`，並且以共用底層資料為前題
 * 他們會共用 `vector<string>`，保存文字檔，以及 `set<line_no>`，保存某個 word 出現的行數
@@ -1135,7 +1135,7 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
     class QueryResult; // declaration needed for return type in the query function
     class TextQuery {
     public:
-        using line_no = std::vector<std::string>::size_type; 
+        using line_no = std::vector<std::string>::size_type;
         TextQuery(std::ifstream&);
         QueryResult query(const std::string&) const;
     private:
@@ -1152,16 +1152,16 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
     // read the input file and build the map of lines to line numbers
     TextQuery::TextQuery(ifstream &is): file(new vector<string>) {
         string text;
-        while (getline(is, text)) { // for each line in the file 
+        while (getline(is, text)) { // for each line in the file
             file->push_back(text); // remember this line oftext
-            int n = file->size() - 1; // the current line number 
+            int n = file->size() - 1; // the current line number
             istringstream line(text); // separate the line into words
             string word;
             while (line >> word) { // for each word in that line
                 // if word isn’t already in wm, subscripting adds a new entry
-                auto &lines = wm[word]; // lines is a shared_ptr 
+                auto &lines = wm[word]; // lines is a shared_ptr
                 if (!lines) // that pointer is null the first time we see word
-                    lines.reset(new set<line_no>); // allocate a new set 
+                    lines.reset(new set<line_no>); // allocate a new set
                 lines->insert(n);
                 // insert this line number } }
     }
@@ -1197,11 +1197,11 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
         sought(s), lines(p), file(f) { }
     private:
         std::string sought; // word this query represents
-        std::shared_ptr<std::set<line_no>> lines; // lines it’s on     
+        std::shared_ptr<std::set<line_no>> lines; // lines it’s on
         std::shared_ptr<std::vector<std::string>> file; // input file
     };
     ```
-    
+
 #### The `TextQuery::query` Function
 * 吃一個 `string` `sought`，找出 `TextQuery` 內 `sought` 內對應的行數(對應的 `set`)
 * 找到之後，用 `TextQuery` 對應的 members 來建構一個 `QueryResult` 並回傳
@@ -1227,12 +1227,12 @@ Do not allocate dynamic arrays in code inside classes until you have read Chapte
 ```cpp
 ostream &print(ostream & os, const QueryResult &qr) {
     // if the word was found, print the count and all occurrences
-    os << qr.sought << " occurs " << qr.lines->size() << " " << 
+    os << qr.sought << " occurs " << qr.lines->size() << " " <<
         make_plural(qr.lines->size(), "time", "s") << endl;
-    // print each line in which the word appeared 
+    // print each line in which the word appeared
     for (auto num : *qr.lines) // for every element in the set
     // don’t confound the user with text lines  starting at 0
-    os << "\t(line " << num + 1 << ") " << 
+    os << "\t(line " << num + 1 << ") " <<
         *(qr.file->begin() + num) << endl;
     return os;
 }

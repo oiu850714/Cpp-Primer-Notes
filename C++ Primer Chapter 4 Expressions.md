@@ -3,7 +3,7 @@ tags: C++
 ---
 
 # C++ Primer Chapter 4 Expressions
-* **An** expression is composed of one or more **operands** and **yields a result** when it is evaluated. 
+* **An** expression is composed of one or more **operands** and **yields a result** when it is evaluated.
 * More complicated expressions are formed from an operator and one or more operands.
 ## 4.1 Fundamentals
 ### 4.1.1 Basic Concepts
@@ -116,8 +116,8 @@ bool b2 = -b; // b2is true!
             * (-100)/3*3 + (-100)%3 = -100，由 / 的定義知道 + 左邊的值是 -99，所以 (-100)%3 是 -1，-100 跟 -1 同 sign
     * 還有，除了一些ㄎㄧㄤ例子例如 -m overflow 之類的，(-m)/n 跟 m/(-n) 總是跟 -(m/n) 相同，m%(-n) 跟 m%n 相同，(-m)%n 跟 -(m%n) 相同
         ```cpp
-        21 % 6; /* result is 3 */      21 / 6; /* result is 3 */ 
-        21 % 7; /* result is 0 */      21 / 7; /* result is 3 */  
+        21 % 6; /* result is 3 */      21 / 6; /* result is 3 */
+        21 % 7; /* result is 0 */      21 / 7; /* result is 3 */
         -21 % -8; /* result is -5 */  -21 / -8; /* result is 2 */
         /* (-21)/(-8)*(-8) + (-21)%(-8) = -21*/
         /* (-21)/(-8) = -(21/(-8)) = -(-(21/8)) = 21/8 */
@@ -210,7 +210,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
     * postfix increment 優先權比 dereference 高，所以 ++ 會先作用在 ptr 上
     * *(ptr++)
     * 這樣 dereference 還是作用在舊的 value，可是 ptr 還是會被 increment
-    * This usage relies on the fact that postfix increment returns a copy of its original, unincremented operand. 
+    * This usage relies on the fact that postfix increment returns a copy of its original, unincremented operand.
 #### **Remember That Operands Can Be Evaluated in Any Order**
 * Because the increment and decrement operators change their operands, it is easy to misuse these operators in compound expressions.
 * increment operator 就是屬於那種會改變 operand value 的 operator，所以在 exp 內用它們的時候要小心不要有其他的 subexp 也用到它們作用到的 operand。
@@ -255,7 +255,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 ## 4.8 The Bitwise Operators
 ![](https://i.imgur.com/MqGFg5l.png)
 * 用這些 operator 時，如果 operand 是 small integral，會先被 promote 成大的 integral
-* **不要對 signed integral 做 >>，是 IB(implementation defined)!** 
+* **不要對 signed integral 做 >>，是 IB(implementation defined)!**
 * shift 的位數不可以超過那個 type 的 bit 數，否則也是 UB
 * << inserts bit ""0"" on the right
 * >> 如果 lhs 是 unsigned，那就 insert bit "0 on the left
@@ -320,7 +320,7 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
     * 怎麼轉換後面會敘述一套規則
 * Rather than attempt to add values of the two different types, C++ defines a set of conversions to transform the operands to a common type.
     * **implicit conversions**
-* The implicit conversions among the arithmetic types are **defined to preserve precision, if possible.** 
+* The implicit conversions among the arithmetic types are **defined to preserve precision, if possible.**
 
 * When Implicit Conversions Occur
     * The compiler automatically converts operands in the following circumstances:
@@ -371,10 +371,10 @@ vi = {0,1,2,3,4,5,6,7,8,9}; // vi now has ten elements, values 0 through 9
 * dynamic_cast 19章才會講
     * 哇靠當年 YYP為什麼會講..
 #### static_cast
-* Any well-defined type conversion, other than those involving low-level const, can be requested using a static_cast. 
+* Any well-defined type conversion, other than those involving low-level const, can be requested using a static_cast.
     * 如果你想要的型態可以用既有型態轉過來可是沒有辦法用 implicit conversions，那你就要用 static_cast
     ```cpp
-    // cast used to force floating-point division 
+    // cast used to force floating-point division
     double slope = static_cast<double>(j) / i;
     ```
     * 如果你沒加 cast，原本的 / 會用 int 的方式除，這樣小數會被丟掉。加了之後就會用浮點數的方法除了。

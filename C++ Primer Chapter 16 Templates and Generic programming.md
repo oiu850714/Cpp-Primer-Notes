@@ -21,15 +21,15 @@ tags: C++
 * template 想解決的問題: 幾乎同樣的 code 寫很多遍，只差在型別不同
 * 例如 compare 兩個 value，原本我們會想要寫多種不同型態的版本:
     ```cpp
-    // returns 0 if the values are equal, -1 if v1 is smaller, 1 if v2 is smaller 
+    // returns 0 if the values are equal, -1 if v1 is smaller, 1 if v2 is smaller
     int compare(const string &v1, const string &v2) {
         if (v1 < v2) return -1;
         if (v2 < v1) return 1;
         return 0;
     }
     int compare(const double &v1, const double &v2) {
-        if (v1 < v2) return -1; 
-        if (v2 < v1) return 1; 
+        if (v1 < v2) return -1;
+        if (v2 < v1) return 1;
         return 0;
     }
     ```
@@ -75,7 +75,7 @@ tags: C++
     ```cpp
     // instantiates int compare(const int&, const int&)
     cout << compare(1, 0) << endl; // T is int
-    // instantiates int compare(const vector<int>&, const vector<int>&) 
+    // instantiates int compare(const vector<int>&, const vector<int>&)
     vector<int> vec1{1, 2, 3}, vec2{4, 5, 6};
     cout << compare(vec1, vec2) << endl; // T is vector<int>
     ```
@@ -83,8 +83,8 @@ tags: C++
     * 第一個會把 `T` 替換成 `int`:
     ```cpp
     int compare(const int &v1, const int &v2) {
-        if (v1 < v2) return -1; 
-        if (v2 < v1) return 1; 
+        if (v1 < v2) return -1;
+        if (v2 < v1) return 1;
         return 0;
     }
     ```
@@ -103,8 +103,8 @@ tags: C++
     ```cpp
     // ok: same type used for the return type and parameter
     template <typename T> T foo(T* p) {
-        T tmp = *p; // tmp will have the type to which p points 
-        // ... 
+        T tmp = *p; // tmp will have the type to which p points
+        // ...
         return tmp;
     }
     ```
@@ -112,7 +112,7 @@ tags: C++
 * 在 temp para list 內要宣告 type parameter 時，必須在 parameter 前面加上 keyword `typename` 或 `class`
     * 他們兩個本質上沒有差別，都是代表要宣告 type parameter
     ```cpp
-    // error: must precede U with either typename or class 
+    // error: must precede U with either typename or class
     template <typename T, U> T calc(const T&, const U&);
     ```
     * 用 `typename` 比較清楚就是，只是這是比較晚期的標準才有的，早期 code 都只有用 `class`
@@ -124,7 +124,7 @@ tags: C++
     * **既然這個 value 是在實例化時，也就是 compile time 時，就要決定的，換句話說它要是 constant expression**
 * 我們可以再寫一個 `compare` 的 function template:
     ```cpp
-    template<unsigned N, unsigned M> 
+    template<unsigned N, unsigned M>
     int compare(const char (&p1)[N], const char (&p2)[M]) {
         return strcmp(p1, p2);
     }
@@ -173,7 +173,7 @@ tags: C++
 #### `inline` and `constexpr` Function Templates
 * function template 一樣可以宣告成這兩種，格式如下:
     ```cpp
-    // ok: inline specifier follows the template parameter list 
+    // ok: inline specifier follows the template parameter list
     template <typename T> inline T min(const T&, const T&);
     // error: incorrect placement of the inline specifier
     inline template <typename T> T min(const T&, const T&);
@@ -255,7 +255,7 @@ tags: C++
         * also detect whether two arguments that are supposed to have the same type do so.
             * 例如你 template parameter 都是給 T，結果兩個參數型別卻不一樣
             ```cpp
-            template <typename T> int f(T t1, T t2); 
+            template <typename T> int f(T t1, T t2);
             f(1, 0.87); // error
             ```
         * 但也只能檢查這些了
@@ -293,14 +293,14 @@ tags: C++
     * 為什麼好死不死要用一個 pointerlike 的型態來講解 QQ，自幹個 vector 不好嗎
     * As with the library containers, our users will have to specify the element type when they use a `Blob`.
     ```cpp
-    template <typename T> class Blob { 
+    template <typename T> class Blob {
     public:
         typedef T value_type;
         typedef typename std::vector<T>::size_type size_type; // 這行 typedef 中間的 typename 之後會講解
         // constructors
         Blob();
-        Blob(std::initializer_list<T> il); 
-        // number of elements in the Blob 
+        Blob(std::initializer_list<T> il);
+        // number of elements in the Blob
         size_type size() const { return data->size(); }
         bool empty() const { return data->empty(); }
         // add and remove elements
@@ -311,7 +311,7 @@ tags: C++
         // element access T& back();
         T& operator[](size_type i); // defined in § 14.5 (p. 566)
     private:
-        std::shared_ptr<std::vector<T>> data; // throws msg if data[i] isn’t valid 
+        std::shared_ptr<std::vector<T>> data; // throws msg if data[i] isn’t valid
         void check(size_type i, const std::string &msg) const;
     };
     ```
@@ -339,8 +339,8 @@ tags: C++
         typedef int value_type;
         typedef typename std::vector<int>::size_type size_type;
         Blob();
-        Blob(std::initializer_list<int> il); 
-        // ... 
+        Blob(std::initializer_list<int> il);
+        // ...
         int& operator[](size_type i);
     private:
         std::shared_ptr<std::vector<int>> data;
@@ -351,11 +351,11 @@ tags: C++
 
 * The compiler *generates a different class* for each element type we specify:
     ```cpp
-    // these definitions instantiate two distinct Blob types 
+    // these definitions instantiate two distinct Blob types
     Blob<string> names; // Blob that holds strings
     Blob<double> prices; // different element type
     ```
-    
+
 * Note: Each instantiation of a class template *constitutes an **independent** class.*
     * The type `Blob<string>` has no relationship to, or any special access to, the members of any other `Blob` type.
 
@@ -377,7 +377,7 @@ tags: C++
     ```cpp
     ret-type StrBlob::member_name(parm_list)
     ```
-    * 上面是一般 class member function 定義在 class 外的格式 
+    * 上面是一般 class member function 定義在 class 外的格式
     ```cpp
     template <typename T>
     ret-type Blob<T>::member_name(parm_list)
@@ -403,7 +403,7 @@ tags: C++
     }
     template <typename T>
     T& Blob<T>::operator[](size_type i) {
-        // if i is too big, check will throw, preventing access to a non existent element 
+        // if i is too big, check will throw, preventing access to a non existent element
         check(i, "subscript out of range");
         return (*data)[i];
     }
@@ -411,7 +411,7 @@ tags: C++
 * `pop_back` 就更像 `StrBlob` 定義的，因為他連 return 都沒有:
     ```cpp
     template <typename T> void Blob<T>::pop_back() {
-        check(0, "pop_back on empty Blob"); 
+        check(0, "pop_back on empty Blob");
         data->pop_back();
     }
     ```
@@ -420,7 +420,7 @@ tags: C++
 #### `Blob` Constructors
 * 跟一般 member function 一樣，如果定義在 body 外也要加一些 template 的格式:
     ```cpp
-    template <typename T> Blob<T>::Blob(): 
+    template <typename T> Blob<T>::Blob():
         data(std::make_shared<std::vector<T>>()) { }
     ```
     * 注意是寫成 `Blob<T>::Blob()`
@@ -431,20 +431,20 @@ tags: C++
     template <typename T> Blob<T>::Blob(std::initializer_list<T> il):
         data(std::make_shared<std::vector<T>>(il)) { }
     ```
-    
+
  #### Instantiation of Class-Template Member Functions
  * **By default, a member function of a class template is instantiated only if the program uses that member function.**
      * compiler 很懶，你用到了某個 class-template 的 member function 之後它才會實例化這個 member function
      * 其實就跟你一般的 member function 一樣，只要沒用到，就算沒有 definition 也沒關係
-     
+
 * 例如下面的 code:
     ```cpp
     // instantiates:
     //     Blob<int> class definition
-    //     and the initializer_list<int> constructor 
-    Blob<int> squares = {0,1,2,3,4,5,6,7,8,9}; 
+    //     and the initializer_list<int> constructor
+    Blob<int> squares = {0,1,2,3,4,5,6,7,8,9};
 
-    // instantiates Blob<int>::size() const 
+    // instantiates Blob<int>::size() const
     for (size_t i = 0; i != squares.size(); ++i)
         squares[i] = i*i; // instantiates Blob<int>::operator[](size_t)
     ```
@@ -460,13 +460,13 @@ tags: C++
     * 當你已經在 class template scope 內時，就可以不用提供
 * 用 `BlobPtr` 舉例:
     ```cpp
-    // BlobPtr throws an exception on attempts to access a nonexistent element 
+    // BlobPtr throws an exception on attempts to access a nonexistent element
     template <typename T> class BlobPtr {
     public:
         BlobPtr(): curr(0) { }
         BlobPtr(Blob<T> &a, size_t sz = 0):
                 wptr(a.data), curr(sz) { }
-        T& operator*() const { 
+        T& operator*() const {
             auto p = check(curr, "dereference past end");
             return (*p)[curr]; // (*p)is the vector to which this object points
         }
@@ -475,7 +475,7 @@ tags: C++
         BlobPtr& operator--();
         // prefix operators
         private: // check returns a shared_ptr to the vector if the check succeeds
-        std::shared_ptr<std::vector<T>> 
+        std::shared_ptr<std::vector<T>>
             check(std::size_t, const std::string&) const;
         // store a weak_ptr, which means the underlying vector might be destroyed
         std::weak_ptr<std::vector<T>> wptr;
@@ -494,13 +494,13 @@ tags: C++
 #### Using a Class Template Name outside the Class Template Body
 * We must remember that we are not in the scope of the class *until the class name is seen*
     ```cpp
-    // postfix: increment/decrement the object but return the unchanged value 
+    // postfix: increment/decrement the object but return the unchanged value
     template <typename T>
     BlobPtr<T> BlobPtr<T>::operator++(int) {
     //^ not in scope       ^ in scope
-        // no check needed here; the call to prefix increment will do the check 
-        BlobPtr ret = *this; // save the current value 
-        ++*this; // advance one element; prefix ++ checks the increment 
+        // no check needed here; the call to prefix increment will do the check
+        BlobPtr ret = *this; // save the current value
+        ++*this; // advance one element; prefix ++ checks the increment
         return ret; // return the saved state
     }
     ```
@@ -537,15 +537,15 @@ tags: C++
 #### template declaration
 * A template declaration includes the template’s template parameter list:
     ```cpp
-    // **forward declarations** needed for friend declarations in Blob 
+    // **forward declarations** needed for friend declarations in Blob
     template <typename> class BlobPtr;
-    template <typename> class Blob; // needed for parameters in operator== 
+    template <typename> class Blob; // needed for parameters in operator==
 
     template <typename T>
     bool operator==(const Blob<T>&, const Blob<T>&);
 
     template <typename T> class Blob {
-        // each instantiation of Blob **grants access to** the version of 
+        // each instantiation of Blob **grants access to** the version of
         // BlobPtr and the equality operator **instantiated with the same type**
         friend class BlobPtr<T>;
         friend bool operator==<T> (const Blob<T>&, const Blob<T>&);
@@ -564,7 +564,7 @@ tags: C++
     * 這意味著只有用相同的 type 來實例化的 `BlobPtr` 跟 `operator==` 才會是 `Blob` 的 friend
     * 看例子:
     ```cpp
-    Blob<char> ca; // BlobPtr<char> and operator==<char> are friends 
+    Blob<char> ca; // BlobPtr<char> and operator==<char> are friends
     Blob<int> ia; // BlobPtr<int> and operator==<int> are friends
     ```
     * `BlobPtr<int>` 還有 `operator==<int>` 跟 `Blob<int>` 是朋友，可是跟 `Blob<char>` 就不是
@@ -575,22 +575,22 @@ tags: C++
 * 亦即一個 class 可以讓某 template 的所有 instantiations 都成為 friend
     * 或者只讓部分成為 friend
     ```cpp
-    // forward declaration necessary to be friend a specific instantiation of a template 
+    // forward declaration necessary to be friend a specific instantiation of a template
     template <typename T> class Pal;
-    
-    class C { // C is an ordinary, nontemplate class 
-        friend class Pal<C>; // Pal instantiated with class C is a friend to C 
-        // all instances of Pal2 are friends to C; 
+
+    class C { // C is an ordinary, nontemplate class
+        friend class Pal<C>; // Pal instantiated with class C is a friend to C
+        // all instances of Pal2 are friends to C;
         // no forward declaration required when we befriend all instantiations
         template <typename T> friend class Pal2;
     };
-    template <typename T> class C2 { // C2 is itself a class template 
-        // each instantiation of C2 has the same instance of Pal as a friend 
-        friend class Pal<T>; 
-        // a template declaration for Pal must be in scope 
-        // all instances of Pal2 are friends of each instance of C2, prior declaration "not"(Primer 好像寫錯?? 自己測 code 是不需要先宣告 Pal2) needed 
+    template <typename T> class C2 { // C2 is itself a class template
+        // each instantiation of C2 has the same instance of Pal as a friend
+        friend class Pal<T>;
+        // a template declaration for Pal must be in scope
+        // all instances of Pal2 are friends of each instance of C2, prior declaration "not"(Primer 好像寫錯?? 自己測 code 是不需要先宣告 Pal2) needed
         template <typename X> friend class Pal2;
-        // Pal3 is a nontemplate class that is a friend of every instance of C2 
+        // Pal3 is a nontemplate class that is a friend of every instance of C2
         friend class Pal3; // prior declaration for Pal3 not needed
     };
     ```
@@ -635,14 +635,14 @@ tags: C++
     * 這樣很奇怪，根本不知道 `T` 是啥
 * 但在 C++11 可以這樣寫:
     ```cpp
-    template<typename T> using twin = pair<T, T>; 
+    template<typename T> using twin = pair<T, T>;
     twin<string> authors; // authors is a pair<string, string>
     ```
     * 還算好理解，alias 出來的 name(在上面的例子就是 `twin`)他還是個 template，不是型別
 * 另外 `using` = 右邊的東西如果有用到 template 的話，還可以固定他的某些 type parameter(s):
     ```cpp
     template <typename T> using partNo = pair<T, unsigned>;
-    partNo<string> books; // books is a pair<string, unsigned> 
+    partNo<string> books; // books is a pair<string, unsigned>
     partNo<Vehicle> cars; // cars is a  pair<Vehicle, unsigned>
     partNo<Student> kids; // kids is a pair<Student, unsigned>
     ```
@@ -652,10 +652,10 @@ tags: C++
     ```cpp
     template <typename T> class Foo {
     public:
-        static std::size_t count() { return ctr; } 
+        static std::size_t count() { return ctr; }
         // other interface members
     private:
-        static std::size_t ctr; 
+        static std::size_t ctr;
         // other implementation members
     };
     ```
@@ -663,15 +663,15 @@ tags: C++
     * 每個 template instantiation 都有獨立的一份 static member
     * That is, for any given type `X`, there is one `Foo<X>::ctr` and one `Foo<X>::count` member.
     ```cpp
-    // instantiates static members Foo<string>::ctr and Foo<string>::count 
-    Foo<string> fs; 
+    // instantiates static members Foo<string>::ctr and Foo<string>::count
+    Foo<string> fs;
     // all three objects share the same Foo<int>::ctr and Foo<int>::count members
     Foo<int> fi, fi2, fi3;
     ```
 * class template 的 `static` members 的 definition 一樣只能有一個
     * 但是 template 的每個 instantiation 都有一個 `static` member，所以定義這個 member 時前面還是要給定 class template (的 instantiation)的 scope:
     ```cpp
-    template <typename T> 
+    template <typename T>
     size_t Foo<T>::ctr = 0; // define and initialize ctr
     ```
     * 這樣特定 type `T` 的 `Foo` 就有特定的 `Foo<T>::ctr`
@@ -679,9 +679,9 @@ tags: C++
 * 跟一般 class 一樣，user code 可以用 instantiation(i.e. class type) 或者 instantiation 的 instances(i.e. class object) 來 access static member(s)
     * 記得不是用 template name 而是 instantiation 來 access(也就是要給定 template argument):
     ```cpp
-    Foo<int> fi; // instantiates Foo<int> class 
+    Foo<int> fi; // instantiates Foo<int> class
                  // the staticdata member ctr
-    auto ct = Foo<int>::count(); // instantiates Foo<int>::count 
+    auto ct = Foo<int>::count(); // instantiates Foo<int>::count
     ct = fi.count(); // uses Foo<int>::count
     ct = Foo::count(); // error: which template instantiation?
     ```
@@ -700,8 +700,8 @@ tags: C++
 * temp para 的名字跟 func para 一樣，它的名字沒有特殊意義，你想叫什麼都行:
     ```cpp
     template <typename Foo> Foo calc(const Foo& a, const Foo& b) {
-        Foo tmp = a; // tmp has the same type as the parameters and return type 
-        // ... 
+        Foo tmp = a; // tmp has the same type as the parameters and return type
+        // ...
         return tmp; // return type and parameters have the same type
     }
     ```
@@ -727,23 +727,23 @@ tags: C++
 
 * 既然不能重 reuse template parameter，當然也不能這樣寫:
     ```cpp
-    // error: illegal reuse of template parameter name V 
+    // error: illegal reuse of template parameter name V
     template <typename V, typename V> // ...
     ```
-    
+
 #### Template Declarations
 * must include the template parameters:
     ```cpp
-    // declares but does not define compare and Blob 
+    // declares but does not define compare and Blob
     template <typename T> int compare(const T&, const T&);
     template <typename T> class Blob;
     ```
 * 跟 function dec/def 一樣，template declaration 內寫的 templare parameter 的名字不一定要跟 definition 寫的一樣:
     ```cpp
-    // all three uses of calc refer to the same function template 
-    template <typename T> T calc(const T&, const T&); // declaration 
-    template <typename U> U calc(const U&, const U&); // declaration 
-    // definition of the template 
+    // all three uses of calc refer to the same function template
+    template <typename T> T calc(const T&, const T&); // declaration
+    template <typename U> U calc(const U&, const U&); // declaration
+    // definition of the template
     template <typename Type>
     Type calc(const Type& a, const Type& b) { /* .. . */}
     ```
@@ -761,7 +761,7 @@ tags: C++
 #### Using Class Members That Are Types
 * 參考: 跟這個有關
     * https://en.cppreference.com/w/cpp/language/dependent_name
-* 這裡在說明之前在宣告 class template 的 type 時偶爾會出現的 `typename` 到底是做什麼用的 
+* 這裡在說明之前在宣告 class template 的 type 時偶爾會出現的 `typename` 到底是做什麼用的
 * 還記得對 (nontemplate) class 可以用 scope operator `::` 來存取:
     * class 內的 type
     * *或 static member*
@@ -813,8 +813,8 @@ tags: C++
     * 詭異... 就當作沒這回事
 * 重寫 `compare` 來舉例:
     ```cpp
-    // compare has a default template argument, less<T> 
-    // and a default function argument, F() 
+    // compare has a default template argument, less<T>
+    // and a default function argument, F()
     template <typename T, typename F = less<T>>
     int compare(const T &v1, const T &v2, F f = F()) {
         if (f(v1, v2)) return -1;
@@ -848,7 +848,7 @@ tags: C++
 * 如果 class template 所有 parameter 都有 default argument 勒？
     * 答: **使用 class template 不管怎樣都要有角括號**
     ```cpp
-    template <class T = int> class Numbers { 
+    template <class T = int> class Numbers {
         // by default T is int
     public:
         Numbers(T v = 0): val(v) { }
@@ -883,10 +883,10 @@ tags: C++
 * Because we *want to use our deleter with any type,* we’ll make the call operator a template:
     ```cpp
     // function-object class that calls delete on a given pointer
-    class DebugDelete { 
+    class DebugDelete {
     public:
         DebugDelete(std::ostream &s = std::cerr): os(s) { }
-        // as with any function template, the type of T is deduced by the compiler 
+        // as with any function template, the type of T is deduced by the compiler
         template <typename T> void operator()(T *p) const
             { os << "deleting unique_ptr" << std::endl; delete p; }
     private:
@@ -920,7 +920,7 @@ tags: C++
         * `unique_ptr<T>` 被實例化時，因為 dtor 就會呼叫 `DebugDelete::operator()<T>`
         * 所以實例化 dtor 時，`DebugDelete` 對應的 `operator()<T>` 也會被實例化
     ```cpp
-    // sample instantiations for member templates of DebugDelete 
+    // sample instantiations for member templates of DebugDelete
     void DebugDelete::operator()(int *p) const { delete p; }
     void DebugDelete::operator()(string *p) const { delete p; }
     ```
@@ -933,7 +933,7 @@ tags: C++
 * member template 的 type parameter 不要跟 class template 的有 name collision
 * 我們來為 `Blob` 寫一個跟 STL container 類似的 ctor:
     ```cpp
-    template <typename T> class Blob { 
+    template <typename T> class Blob {
         template <typename It> Blob(It b, It e);
         // ...
     };
@@ -943,7 +943,7 @@ tags: C++
     * The parameter list for the class template comes first, followed by the member’s own template parameter list:
     ```cpp
     template <typename T> // type parameter for the class
-    template <typename It> // type parameter for the constructor 
+    template <typename It> // type parameter for the constructor
     Blob<T>::Blob(It b, It e):
         data(std::make_shared<std::vector<T>>(b, e)) { }
     ```
@@ -964,14 +964,14 @@ tags: C++
     ```cpp
     int ia[] = {0,1,2,3,4,5,6,7,8,9};
     vector<long> vi = {0,1,2,3,4,5,6,7,8,9};
-    list<const char*> w = {"now", "is", "the", "time"}; 
-    // instantiates the Blob<int> class 
+    list<const char*> w = {"now", "is", "the", "time"};
+    // instantiates the Blob<int> class
     // and the Blob<int> constructor that has two int* parameters
-    Blob<int> a1(begin(ia), end(ia)); 
+    Blob<int> a1(begin(ia), end(ia));
     // instantiates the Blob<int> constructor that has
     // two vector<long>::iterator parameters
-    Blob<int> a2(vi.begin(), vi.end()); 
-    // instantiates the Blob<string> class and the Blob<string> 
+    Blob<int> a2(vi.begin(), vi.end());
+    // instantiates the Blob<string> class and the Blob<string>
     // constructor that has two list<const char*>::iterator parameters
     Blob<string> a3(w.begin(), w.end());
     ```
@@ -985,7 +985,7 @@ tags: C++
     * 如果:
         * 你在不同的 TUs 都使用到這個 template
         * 而且提供一樣的 template argument(s)
-        * 而且這些 TU 的 object files 會 link 
+        * 而且這些 TU 的 object files 會 link
         * 這樣這些不同 TU 的 object files 都會各自有一份實例(但 link 不會噴 error 就是，我還不知道 compiler 怎處理的... 既然實例都是他生的，他自己會處理吧)
             * 參考:
                 * https://stackoverflow.com/questions/44335046/how-does-the-linker-handle-identical-template-instantiations-across-translation
@@ -1001,7 +1001,7 @@ tags: C++
         * 並且*把 template arguments 都填上去*:
     * 看例子:
     ```cpp
-    // instantion declaration and definition 
+    // instantion declaration and definition
     extern template class Blob<string>; // declaration
     template int compare(const int&, const int&); // definition
     ```
@@ -1018,13 +1018,13 @@ tags: C++
 * 而因為 compiler 會在我們使用 template 時就自動生出對應的實例，所以我們應該要在使用 template 的某個實例之前就宣告上面的 `extern` declaration
     * 不然 compiler 還是會在當前 TU 生一個實例:
     ```cpp
-    // Application.cc 
-    // these template types must be instantiated elsewhere in the program 
+    // Application.cc
+    // these template types must be instantiated elsewhere in the program
     extern template class Blob<string>;
     extern template int compare(const int&, const int&);
     Blob<string> sa1, sa2; // instantiation will appear elsewhere
-    // Blob<int> and its initializer_list constructor instantiated in this file 
-    Blob<int> a1 = {0,1,2,3,4,5,6,7,8,9}; 
+    // Blob<int> and its initializer_list constructor instantiated in this file
+    Blob<int> a1 = {0,1,2,3,4,5,6,7,8,9};
     Blob<int> a2(a1); // copy constructor instantiated in this file
     int i = compare(a1[0], a2[0]); // instantiation will appear elsewhere
     ```
@@ -1032,8 +1032,8 @@ tags: C++
 	* 而 `compare<int>` 跟 `Blob<string>` 的實例則會在別的 TU 內產生:
     ```cpp
     // templateBuild.cc
-    // instantiation file must provide a (nonextern) definition for every 
-    // type and function that other files declare as extern 
+    // instantiation file must provide a (nonextern) definition for every
+    // type and function that other files declare as extern
     template int compare(const int&, const int&);
     template class Blob<string>; // ***instantiates all members*** of the class template
     ```
@@ -1107,10 +1107,10 @@ tags: C++
     ```cpp
     template <typename T> T fobj(T, T); // arguments are ***copied***
     template <typename T> T fref(const T&, const T&); // ***references***
-    string s1("a value"); 
-    const string s2("another value"); 
+    string s1("a value");
+    const string s2("another value");
     fobj(s1, s2); // calls fobj(string, string); const is ignored
-    fref(s1, s2); // calls fref(const string&, const string&) 
+    fref(s1, s2); // calls fref(const string&, const string&)
                   // uses **premissible conversion to const on s1**
     int a[10], b[42];
     fobj(a, b); // calls f(int*, int*)
@@ -1138,22 +1138,22 @@ tags: C++
     ```cpp
     template <typename T>
     int compare(const T&, const T&);
-    long lng; 
+    long lng;
     compare(lng, 1024); // error: cannot instantiate compare(long, int)
     ```
     * compiler 推斷第一個 type 是 `long`，第二個是 `int`，不 match，噴 error
 
 * 解決上面的方法之一是使用兩個 type parameters:
     ```cpp
-    // argument types can differ but must be compatible(comparable?) 
-    template <typename A, typename B> 
+    // argument types can differ but must be compatible(comparable?)
+    template <typename A, typename B>
     int flexibleCompare(const A& v1, const B& v2) {
-        if (v1 < v2) return -1; 
-        if (v2 < v1) return 1; 
+        if (v1 < v2) return -1;
+        if (v2 < v1) return 1;
         return 0;
     }
     // ...
-    long lng; 
+    long lng;
     flexibleCompare(lng, 1024); // ok: calls flexibleCompare(long,int)
     ```
     * 這樣上面的 call 就會合法
@@ -1186,24 +1186,24 @@ tags: C++
     * 然後可以**讓 user 指定回傳的型別**
     * 以達到 user 要求的精確值:
     ```cpp
-    // T1 cannot be deduced: it doesn’t appear in the function parameter list 
+    // T1 cannot be deduced: it doesn’t appear in the function parameter list
     template <typename T1, typename T2, typename T3>
     T1 sum(T2, T3);
     ```
     * 這時就很明顯，compiler 不可能單純用你傳的 function arguments 來推斷 `T1` 的型別
     * The caller must provide an **explicit template argument** for this parameter on *each* call to sum.
     ```cpp
-    // T1 is explicitly specified; T2 and T3 are inferred from the argument types 
+    // T1 is explicitly specified; T2 and T3 are inferred from the argument types
     auto val3 = sum<long long>(i, lng); // long long sum(int, long)
     ```
-    
+
 * Explicit template argument(s) are matched to corresponding template parameter(s) **from left to right;**
     * template arguments 跟 function argument 一樣，只能從最右邊開始省略
     * **而且要 compiler 有辦法推斷型別的情況才能省略**
 * 上面的省略 convention 意味著你 template type parameters 的宣告順序很重要!
 * 看例子:
     ```cpp
-    // poor design: users must explicitly specify all three template parameters 
+    // poor design: users must explicitly specify all three template parameters
     template <typename T1, typename T2, typename T3>
         T3 alternative_sum(T2, T1);
     ```
@@ -1212,7 +1212,7 @@ tags: C++
         * 否則你只給定一個 template argument，在這個 case 該 argument 會被 bind 到 `T1`
     * 換句話說就是全部的 type 都要明確提供...
     ```cpp
-    // error: can’t infer initial template parameters 
+    // error: can’t infer initial template parameters
     auto val3 = alternative_sum<long long>(i, lng);
     // ok: all three parameters are explicitly specified
     auto val2 = alternative_sum<long long, int, long>(i, lng);
@@ -1227,7 +1227,7 @@ tags: C++
     * 否則難道要 compiler 生一個 template parameter 跟你指定的 argument 不同的 instantiation 然後呼叫嗎?
 * 看例子
     ```cpp
-    long lng; 
+    long lng;
     compare(lng, 1024); // error: template parameters don’t match
     compare<long>(lng, 1024); // ok: instantiates compare(long, long)
     compare<int>(lng, 1024); // ok: instantiates compare(int, int)
@@ -1251,9 +1251,9 @@ tags: C++
     * *put burden on the user with no compensating advantage*
 * 例如下面的 code:
     ```cpp
-    template <typename It> 
+    template <typename It>
     ??? &fcn(It beg, It end) {
-        // process the range 
+        // process the range
         return *beg; // return a reference to an element from the range
     }
     ```
@@ -1268,8 +1268,8 @@ tags: C++
         * 可是對 user 來說在這個情況下提供 element type 很奇怪，他會覺得你對 iterator dereference 不就知道了?
     * 例如 user 這樣寫:
     ```cpp
-    vector<int> vi = {1,2,3,4,5}; 
-    Blob<string> ca = { "hi", "bye" }; 
+    vector<int> vi = {1,2,3,4,5};
+    Blob<string> ca = { "hi", "bye" };
     auto &i = fcn(vi.begin(), vi.end()); // fcn should return int&
     auto &s = fcn(ca.begin(), ca.end()); // fcn should return string&
     ```
@@ -1280,10 +1280,10 @@ tags: C++
         * 而且在 parsing return type 時 compiler 還沒進到 function scope，所以 compiler 也看不到 `beg`
 * 所以這裡用 c++11 的 `decltype` 加上 trailing return type(§ 6.3.3, p. 229)，來達成這件事:
     ```cpp
-    // a trailing return lets us declare the return type **after the parameter list is seen** 
+    // a trailing return lets us declare the return type **after the parameter list is seen**
     template <typename It> auto fcn(It beg, It end) -> decltype(*beg) {
-        // process the range 
-        return *beg; 
+        // process the range
+        return *beg;
         // return a reference to an element from the range
     }
     ```
@@ -1293,7 +1293,7 @@ tags: C++
 
 
 #### The Type Transformation Library Template Classes
-* 這個章節有點進階，so called "template metaprogramming", 
+* 這個章節有點進階，so called "template metaprogramming",
     * a topic that is beyond the scope of this Primer
 
 * 首先上一個 section 是達到 return reference to element 的效果
@@ -1323,11 +1323,11 @@ tags: C++
     * 記得使用時要加上 `typename`，因為 `*beg` 是 dependent name
 * 我們在把原本的 function template 宣告改一下:
     ```cpp
-    // must use typename to use a type member of a template parameter; see § 16.1.3 (p. 670) 
-    template <typename It> auto fcn2(It beg, It end) -> 
+    // must use typename to use a type member of a template parameter; see § 16.1.3 (p. 670)
+    template <typename It> auto fcn2(It beg, It end) ->
             typename remove_reference<decltype(*beg)>::type
     {
-        // process the range 
+        // process the range
         return *beg; // return a copy of an element from the range
     }
     ```
@@ -1344,14 +1344,14 @@ tags: C++
 :::info
 * 上面這張表是 *transformation* template
 * 只是 `<type_traits>` 的其中一個功能
-* header 裡面還有 unary predicates 跟 binary predicates 兩種 
+* header 裡面還有 unary predicates 跟 binary predicates 兩種
 :::
 
 ### 16.2.4 Function Pointers and Argument Deduction
 * 當初始化或 assign 一個 function template(instantiation) 到一個 function pointer 時，compiler 會用 function pointer 的型別去推斷 template arguments
 * 看例子:
     ```cpp
-    template <typename T> int compare(const T&, const T&); 
+    template <typename T> int compare(const T&, const T&);
     // pf1 points to the instantiation int compare(const int&, const int&)
     int (*pf1)(const int&, const int&) = compare;
     ```
@@ -1359,8 +1359,8 @@ tags: C++
 
 * 以下的東西感覺就 code smell，可以看一下，會發生 ambiguous call:
     ```cpp
-    // overloaded versions of func; each takes a different function pointer type 
-    void func(int(*)(const string&, const string&)); 
+    // overloaded versions of func; each takes a different function pointer type
+    void func(int(*)(const string&, const string&));
     void func(int(*)(const int&, const int&));
     func(compare); // **error: which instantiation of compare?**
     ```
@@ -1368,10 +1368,10 @@ tags: C++
 
 * 不過你還是可以用 explicit template argument 避免上面的 error:
     ```cpp
-    // ok: explicitly specify which version of compare to instantiate 
+    // ok: explicitly specify which version of compare to instantiate
     func(compare<int>); // passing compare(const int&, const int&)
     ```
-    
+
 ### 16.2.5 Template Argument Deduction and References
 
 * 這種 func temp:
@@ -1391,12 +1391,12 @@ tags: C++
 * 如果 function parameter 是 ordinary(lvalue) reference，也就是 `T&`，則 binding rule 告訴我們只能傳入 lvalue
     * 這個 lvalue 可能是也可能不是 `const`，如果是的話，T 就會被 deduced 成 `const` type:
     ```cpp
-    template <typename T> void f1(T&); // argument must be an lvalue 
+    template <typename T> void f1(T&); // argument must be an lvalue
     int i = 8;
     const int ci = 7;
     // calls to f1 **use the referred-to type of the argument
-    // as the template parameter type** 
-    f1(i); // i is an int; template parameter T is int 
+    // as the template parameter type**
+    f1(i); // i is an int; template parameter T is int
     f1(ci); // ci is a const int; template parameter T is const int
     f1(5); // error: argument to a & parameter must be an lvalue
     ```
@@ -1407,15 +1407,15 @@ tags: C++
 * **如果 function parameter 已經宣告成 `const`，則 deduced type `T` 就不會是 `const` 了**
     * **`const` 已經是 *function* parameter type 的一部分，它就不會變成 *template* parameter type 的一部分了:**
     ```cpp
-    template <typename T> void f2(const T&); // can take an rvalue 
-    // parameter in f2 is const &; const in the argument is irrelevant 
-    // in each of these three calls, f2’s function parameter is inferred as const int& 
-    f2(i); // i is an int; template parameter T is int 
+    template <typename T> void f2(const T&); // can take an rvalue
+    // parameter in f2 is const &; const in the argument is irrelevant
+    // in each of these three calls, f2’s function parameter is inferred as const int&
+    f2(i); // i is an int; template parameter T is int
     f2(ci); // ci is a const int, but template parameter T is int
     f2(5); // a const& parameter can be bound to an rvalue; T is int
     ```
     * 知道 `const` 到底包含在 function parameter 還是 template parameter 內很重要
-        * 因為很可能會拿 template parameter 來宣告變數，所以你當然要知道它是不是 const** 
+        * 因為很可能會拿 template parameter 來宣告變數，所以你當然要知道它是不是 const**
     * 你可以把上面的 code 丟到 IDE 然後看 IDE 會呼叫的實例內，角括號的型態是 `int`，並沒有 `const`
 
 #### *Type Deduction from Rvalue Reference Function Parameters*
@@ -1476,7 +1476,7 @@ tags: C++
 * 總之 compiler 會推出像這樣的實例:
     * demo 用，not valid code:
     ```cpp
-    // invalid code, for illustration purposes only 
+    // invalid code, for illustration purposes only
     void f3<int&>(int& &&); // when T is int&, function parameter is "int& &&", which collapses to int&
     ```
 
@@ -1499,8 +1499,8 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 * 上面關於 rvalue reference to template parameter type (forwarding reference) 的情境會導致 template type parameter 被推成 reference type，那下面的 code 就會很...撲朔迷離:
     ```cpp
     template <typename T> void f3(T&& val) {
-        T t = val; // copy or binding a reference? 
-        t = fcn(t); // does the assignment change only tor val and t? 
+        T t = val; // copy or binding a reference?
+        t = fcn(t); // does the assignment change only tor val and t?
         if (val == t) { /* .. . */} // always true if T is a reference type
     }
     ```
@@ -1533,11 +1533,11 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 
 * 來看 `std::move` 怎麼定義:
     ```cpp
-    // for the use of typename in the return type and the cast see § 16.1.3 (p. 670) 
-    // remove_reference is covered in § 16.2.3 (p. 684) 
-    template <typename T> 
+    // for the use of typename in the return type and the cast see § 16.1.3 (p. 670)
+    // remove_reference is covered in § 16.2.3 (p. 684)
+    template <typename T>
     typename remove_reference<T>::type&& move(T&& t) {
-        // static_cast covered in § 4.11.3 (p. 163) 
+        // static_cast covered in § 4.11.3 (p. 163)
         return static_cast<typename remove_reference<T>::type&&>(t);
     }
     ```
@@ -1547,7 +1547,7 @@ An argument of any type can be passed to a function parameter that is an **rvalu
     * **所以我們要看我們傳入 l/rvalue 給 `std::move` 時 `T` 分別會被推斷成什麼型態**
 * 用這段 code 講解:
     ```cpp
-    string s1("hi!"), s2; 
+    string s1("hi!"), s2;
     s2 = std::move(string("bye!")); // ok: moving from an rvalue
     s2 = std::move(s1); // ok: but after the assigment s1 has indeterminate value
     ```
@@ -1603,10 +1603,10 @@ An argument of any type can be passed to a function parameter that is an **rvalu
     * 題外話，我覺得定義 `greater` 然後使用 `less` 來定義比較有意義啦
 * 以下是*錯誤的實作版本*
     ```cpp
-    // template that takes a callable and two parameters 
+    // template that takes a callable and two parameters
     // and calls the given callable **with the parameters "flipped"**
     // flip1 is an **incomplete implementation: top-level const and references are lost**
-    template <typename F, typename T1, typename T2> 
+    template <typename F, typename T1, typename T2>
     void flip1(F f, T1 t1, T2 t2) {
         f(t2, t1);
     }
@@ -1647,7 +1647,7 @@ An argument of any type can be passed to a function parameter that is an **rvalu
     1. 定義成 ref，都會保持被綁定的型態的 `const`ness，因為 low level `const` never ignored
     2. 而利用 forwarding reference 的 reference collapsing(§ 16.2.5, p. 687)，這樣如果傳進 function template 的 argument 是 lvalue，則 parameter type 就會是 lref，argument 是 rvalue，parameter type 就會是 rref
     ```cpp
-    template <typename F, typename T1, typename T2> 
+    template <typename F, typename T1, typename T2>
     void flip2(F f, T1 &&t1, T2 &&t2) {
         f(t2, t1);
     }
@@ -1703,7 +1703,7 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 :::
 * 所以總結，我們的 `flip` 應該這樣寫:
     ```cpp
-    template <typename F, typename T1, typename T2> 
+    template <typename F, typename T1, typename T2>
     void flip(F f, T1 &&t1, T2 &&t2) {
         f(std::forward<T2>(t2), std::forward<T1>(t1));
     }
@@ -1737,18 +1737,18 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 	```cpp
 	// print any type we don’t otherwise handle
 	template <typename T> string debug_rep(const T &t) {
-		ostringstream ret; // see § 8.3 (p. 321) 
-		ret << t; // uses T’s output operator to print a representation of t 
+		ostringstream ret; // see § 8.3 (p. 321)
+		ret << t; // uses T’s output operator to print a representation of t
 		return ret.str(); // return a copy of the string to which ret is bound
 	}
 	```
 	* 這裡用了 `std::ostreamstring` 簡化字串處理，不過傳入物件要支援 `operator<<`
 * 接下來定義另一個版本，**吃 `T*`**
 	```cpp
-	// print pointers as their pointer value, followed by the object to which the pointer points 
-	// NB(注意)): this function will not work properly with char*; see § 16.3 (p. 698) 
+	// print pointers as their pointer value, followed by the object to which the pointer points
+	// NB(注意)): this function will not work properly with char*; see § 16.3 (p. 698)
 	template <typename T> string debug_rep(T *p) {
-		ostringstream ret; 
+		ostringstream ret;
 		ret << "pointer: " << p;
 		if (p) // print the pointer’s own value
 			ret << " " << debug_rep(*p); // print the value to which p points
@@ -1763,7 +1763,7 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 	    * p.698 會講要怎麼處理這個情況
 * 可以這樣用這兩個 templates:
 	```cpp
-	string s("hi"); 
+	string s("hi");
 	cout << debug_rep(s) << endl;
 	```
 	* 上面這個直接把 s 的 string representation 印出來(這樣講很奇怪，但 string 也是物件，而且支援 <<，就說 string 有「string representation」吧)
@@ -1791,7 +1791,7 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 #### Multiple Viable Templates
 * 再看一個例子:
 	```cpp
-	const string *sp = &s; 
+	const string *sp = &s;
 	cout << debug_rep(sp) << endl;
 	```
 	* 這時兩個 template 都是 exact match!
@@ -1813,14 +1813,14 @@ When there are several overloaded templates that provide an equally good match f
 * 如果要讓一般函數跟模板函數 overload 呢?
 * 為此我們再定義一個一般函數:
 	```cpp
-	// print strings inside double quotes 
+	// print strings inside double quotes
 	string debug_rep(const string &s) {
 	return '"' + s + '"';
 	}
 	```
 * 這時寫這樣的 code 會如何?:
 	```cpp
-	string s("hi"); 
+	string s("hi");
 	cout << debug_rep(s) << endl;
 	```
 	* 這時有兩個 viable functions, 而且 equally good
@@ -1853,9 +1853,9 @@ When there are several overloaded templates that provide an equally good match f
 
 * 解決方法就是定義兩個吃 (`const`) `char*` 的一般 function
 	```cpp
-	// convert the character pointers to string and call the string version of debug_rep 
+	// convert the character pointers to string and call the string version of debug_rep
 	string debug_rep(char *p) {
-		return debug_rep(string(p)); 
+		return debug_rep(string(p));
 	}
 	string debug_rep(const char *p) {
 		return debug_rep(string(p));
@@ -1872,14 +1872,14 @@ When there are several overloaded templates that provide an equally good match f
 	* 注意那個吃 `const &` 的模板做的事情跟我們自定義的 `const string&` 做的事情是不一樣的
 	    * 自己測試，會少印那個 `""`
 	```cpp
-	template <typename T> string debug_rep(const T &t); 
-	template <typename T> string debug_rep(T *p); 
+	template <typename T> string debug_rep(const T &t);
+	template <typename T> string debug_rep(T *p);
 	// ***the following declaration must be in scope***
-	// ***for the definition of debug_rep(char*) to do the right thing*** 
-	string debug_rep(const string &); 
+	// ***for the definition of debug_rep(char*) to do the right thing***
+	string debug_rep(const string &);
 	string debug_rep(char *p) {
-		// if the declaration for the version that takes a const string& is not in scope 
-		// the return will call debug_rep(constT&) with T instantiated to string 
+		// if the declaration for the version that takes a const string& is not in scope
+		// the return will call debug_rep(constT&) with T instantiated to string
 		return debug_rep(string(p));
 	}
 	```
@@ -1901,8 +1901,8 @@ When there are several overloaded templates that provide an equally good match f
 	    * 繞口令?
 * 看例子
 	```cpp
-	// Args is a template parameter pack; rest is a function parameter pack 
-	// Args represents zero or more template type parameters 
+	// Args is a template parameter pack; rest is a function parameter pack
+	// Args represents zero or more template type parameters
 	// rest represents zero or more function parameters
 	template <typename T, typename... Args>
 	void foo(const T &t, const Args& ... rest);
@@ -1915,8 +1915,8 @@ When there are several overloaded templates that provide an equally good match f
 	```cpp
 	int i = 0; double d = 3.14; string s = "how now brown cow";
 	foo(i, s, 42, d); // 3 parameters in the pack
-	foo(s, 42, "hi"); // 2 parameters in the pack 
-	foo(d, s); // 1 parameter in the pack 
+	foo(s, 42, "hi"); // 2 parameters in the pack
+	foo(d, s); // 1 parameter in the pack
 	foo("hi"); // empty pack
 	```
 	* `foo` 的第一個 arguments 會用來推斷 `T` 的型別；
@@ -1936,7 +1936,7 @@ When there are several overloaded templates that provide an equally good match f
 * 有時需要靜態就知道 pack 內有幾個 parameters，這時可以用 `sizeof...`:
 	```cpp
 	template<typename ... Args>  void g(Args ... args) {
-		cout << sizeof...(Args) << endl; // number of type parameters 
+		cout << sizeof...(Args) << endl; // number of type parameters
 		cout << sizeof...(args) << endl; // number of function parameters
 	}
 	```
@@ -1954,14 +1954,14 @@ When there are several overloaded templates that provide an equally good match f
     * 那是因為一定要這樣寫，你無法對 pack 做什麼 range for 之類的，沒有這種功能
 * 實作如下
 	```cpp
-	// function to end the recursion and print the last element 
-	// ***this function must be declared before the variadic version of print is defined*** 
-	template<typename T> 
+	// function to end the recursion and print the last element
+	// ***this function must be declared before the variadic version of print is defined***
+	template<typename T>
 	ostream &print(ostream &os, const T &t) {
 		return os << t; // no separator after the last element in the pack
 	}
-	// this version of print will be called for all but the last element in the pack 
-	template <typename T, typename... Args> 
+	// this version of print will be called for all but the last element in the pack
+	template <typename T, typename... Args>
 	ostream &print(ostream &os, const T &t, const Args&... rest)
 	{
 		os << t << ", "; // print the first argument
@@ -2031,11 +2031,11 @@ When there are several overloaded templates that provide an equally good match f
 	* 換句話說 Primer 又先斬後奏了，因為上面的 code 已經用到了
 * 例如我們的 `print` 就有用到兩次 expand:
 	```cpp
-	template <typename T, typename... Args> 
-	ostream & 
-	print(ostream &os, const T &t, const Args&... rest) // expand Args 
+	template <typename T, typename... Args>
+	ostream &
+	print(ostream &os, const T &t, const Args&... rest) // expand Args
 	{
-		os << t << ", "; 
+		os << t << ", ";
 		return print(os, rest...); // expand rest
 	}
 	```
@@ -2061,10 +2061,10 @@ When there are several overloaded templates that provide an equally good match f
 * 上面的 expand 看起來很 toy? 來看看更進階的展開方式
 * For example, we might write a second variadic function that calls `debug_rep` (§ 16.3, p. 695) on each of its arguments and then calls `print` to print the resulting `string`s:
 	```cpp
-	// call debug_rep on each argument in the call to print 
-	template <typename... Args> 
+	// call debug_rep on each argument in the call to print
+	template <typename... Args>
 	ostream &errorMsg(ostream &os, const Args&... rest) {
-		// print(os, debug_rep(a1), debug_rep(a2), ..., debug_rep(an) 
+		// print(os, debug_rep(a1), debug_rep(a2), ..., debug_rep(an)
 		return print(os, debug_rep(rest)...);
 	}
 	```
@@ -2077,13 +2077,13 @@ When there are several overloaded templates that provide an equally good match f
 	```
 	* 裡面呼叫 `print` 的部分會變這樣:
 	```cpp
-	print(cerr, debug_rep(fcnName), debug_rep(code.num()), 
+	print(cerr, debug_rep(fcnName), debug_rep(code.num()),
 		debug_rep(otherData), debug_rep("otherData"),
 		debug_rep(item));
 	```
 * 如果你寫下面的 code 則無法編譯，**注意看 `...` 的位置**
 	```cpp
-	// passes the pack to debug_rep; print(os, debug_rep(a1, a2, ..., an)) 
+	// passes the pack to debug_rep; print(os, debug_rep(a1, a2, ..., an))
 	print(os, debug_rep(rest...)); // error: no matching function to call
 	```
 	* 最上面的 code 是寫 `debug_rep(rest)...`，這裡則是寫 `debug(rest...)`，	`...` 作用的 pattern 不同
@@ -2115,7 +2115,7 @@ When there are several overloaded templates that provide an equally good match f
 	template <class... Args>
 	inline
 	void StrVec::emplace_back(Args&&... args) {
-		chk_n_alloc(); // reallocates the StrVec ifnecessary 
+		chk_n_alloc(); // reallocates the StrVec ifnecessary
 		alloc.construct(first_free++, std::forward<Args>(args)...);
 	}
 	```
@@ -2149,12 +2149,12 @@ When there are several overloaded templates that provide an equally good match f
 #### ADVICE: FORWARDING AND VARIADIC TEMPLATES
 * 基本上 variadic templates 很常會跟 `forward` 一起使用，其 pattern 跟我們寫的 `emplace_back` 很像:
 	```cpp
-	// fun has zero or more parameters each of which is 
+	// fun has zero or more parameters each of which is
 	// an rvalue reference to a template parameter type(forwarding reference)
 	template<typename... Args>
-	void fun(Args&&... args) // expands Args as a list of rvalue references 
+	void fun(Args&&... args) // expands Args as a list of rvalue references
 	{
-		// the argument to work expands both Args and args 
+		// the argument to work expands both Args and args
 		work(std::forward<Args>(args)...);
 	}
 	```
@@ -2168,8 +2168,8 @@ When there are several overloaded templates that provide an equally good match f
 	* 我們希望比較 char ptr 時是呼叫(lib已經寫好且行為正確的) `strcmp`，而不是用原本 template 定義的直接比較指標
 * 實際上 16.1.1 已經寫了一個*有點像*的東西，還記得的話:
 	```cpp
-	// first version; can compare any two types 
-	template <typename T> int compare(const T&, const T&); // second version to handle string literals 
+	// first version; can compare any two types
+	template <typename T> int compare(const T&, const T&); // second version to handle string literals
 	template<size_t N, size_t M>
 	int compare(const char (&)[N], const char (&)[M]);
 	```
@@ -2188,8 +2188,8 @@ When there are several overloaded templates that provide an equally good match f
 #### Defining a Function Template Specialization
 * 格式長這樣:
 	```cpp
-	// special version of compare to handle pointers to character arrays 
-	template <> 
+	// special version of compare to handle pointers to character arrays
+	template <>
 	int compare(const char* const &p1, const char* const &p2) {
 		return strcmp(p1, p2);
 	}
@@ -2215,8 +2215,8 @@ When there are several overloaded templates that provide an equally good match f
     * specialization 其實只是告訴 compiler 特定的 instantiation 應該長怎樣，並**不會影響 compiler 看到 function template 被呼叫時怎麼 deduce 成特定的 instantiation**
 * 假設原本有這兩種:
 	```cpp
-	// first version; can compare any two types 
-	template <typename T> int compare(const T&, const T&); // second version to handle string literals 
+	// first version; can compare any two types
+	template <typename T> int compare(const T&, const T&); // second version to handle string literals
 	template<size_t N, size_t M>
 	int compare(const char (&)[N], const char (&)[M]);
 	```
@@ -2231,14 +2231,14 @@ When there are several overloaded templates that provide an equally good match f
 	    * 而之前也學到，這種情況下 compiler 會選擇一般 function。
 
 :::warning
-#### KEY CONCEPT: ORDINARY SCOPE RULES APPLY TO SPECIALIZATIONS 
+#### KEY CONCEPT: ORDINARY SCOPE RULES APPLY TO SPECIALIZATIONS
 * 要定義某個 template 的 specialization 時，template declaration 要 in scope
-* **而 user code 要使用這個 specialization 對應的 instantiation 時這個 specialization 的宣告也要 in scope!!** 
+* **而 user code 要使用這個 specialization 對應的 instantiation 時這個 specialization 的宣告也要 in scope!!**
 * 如果在使用某特定的 instantiation 時，對應的 specialization 還沒 in scope，compiler 就會生一個它自己的版本，這樣就用不到自訂的 specialization 了，這樣(預期)行為就會出錯
 * 而且這種 error 很難找
 :::
 :::info
-* Best Practice: **Templates and their specializations should be declared in the same header file.** 
+* Best Practice: **Templates and their specializations should be declared in the same header file.**
 * Declarations for all the templates with a given name should appear first, followed by any specializations of those templates.
 :::
 #### Class Template Specializations
@@ -2258,7 +2258,7 @@ When there are several overloaded templates that provide an equally good match f
 * 18.2 章會講到，我們現在只要知道如下操作就可:
 	* 我們需要"開啟"(open) namespace:
 	```cpp
-	// open the std namespace so we can specialize std::hash 
+	// open the std namespace so we can specialize std::hash
 	namespace std {
 	} // close the std namespace; note: no semicolon after the close curly
 	```
@@ -2267,39 +2267,39 @@ When there are several overloaded templates that provide an equally good match f
     * https://en.cppreference.com/w/cpp/language/extending_std
 * 下面的 code 會寫一個 `std::hash<Sales_data>` 的 specialization:
 	```cpp
-	// open the std namespace so we can specialize std::hash 
-	namespace std { 
+	// open the std namespace so we can specialize std::hash
+	namespace std {
 	template <> // we’re defining a specialization with
-	struct hash<Sales_data> // the template parameter of Sales_data 
+	struct hash<Sales_data> // the template parameter of Sales_data
 	{
-		// the type used to hash an unordered container must define these types 
-		typedef size_t result_type; 
-		typedef Sales_data argument_type; // by default, this type needs == 
-		size_t operator()(const Sales_data& s) const; 
+		// the type used to hash an unordered container must define these types
+		typedef size_t result_type;
+		typedef Sales_data argument_type; // by default, this type needs ==
+		size_t operator()(const Sales_data& s) const;
 		// our class uses synthesized copy control and default constructor
-	}; 
+	};
 	size_t
-	hash<Sales_data>::operator()(const Sales_data& s) const 
+	hash<Sales_data>::operator()(const Sales_data& s) const
 	{
-		return hash<string>()(s.bookNo) ^ 
-			   hash<unsigned>()(s.units_sold) ^ 
+		return hash<string>()(s.bookNo) ^
+			   hash<unsigned>()(s.units_sold) ^
 			   hash<double>()(s.revenue);
 	}
 	}// close the std namespace
-	``` 
+	```
 * 我們對 `std::hash` 這個 template 定義一個 specialization，`hash<Sales_data>`
 * 直接使用 library 定義好的 `hash<string/unsigned/double>` 來算 hash code
     * 而去看 `std::hash` 的文件，這些版本其實也是標準定義的 specializations
-* 總之寫了這個以後，我們就可以寫下面的 code 了:	
+* 總之寫了這個以後，我們就可以寫下面的 code 了:
 	```cpp
-	// uses hash<Sales_data> and Sales_data::operator== from § 14.3.1 (p. 561) 
+	// uses hash<Sales_data> and Sales_data::operator== from § 14.3.1 (p. 561)
 	unordered_multiset<Sales_data> SDset;
 	```
 * 另外需要在 `Sales_data` 內宣告 `std::hash<Sales_data>` 為 friend，因為它會用到 private member
 	```cpp
-	template <class T> class std::hash; // needed for the friend declaration 
-	class Sales_data { 
-		friend class std::hash<Sales_data>; 
+	template <class T> class std::hash; // needed for the friend declaration
+	class Sales_data {
+		friend class std::hash<Sales_data>;
 		// other members as before
 	};
 	```
@@ -2314,12 +2314,12 @@ When there are several overloaded templates that provide an equally good match f
 
 * 之前用過的 `std::remove_reference`，其實就有很多種 partial specializations:
 	```cpp
-	// original, most general template 
+	// original, most general template
 	template <class T> struct remove_reference {
 		typedef T type;
-	}; 
-	// partial specializations that will be used for lvalue and rvalue references 
-	template <class T> struct remove_reference<T&> // lvalue references 
+	};
+	// partial specializations that will be used for lvalue and rvalue references
+	template <class T> struct remove_reference<T&> // lvalue references
 		{ typedef T type; };
 	template <class T> struct remove_reference<T&&> // rvalue references
 		{ typedef T type; };
@@ -2327,11 +2327,11 @@ When there are several overloaded templates that provide an equally good match f
 	* 第一個 template 最 general，可以實例化任何 type；後面兩個是 partial specializations
 * 看看丟不同 type 給 `std::remove_reference` 分別會用到哪種版本
 	```cpp
-	int i; 
-	// decltype(42) is int, uses the original template 
-	remove_reference<decltype(42)>::type a; 
-	// decltype(i) is int&, uses first (T&) partial specialization 
-	remove_reference<decltype(i)>::type b; 
+	int i;
+	// decltype(42) is int, uses the original template
+	remove_reference<decltype(42)>::type a;
+	// decltype(i) is int&, uses first (T&) partial specialization
+	remove_reference<decltype(i)>::type b;
 	// decltype(std::move(i)) is int&&, uses second (i.e., T&&) partial specialization
 	remove_reference<decltype(std::move(i))>::type c;
 	```
@@ -2339,22 +2339,22 @@ When there are several overloaded templates that provide an equally good match f
 * 我們可以只 spectialize 某個 class instantiation *的 member*:
 	```cpp
 	template <typename T> struct Foo {
-		Foo(const T &t = T()): mem(t) { } 
-		void Bar() { /* .. . */} 
-		T mem; 
+		Foo(const T &t = T()): mem(t) { }
+		void Bar() { /* .. . */}
+		T mem;
 		// other members of Foo
 	};
 	template<> // we're specializing a template
 	void Foo<int>::Bar() // we're specializing the Bar member of Foo<int>
-	{ 
+	{
 		// do whatever specialized processing that applies to ints
 	}
 	```
 	* 我們這樣寫的話，當我們真的定義了 `Foo<int>` 且使用 `Bar` 時，compiler 就不會實例化這個 member，而是用我們定義的:
 	```cpp
-	Foo<string> fs; // instantiates Foo<string>::Foo() 
+	Foo<string> fs; // instantiates Foo<string>::Foo()
 	fs.Bar(); 		// instantiates Foo<string>::Bar()
-	Foo<int> fi; 	// instantiates Foo<int>::Foo() 
+	Foo<int> fi; 	// instantiates Foo<int>::Foo()
 	fi.Bar(); 		// ***uses our specialization ofFoo<int>::Bar()***
 	```
 	* 最後一行 code 會用我們定義的 `Foo<int>::Bar()`

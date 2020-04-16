@@ -23,7 +23,7 @@ tags: C++
     * 用在那些語法上需要一個 statement 但是程式邏輯不需要的地方
     * 例如 loop 要做的事情全部寫在 header 裡面，可是還是需要一個 statement 當作 loop body，這時就加個 ;
         ```cpp
-        // read until we hit end-of-file or find an input equal to sought 
+        // read until we hit end-of-file or find an input equal to sought
         while (cin >> s && s != sought)
             ;// null statement
         ```
@@ -31,7 +31,7 @@ tags: C++
 #### Beware of Missing or Extraneous Semicolons
 * Null statements 就是 statement，他當然可以出現在 statements 可以出現的地方:
     ```cpp
-    ival = v1 + v2;; 
+    ival = v1 + v2;;
     // ok: second semicolon is a superfluous null statement
     ```
     * 上面有**兩個** statements，一個是 exp statement，一個是 null statement
@@ -44,14 +44,14 @@ tags: C++
     *  Names introduced inside a block are accessible only in that block and in blocks nested inside that block.
 * Compound statements are used when the language requires a single statement but the logic of our program needs more than one.
     * 例子一樣是 loop
-* 你也可以擺 empty block，它等價於 null statement 
+* 你也可以擺 empty block，它等價於 null statement
 
 ## 5.2 Statement Scope
 * 我們可以在 if, switch, while, for 的 control structure(也就是它們後面跟著的括號)內定義變數
 * 對你沒看錯不只有 for 可以，不過如果是在 while 裡面宣告的話，**每次 loop 都會重新宣告跟初始化**
 ```cpp
-while (int i = get_num()) 
-// i is created and initialized on each iteration     
+while (int i = get_num())
+// i is created and initialized on each iteration
     cout << i << endl;
 i = 0; // error: iis not accessible outside the loop
 ```
@@ -95,13 +95,13 @@ i = 0; // error: iis not accessible outside the loop
 ```cpp
 case true:
 // this switch statement is illegal because these initializations might be bypassed
-string file_name; // error: control bypasses an implicitly initialized variable 
-int ival = 0; // error: control bypasses an explicitly initialized variable 
-int jval;// ok: because jvalis not initialized 
+string file_name; // error: control bypasses an implicitly initialized variable
+int ival = 0; // error: control bypasses an explicitly initialized variable
+int jval;// ok: because jvalis not initialized
 break;
 
-case false: 
-// ok: jval is in scope but is uninitialized 
+case false:
+// ok: jval is in scope but is uninitialized
 jval = next_num(); // ok: assign a value to jval
 if (file_name.empty()); // file_name is in scope but wasn’t initialized
 ```
@@ -122,7 +122,7 @@ if (file_name.empty()); // file_name is in scope but wasn’t initialized
     * when we want to **iterate indefinitely**
 
 ### 5.4.2 Traditional for Statement
-* 
+*
     ```cpp
     for (init-statement condition; expression) statement
     ```
@@ -143,9 +143,9 @@ if (file_name.empty()); // file_name is in scope but wasn’t initialized
     ```
 * 傳統的等價 loop
     ```cpp
-    for (auto beg = v.begin(), end = v.end(); beg != end; ++beg) 
-    { 
-        auto &r = *beg; // r must be a reference so we can change the element 
+    for (auto beg = v.begin(), end = v.end(); beg != end; ++beg)
+    {
+        auto &r = *beg; // r must be a reference so we can change the element
         r *=2;
         // double the value ofeach element in v
     }
@@ -153,12 +153,12 @@ if (file_name.empty()); // file_name is in scope but wasn’t initialized
     * 注意看 reference 的部分，如果在傳統 loop 內把 initializer 寫成 reference 就沒辦法更動了，所以是寫在 body 內。
 * Now we can understand why we said in § 3.3.2 (p. 101) that we cannot use a range for to add elements to a vector
     * In a range for,the value of end() is cached.
-    * If we add elements to (or remove them from) the sequence, the value of end might be invalidated(§ 3.4.1, p. 110). 
+    * If we add elements to (or remove them from) the sequence, the value of end might be invalidated(§ 3.4.1, p. 110).
     * 第九章才會講到底為什麼會被 invalidated
 
 ### 5.4.4 The do while Statement
 ```cpp
-do 
+do
     statement
 while (condition);
 ```
