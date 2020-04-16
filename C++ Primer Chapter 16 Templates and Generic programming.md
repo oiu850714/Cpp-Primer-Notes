@@ -166,7 +166,7 @@ tags: C++
         * ptr 可以用 `nullptr` 或 0 來實例化
         * 你不信你可以綁個 nonstatic 的試試看，compiler 推斷它不是 constant expression 之後就不知道怎麼實例化，就會噴你 error
         * 因為只有 static lifetime 的物件才有辦法在 compile time 時就決定要擺哪裡
-	    * 包括 global 變數，function 內的 `static` 變數，`static` member
+        * 包括 global 變數，function 內的 `static` 變數，`static` member
 :::warning
 * Template arguments used for nontype template parameters **must be constant expressions.**
 :::
@@ -424,8 +424,8 @@ tags: C++
         data(std::make_shared<std::vector<T>>()) { }
     ```
     * 注意是寫成 `Blob<T>::Blob()`
-	    * 原因是因為，`Blob<T>` 是 class，`Blob<T>::Blob` 是 member function，他就只是個 member function，不需要加 template parameter
-	    * 其他 member function 也同理，`T` 只有寫一次
+        * 原因是因為，`Blob<T>` 是 class，`Blob<T>::Blob` 是 member function，他就只是個 member function，不需要加 template parameter
+        * 其他 member function 也同理，`T` 只有寫一次
 * 吃 `initializer_list` 的 ctor:
     ```cpp
     template <typename T> Blob<T>::Blob(std::initializer_list<T> il):
@@ -525,9 +525,9 @@ tags: C++
 
 #### One-to-One Friendship
 * 在 class 跟 friend 都是 templates 的情況下，最常見的 friendship 就是，用 `T` 實例化的 class template instantiation 有一個用 `T` 實例化的 friend instantiation
-	* 例如希望 `Blob` 可以跟 `BlobPtr` 還有 `operator==` 成為 friend
-	* 可是這樣講太攏統，因為他們三個都是 template
-	* one-to-one friendship 就是說，**可以具體指定，他們三個各自用相同 type 實例化出來的 instantiations 互為 friend**
+    * 例如希望 `Blob` 可以跟 `BlobPtr` 還有 `operator==` 成為 friend
+    * 可是這樣講太攏統，因為他們三個都是 template
+    * one-to-one friendship 就是說，**可以具體指定，他們三個各自用相同 type 實例化出來的 instantiations 互為 friend**
     * `Blob<int>` 有 `BlobPtr<int>` 還有 `operator==<int>` 這兩個 `friend`s
 * 不過如果要在 class template 內說某 template 的某個 instantiation 是我的 friend，我們必須**在定義該 class template 之前先*宣告*這個 friend template**
     * template 也可以只單純宣告，不提供定義
@@ -955,7 +955,7 @@ tags: C++
 
 #### Instantiation and Member Templates
 * To instantiate a member template of a class template, we must **supply arguments for the template parameters for *both* the class and the function templates.**
-	* 注意，supply 不代表 user code 一定都要打出來，compiler 會推斷
+    * 注意，supply 不代表 user code 一定都要打出來，compiler 會推斷
     * template argument for class 已經在宣告物件的時候給定
         * 之後要用這個物件時 compiler 就已經知道 temp argument 是哪種了
     * 而 member templates 則是在你給定 function arguments 時由 compiler 自行推斷
@@ -1029,7 +1029,7 @@ tags: C++
     int i = compare(a1[0], a2[0]); // instantiation will appear elsewhere
     ```
     * `Application.o` 會包含有 `Blob<int>` 的 class definition，以及 `Blob<int>` 吃 `initializer_list` 的 ctor 還有 copy ctor 的 definition
-	* 而 `compare<int>` 跟 `Blob<string>` 的實例則會在別的 TU 內產生:
+    * 而 `compare<int>` 跟 `Blob<string>` 的實例則會在別的 TU 內產生:
     ```cpp
     // templateBuild.cc
     // instantiation file must provide a (nonextern) definition for every
@@ -1070,7 +1070,7 @@ tags: C++
 
 * 而因為 `deleter` type 會用 template argument 指定，換句話說在 compile time 時就能知道 deleter 的型別
     * 所以 `unique_ptr` 就能把 deleter 當作 direct member
-	* 這樣就不會有 `shared_ptr` 那一層多的 call 了
+    * 這樣就不會有 `shared_ptr` 那一層多的 call 了
 
 
 * 總結:
@@ -1584,7 +1584,7 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 :::warning
 * 請不要手動 call `static_cast` 把 lvalue 轉成 rvalue reference
 * 要轉也是 call `std::move`，比較好用
-	* 你可以想成 `std::move` 就是這種噁心的 `static_cast` 的一個 wrapper，讓你比較簡單使用
+    * 你可以想成 `std::move` 就是這種噁心的 `static_cast` 的一個 wrapper，讓你比較簡單使用
 :::
 ### 16.2.7 Forwarding
 * use case: 有的時候 function template 會有一種寫法，就是把 function parameter 丟給另一個 function 來幫你做事情，template 本身有點像 wrapper 的概念
@@ -1718,15 +1718,15 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 * function template(s) 也可以參與 overloading
 
 * 有了 function template(s)，function matching 的規則就是第六章說明的(p.233) 加上以下規則
-	* 所有可以 match(或者說 deduce) 的 instantiation(s) 的 template(s) 都是 candidates
-	* 這些 cadndates 同時(一定)也是 viable functions
-	* 因為可以 deduce 出來的 instantiations 一定可以被呼叫
-	* 如第六章的 rank 方式，function(templates) 也是按照是否須要對 argument 做(哪種) conversion 來排名
-		* 不過別忘記 function template 可以做的 conversion 很少(16.2)
-	* 一樣，如果 viable functions 裡面有一個 function 全部參數都是 better match，就會被選擇來呼叫；如果沒有則看以下情況:
-		* 如果有多個以上 viables，**但是這些 viables 裡面 nontemplate function 只有一個**，那就是這個 nontemplate function 被呼叫
-		* 如果 viable 內一個 nontemplate function 都沒有，而有多個 function template instantiations，**但是其中一個 more specialized**，則他被呼叫
-		* 否則就是 ambiguous call
+    * 所有可以 match(或者說 deduce) 的 instantiation(s) 的 template(s) 都是 candidates
+    * 這些 cadndates 同時(一定)也是 viable functions
+    * 因為可以 deduce 出來的 instantiations 一定可以被呼叫
+    * 如第六章的 rank 方式，function(templates) 也是按照是否須要對 argument 做(哪種) conversion 來排名
+        * 不過別忘記 function template 可以做的 conversion 很少(16.2)
+    * 一樣，如果 viable functions 裡面有一個 function 全部參數都是 better match，就會被選擇來呼叫；如果沒有則看以下情況:
+        * 如果有多個以上 viables，**但是這些 viables 裡面 nontemplate function 只有一個**，那就是這個 nontemplate function 被呼叫
+        * 如果 viable 內一個 nontemplate function 都沒有，而有多個 function template instantiations，**但是其中一個 more specialized**，則他被呼叫
+        * 否則就是 ambiguous call
     * 後面會講什麼是 **more specialized**
 :::warning
 * Correctly defining a set of overloaded function templates  requires a good understanding of the relationship among types and of the restricted conversions applied to arguments in template functions.
@@ -1734,42 +1734,42 @@ An argument of any type can be passed to a function parameter that is an **rvalu
 #### Writing Overloaded Templates
 * overload matching 規則那麼複雜根本記不起來，先看 code
 * 來定義一些 debug 時很有用的 function template(s)，`debug_rep`，會回傳 `std::string`，代表某個物件的 `string` representation
-	```cpp
-	// print any type we don’t otherwise handle
-	template <typename T> string debug_rep(const T &t) {
-		ostringstream ret; // see § 8.3 (p. 321)
-		ret << t; // uses T’s output operator to print a representation of t
-		return ret.str(); // return a copy of the string to which ret is bound
-	}
-	```
-	* 這裡用了 `std::ostreamstring` 簡化字串處理，不過傳入物件要支援 `operator<<`
+    ```cpp
+    // print any type we don’t otherwise handle
+    template <typename T> string debug_rep(const T &t) {
+        ostringstream ret; // see § 8.3 (p. 321)
+        ret << t; // uses T’s output operator to print a representation of t
+        return ret.str(); // return a copy of the string to which ret is bound
+    }
+    ```
+    * 這裡用了 `std::ostreamstring` 簡化字串處理，不過傳入物件要支援 `operator<<`
 * 接下來定義另一個版本，**吃 `T*`**
-	```cpp
-	// print pointers as their pointer value, followed by the object to which the pointer points
-	// NB(注意)): this function will not work properly with char*; see § 16.3 (p. 698)
-	template <typename T> string debug_rep(T *p) {
-		ostringstream ret;
-		ret << "pointer: " << p;
-		if (p) // print the pointer’s own value
-			ret << " " << debug_rep(*p); // print the value to which p points
-		else
-			ret << " null pointer"; // or indicate that the pis null
-		return ret.str(); // return a copy ofthe string to which ret is bound
-	}
-	```
-	* 注意這個版本會呼叫前一個版本 LOL
-	* 另外**這個版本對 `char*` 有問題**
-	    * 因為 `operator<<` 已經對 `char*` 做 overload 了，直接認定 operand 指向 null terminated string
-	    * p.698 會講要怎麼處理這個情況
+    ```cpp
+    // print pointers as their pointer value, followed by the object to which the pointer points
+    // NB(注意)): this function will not work properly with char*; see § 16.3 (p. 698)
+    template <typename T> string debug_rep(T *p) {
+        ostringstream ret;
+        ret << "pointer: " << p;
+        if (p) // print the pointer’s own value
+            ret << " " << debug_rep(*p); // print the value to which p points
+        else
+            ret << " null pointer"; // or indicate that the pis null
+        return ret.str(); // return a copy ofthe string to which ret is bound
+    }
+    ```
+    * 注意這個版本會呼叫前一個版本 LOL
+    * 另外**這個版本對 `char*` 有問題**
+        * 因為 `operator<<` 已經對 `char*` 做 overload 了，直接認定 operand 指向 null terminated string
+        * p.698 會講要怎麼處理這個情況
 * 可以這樣用這兩個 templates:
-	```cpp
-	string s("hi");
-	cout << debug_rep(s) << endl;
-	```
-	* 上面這個直接把 s 的 string representation 印出來(這樣講很奇怪，但 string 也是物件，而且支援 <<，就說 string 有「string representation」吧)
+    ```cpp
+    string s("hi");
+    cout << debug_rep(s) << endl;
+    ```
+    * 上面這個直接把 s 的 string representation 印出來(這樣講很奇怪，但 string 也是物件，而且支援 <<，就說 string 有「string representation」吧)
 * 來分析 compiler 怎麼 match `debug_rep`
-	* 首先只有第一個版本的 `debug_rep` 是 viable
-	* 因為第二個版本是吃指標，而我們是傳物件進去，**不可能把一個物件轉成指標，所以 deduction fails**
+    * 首先只有第一個版本的 `debug_rep` 是 viable
+    * 因為第二個版本是吃指標，而我們是傳物件進去，**不可能把一個物件轉成指標，所以 deduction fails**
         * 這裡提供一個更單純的範例告訴你這種情境的 deduction fail 會發生什麼事
         ```cpp
         template <typename T> void eat_ptr(T *) {}
@@ -1778,28 +1778,28 @@ An argument of any type can be passed to a function parameter that is an **rvalu
           int i;
           eat_ptr(i);
         }
-	    ```
-	* 因為只有一個 viable 所以就選他惹
+        ```
+    * 因為只有一個 viable 所以就選他惹
 * 接下來看下面這個:
-	```cpp
-	cout << debug_rep(&s) << endl;
-	```
-	* 注意!**兩個 templates 都是 viable!!**
-	    * 第一個 template 會產生 `debug_rep(const string*&)`，reference to pointer
-	    * 第二個會產生 `debug_rep(string*)`
-	* 第二個 viable 是 exact match，第一個 viable 要把 normal pointer 轉成 pointer to `const`，所以第二個被呼叫
+    ```cpp
+    cout << debug_rep(&s) << endl;
+    ```
+    * 注意!**兩個 templates 都是 viable!!**
+        * 第一個 template 會產生 `debug_rep(const string*&)`，reference to pointer
+        * 第二個會產生 `debug_rep(string*)`
+    * 第二個 viable 是 exact match，第一個 viable 要把 normal pointer 轉成 pointer to `const`，所以第二個被呼叫
 #### Multiple Viable Templates
 * 再看一個例子:
-	```cpp
-	const string *sp = &s;
-	cout << debug_rep(sp) << endl;
-	```
-	* 這時兩個 template 都是 exact match!
-	* 第一個生出 `debug_rep(const string*&)`
-	* 第二個生出 `debug_rep(const string*)`
-	* 這個 case 用第六章的 rule 來看是 ambiguous 的
-	    * **但是!!** 這裡如果用 template 獨有的 matching rule，則會呼叫第二個 function
-	        * 因為他 **more specialized**
+    ```cpp
+    const string *sp = &s;
+    cout << debug_rep(sp) << endl;
+    ```
+    * 這時兩個 template 都是 exact match!
+    * 第一個生出 `debug_rep(const string*&)`
+    * 第二個生出 `debug_rep(const string*)`
+    * 這個 case 用第六章的 rule 來看是 ambiguous 的
+        * **但是!!** 這裡如果用 template 獨有的 matching rule，則會呼叫第二個 function
+            * 因為他 **more specialized**
 * 如果沒有上面那個 rule，則宣告成吃指標的那個模板，永遠不可能在 caller 傳入 ptr to `const` 時被呼叫
 * 真正的癥結點在於 **const T& 可以吃 ANY TYPE**，包括指標
     * 我們說這樣的 template **更加的 general**
@@ -1812,21 +1812,21 @@ When there are several overloaded templates that provide an equally good match f
 #### Nontemplate and Template Overloads
 * 如果要讓一般函數跟模板函數 overload 呢?
 * 為此我們再定義一個一般函數:
-	```cpp
-	// print strings inside double quotes
-	string debug_rep(const string &s) {
-	return '"' + s + '"';
-	}
-	```
+    ```cpp
+    // print strings inside double quotes
+    string debug_rep(const string &s) {
+    return '"' + s + '"';
+    }
+    ```
 * 這時寫這樣的 code 會如何?:
-	```cpp
-	string s("hi");
-	cout << debug_rep(s) << endl;
-	```
-	* 這時有兩個 viable functions, 而且 equally good
-	* `debug_rep<string>(const string&)`，從第一個模板生的
-	* `debug_rep(const string&)`，一般函數
-	* **但這裡一般函數會被呼叫**
+    ```cpp
+    string s("hi");
+    cout << debug_rep(s) << endl;
+    ```
+    * 這時有兩個 viable functions, 而且 equally good
+    * `debug_rep<string>(const string&)`，從第一個模板生的
+    * `debug_rep(const string&)`，一般函數
+    * **但這裡一般函數會被呼叫**
     * 就這樣想
         * template 比較 general
         * nontemplate function 本質上比較專屬於某個型態，所以 more specialized
@@ -1837,52 +1837,52 @@ When there are several overloaded templates that provide an equally good match f
 #### Overloaded Templates and Conversions
 * 但上面還沒說怎麼解決上面的傳入 `char*` 出現的問題
 * 假設寫這樣的 code:
-	```cpp
-	cout << debug_rep("hi world!") << endl; // calls debug_rep(T*)
-	```
+    ```cpp
+    cout << debug_rep("hi world!") << endl; // calls debug_rep(T*)
+    ```
     * user code 的 intention 應該是呼叫吃 `const string&` 的 `debug_rep`
         * 中間會使用 implicit conversion
-	* 但首先這個狀況有三個 viable functions:
-	* `debug_rep(const T&)`, with `T` bound to `char[10]`
-	* `debug_rep(T*)`, with `T` bound to `const char`
-	* `debug_rep(const string&)`, which **requires a conversion** from `const char*` to `string`
-	    * 首先第一個第二個 template 都是 exact match(注意第二個從 array decay 成 ptr 算是 exact match，詳情 p.245)
-	    * 第三個 viable 反而還需要 user defined(正確來說是 standard defined) conversion(`const char*` to `std::string`)，所以不會考慮
-	* 所以剩前兩個 templates 可以選
-	* 而上面已經說了，吃指標的版本 more specialized，所以會被呼叫
+    * 但首先這個狀況有三個 viable functions:
+    * `debug_rep(const T&)`, with `T` bound to `char[10]`
+    * `debug_rep(T*)`, with `T` bound to `const char`
+    * `debug_rep(const string&)`, which **requires a conversion** from `const char*` to `string`
+        * 首先第一個第二個 template 都是 exact match(注意第二個從 array decay 成 ptr 算是 exact match，詳情 p.245)
+        * 第三個 viable 反而還需要 user defined(正確來說是 standard defined) conversion(`const char*` to `std::string`)，所以不會考慮
+    * 所以剩前兩個 templates 可以選
+    * 而上面已經說了，吃指標的版本 more specialized，所以會被呼叫
 
 * 解決方法就是定義兩個吃 (`const`) `char*` 的一般 function
-	```cpp
-	// convert the character pointers to string and call the string version of debug_rep
-	string debug_rep(char *p) {
-		return debug_rep(string(p));
-	}
-	string debug_rep(const char *p) {
-		return debug_rep(string(p));
-	}
-	```
-	* 這樣傳入 `char[]` 時，有四個版本都是 exact match(注意現在總共有五個 function(templates)，包含 `debug_rep(const string&)`)
-	    * compiler 會挑吃 `char*` 的 nontemplate `debug_rep`
-	* 傳入 `const char[]` 時，有三個 exact match
-	    * compiler 挑吃 `const char*` 的一般函數
+    ```cpp
+    // convert the character pointers to string and call the string version of debug_rep
+    string debug_rep(char *p) {
+        return debug_rep(string(p));
+    }
+    string debug_rep(const char *p) {
+        return debug_rep(string(p));
+    }
+    ```
+    * 這樣傳入 `char[]` 時，有四個版本都是 exact match(注意現在總共有五個 function(templates)，包含 `debug_rep(const string&)`)
+        * compiler 會挑吃 `char*` 的 nontemplate `debug_rep`
+    * 傳入 `const char[]` 時，有三個 exact match
+        * compiler 挑吃 `const char*` 的一般函數
 #### Missing Declarations *Can Cause the Program to Misbehave*
 * 請注意看我們的，最上面那兩個吃 C style string 的版本，他們的 return 會呼叫吃 `const string&` 的 nontemplate `debug_rep`
     * **前提是在做 function matching 時有看到這個 `debug_rep`**
-	* 如果 compiler 沒看到這個 function(例如還沒宣告)，就會使用吃 `const T&` 的 template 生一個實例出來給你呼叫
-	* 注意那個吃 `const &` 的模板做的事情跟我們自定義的 `const string&` 做的事情是不一樣的
-	    * 自己測試，會少印那個 `""`
-	```cpp
-	template <typename T> string debug_rep(const T &t);
-	template <typename T> string debug_rep(T *p);
-	// ***the following declaration must be in scope***
-	// ***for the definition of debug_rep(char*) to do the right thing***
-	string debug_rep(const string &);
-	string debug_rep(char *p) {
-		// if the declaration for the version that takes a const string& is not in scope
-		// the return will call debug_rep(constT&) with T instantiated to string
-		return debug_rep(string(p));
-	}
-	```
+    * 如果 compiler 沒看到這個 function(例如還沒宣告)，就會使用吃 `const T&` 的 template 生一個實例出來給你呼叫
+    * 注意那個吃 `const &` 的模板做的事情跟我們自定義的 `const string&` 做的事情是不一樣的
+        * 自己測試，會少印那個 `""`
+    ```cpp
+    template <typename T> string debug_rep(const T &t);
+    template <typename T> string debug_rep(T *p);
+    // ***the following declaration must be in scope***
+    // ***for the definition of debug_rep(char*) to do the right thing***
+    string debug_rep(const string &);
+    string debug_rep(char *p) {
+        // if the declaration for the version that takes a const string& is not in scope
+        // the return will call debug_rep(constT&) with T instantiated to string
+        return debug_rep(string(p));
+    }
+    ```
 :::info
 * **Declare every function in an overload set** before you define any of the functions.
 * That way you don’t have to worry whether the compiler will instantiate a call before it sees the function you intended to call.
@@ -1892,255 +1892,255 @@ When there are several overloaded templates that provide an equally good match f
 * 可以吃任意數量的 template parameter 的 templates
 * 這些數量可以任意變化的 parameters 叫做 **parameter pack**
 * 有兩種 parameter packs:
-	* template parameter packs: 代表有 0 到多個 template parameters
-	* function parameter packs: 代表有 0 到多個 function parameters
+    * template parameter packs: 代表有 0 到多個 template parameters
+    * function parameter packs: 代表有 0 到多個 function parameters
 * 用 ellipsis(`...`)來說明一個 function 或 template parameter(name) 是一個 parameter pack
-	* 具體來說，如果在 template parameter list 使用 `typename ...` 或者 `class ...` 來宣告 template parameter name，那個 name 就代表了 template parameter packs
-	    * **代表了 0 到多個不同的 types**
-	* 如果是在 function parameter list 內想要用 function parameter pack，則這個對應的參數型別就要是 template parameter pack
-	    * 繞口令?
+    * 具體來說，如果在 template parameter list 使用 `typename ...` 或者 `class ...` 來宣告 template parameter name，那個 name 就代表了 template parameter packs
+        * **代表了 0 到多個不同的 types**
+    * 如果是在 function parameter list 內想要用 function parameter pack，則這個對應的參數型別就要是 template parameter pack
+        * 繞口令?
 * 看例子
-	```cpp
-	// Args is a template parameter pack; rest is a function parameter pack
-	// Args represents zero or more template type parameters
-	// rest represents zero or more function parameters
-	template <typename T, typename... Args>
-	void foo(const T &t, const Args& ... rest);
-	```
-	* `foo` 是個 variadic template function，有一個 template type parameter `T`，跟一個 template parameter pack，`Args`
-		* `Args` 代表了額外的 0 到多個 type parameters
-	* 而 `foo` 的 function parameter list 則有一個 function parameter `T`，確切型別要看 instantiation，還有一個 function parameter pack，`rest`
-		* `rest` 則是代表了額外的 0 到多個 function parameters
+    ```cpp
+    // Args is a template parameter pack; rest is a function parameter pack
+    // Args represents zero or more template type parameters
+    // rest represents zero or more function parameters
+    template <typename T, typename... Args>
+    void foo(const T &t, const Args& ... rest);
+    ```
+    * `foo` 是個 variadic template function，有一個 template type parameter `T`，跟一個 template parameter pack，`Args`
+        * `Args` 代表了額外的 0 到多個 type parameters
+    * 而 `foo` 的 function parameter list 則有一個 function parameter `T`，確切型別要看 instantiation，還有一個 function parameter pack，`rest`
+        * `rest` 則是代表了額外的 0 到多個 function parameters
 * 在用這種有 pack 的 template 時，compiler 除了幫你 deduce type 外，還會 deduce 有多少數量的型別:
-	```cpp
-	int i = 0; double d = 3.14; string s = "how now brown cow";
-	foo(i, s, 42, d); // 3 parameters in the pack
-	foo(s, 42, "hi"); // 2 parameters in the pack
-	foo(d, s); // 1 parameter in the pack
-	foo("hi"); // empty pack
-	```
-	* `foo` 的第一個 arguments 會用來推斷 `T` 的型別；
-	* 剩下的則都拿來推斷 template parameter pack 內包含的型別(以及數量)
+    ```cpp
+    int i = 0; double d = 3.14; string s = "how now brown cow";
+    foo(i, s, 42, d); // 3 parameters in the pack
+    foo(s, 42, "hi"); // 2 parameters in the pack
+    foo(d, s); // 1 parameter in the pack
+    foo("hi"); // empty pack
+    ```
+    * `foo` 的第一個 arguments 會用來推斷 `T` 的型別；
+    * 剩下的則都拿來推斷 template parameter pack 內包含的型別(以及數量)
 * compiler 會按照上面的 code 生出以下四個 instantiations:
-	```cpp
-	void foo(const int&, const string&, const int&, const double&);
-	void foo(const string&, const int&, const char(&)[3]);
-	void foo(const double&, const string&);
-	void foo(const char(&)[3]);
-	```
+    ```cpp
+    void foo(const int&, const string&, const int&, const double&);
+    void foo(const string&, const int&, const char(&)[3]);
+    void foo(const double&, const string&);
+    void foo(const char(&)[3]);
+    ```
     * 注意 template parameter pack 對應的參數都有 `const`
     * 因為型態宣告那邊是寫 `const Args...&`
     * 被 `...` 展開成多個 parameter 的東西叫做 **pattern**
         * 看 16.4.2
 #### The `sizeof...` Operator
 * 有時需要靜態就知道 pack 內有幾個 parameters，這時可以用 `sizeof...`:
-	```cpp
-	template<typename ... Args>  void g(Args ... args) {
-		cout << sizeof...(Args) << endl; // number of type parameters
-		cout << sizeof...(args) << endl; // number of function parameters
-	}
-	```
-	* **return constant expression**
-	* 傳入 `sizeof...` 的 argument 一定要是 parameter pack，不管是 function/template parameter pack 都可以
+    ```cpp
+    template<typename ... Args>  void g(Args ... args) {
+        cout << sizeof...(Args) << endl; // number of type parameters
+        cout << sizeof...(args) << endl; // number of function parameters
+    }
+    ```
+    * **return constant expression**
+    * 傳入 `sizeof...` 的 argument 一定要是 parameter pack，不管是 function/template parameter pack 都可以
 ### 16.4.1 Writing a Variadic Function Template
 * 還記得第六章的 `initializer_list` 嗎
     * 他可以吃任意數量的**同型別的** arguments
 * Variadic functions 則是用在我們**既不知道 user code 會傳的參數的型別，也不知道 user code 會傳多少參數**
 * 之後會定義一個 `errorMsg` 來示範怎麼用
 * 不過在這之前先定義一個 variadic 版本的 `print`
-	* 他會把所有 arguments 全部都印出來
-	    * 管你有幾個 & &什麼型別
+    * 他會把所有 arguments 全部都印出來
+        * 管你有幾個 & &什麼型別
 * 另外，**Variadic functions are often recursive**
     * 那是因為一定要這樣寫，你無法對 pack 做什麼 range for 之類的，沒有這種功能
 * 實作如下
-	```cpp
-	// function to end the recursion and print the last element
-	// ***this function must be declared before the variadic version of print is defined***
-	template<typename T>
-	ostream &print(ostream &os, const T &t) {
-		return os << t; // no separator after the last element in the pack
-	}
-	// this version of print will be called for all but the last element in the pack
-	template <typename T, typename... Args>
-	ostream &print(ostream &os, const T &t, const Args&... rest)
-	{
-		os << t << ", "; // print the first argument
-		return print(os, rest...); // recursive call; print the other arguments
-	}
-	```
+    ```cpp
+    // function to end the recursion and print the last element
+    // ***this function must be declared before the variadic version of print is defined***
+    template<typename T>
+    ostream &print(ostream &os, const T &t) {
+        return os << t; // no separator after the last element in the pack
+    }
+    // this version of print will be called for all but the last element in the pack
+    template <typename T, typename... Args>
+    ostream &print(ostream &os, const T &t, const Args&... rest)
+    {
+        os << t << ", "; // print the first argument
+        return print(os, rest...); // recursive call; print the other arguments
+    }
+    ```
     * 先看最下方的 `print`
         * 第一次呼叫時**先從 pack 內抓一個參數出來處理**
             * 然後 pack 內剩下的參數就拿來遞迴呼叫 `print`
-	    * 重點就是 `print`，裡面的 `return` 部分；直接把 `rest...` 丟給 `print`
-	    * 這樣傳遞的話，**pack 內的第一個參數就會被綁到 `t`**
-	    * 剩下的綁到下一次 `print` 的 `rest...`
-	* 而第一個版本的 nonvariadic `print` 等等會講是拿來幹嘛的
-	* 舉例子:
-	```cpp
-	print(cout, i, s, 42); // two parameters in the pack
-	```
-	![](https://i.imgur.com/WTmMwlh.png)
-	* 前兩次 call 時，第一個版本都不是 viable function，因為他只吃兩個參數，而前兩次 call 一次傳四個參數，一次傳三個；
-	* 但第三次 call 時，只傳兩個參數，這樣的話兩個版本的 `print` 都會是 viable；
-		* 注意 parameter pack 可以為空，所以第二個版本的 `print` 雖然看起來有三個參數，但是只傳遞兩個參數的話這個 `print` 還是 viable 的
-	* 而根據 specialized rule，**nonvariadic template 比 variadic more specialized**，所以會呼叫第一個版本的 `print`
+        * 重點就是 `print`，裡面的 `return` 部分；直接把 `rest...` 丟給 `print`
+        * 這樣傳遞的話，**pack 內的第一個參數就會被綁到 `t`**
+        * 剩下的綁到下一次 `print` 的 `rest...`
+    * 而第一個版本的 nonvariadic `print` 等等會講是拿來幹嘛的
+    * 舉例子:
+    ```cpp
+    print(cout, i, s, 42); // two parameters in the pack
+    ```
+    ![](https://i.imgur.com/WTmMwlh.png)
+    * 前兩次 call 時，第一個版本都不是 viable function，因為他只吃兩個參數，而前兩次 call 一次傳四個參數，一次傳三個；
+    * 但第三次 call 時，只傳兩個參數，這樣的話兩個版本的 `print` 都會是 viable；
+        * 注意 parameter pack 可以為空，所以第二個版本的 `print` 雖然看起來有三個參數，但是只傳遞兩個參數的話這個 `print` 還是 viable 的
+    * 而根據 specialized rule，**nonvariadic template 比 variadic more specialized**，所以會呼叫第一個版本的 `print`
 * **注意如果沒有讓第一個版本的 `print` 先宣告，會編不過，噴 error**
 * 另外我原本想要這樣寫:
-	```cpp
-	template <typename T, typename... Args>
-	ostream &print(ostream &os, const T &t, const Args &... rest)
-	{
-	  if (sizeof...(rest) > 0)
-	  {
-	    cout << "sizeof: " << sizeof...(rest) << "\n";
-	    os << t << "\n";           // print the first argument
-	    return print(os, rest...); // recursive call; print the other arguments
-	  }
-	  else
-	  {
-	    return os << t;
-	  }
-	}
-	int main() { print(cout, 1, 2, 3, 4, 5) << endl; }
-	```
-	* 注意那個 `if (sizeof...(rest) > 0 )` 的部分；我原本是想要用這個來防止 compiler 去找 `print(ostream)` 這個 function，可是還是會噴 error，結果有人跟我說這要用 **SFINAE** 來解...
-	* **或者 用 C++17 的 `if constexpr`....**:
-	```cpp
-	template <typename T, typename... Args>
-	ostream &print(ostream &os, const T &t, const Args &... rest)
-	{
-	  if constexpr (sizeof...(rest) > 0)
-	  {
-	    cout << "sizeof: " << sizeof...(rest) << "\n";
-	    os << t << "\n";           // print the first argument
-	    return print(os, rest...); // recursive call; print the other arguments
-	  }
-	  else
-	  {
-	    return os << t;
-	  }
-	}
-	int main() { print(cout, 1, 2, 3, 4, 5) << endl; }
-	```
-	* `if constexpr` 應該算是一種 conditional compilation
+    ```cpp
+    template <typename T, typename... Args>
+    ostream &print(ostream &os, const T &t, const Args &... rest)
+    {
+      if (sizeof...(rest) > 0)
+      {
+        cout << "sizeof: " << sizeof...(rest) << "\n";
+        os << t << "\n";           // print the first argument
+        return print(os, rest...); // recursive call; print the other arguments
+      }
+      else
+      {
+        return os << t;
+      }
+    }
+    int main() { print(cout, 1, 2, 3, 4, 5) << endl; }
+    ```
+    * 注意那個 `if (sizeof...(rest) > 0 )` 的部分；我原本是想要用這個來防止 compiler 去找 `print(ostream)` 這個 function，可是還是會噴 error，結果有人跟我說這要用 **SFINAE** 來解...
+    * **或者 用 C++17 的 `if constexpr`....**:
+    ```cpp
+    template <typename T, typename... Args>
+    ostream &print(ostream &os, const T &t, const Args &... rest)
+    {
+      if constexpr (sizeof...(rest) > 0)
+      {
+        cout << "sizeof: " << sizeof...(rest) << "\n";
+        os << t << "\n";           // print the first argument
+        return print(os, rest...); // recursive call; print the other arguments
+      }
+      else
+      {
+        return os << t;
+      }
+    }
+    int main() { print(cout, 1, 2, 3, 4, 5) << endl; }
+    ```
+    * `if constexpr` 應該算是一種 conditional compilation
 ### 16.4.2 Pack Expansion
 * 除了拿 pack 的 size，也可以把 pack **expand**
 * 在 expand 的時候，我們也要提供一個 **pattern** 來說明怎麼展開每個 pack 內的 element
 * 基本上 expand 就是把一個 pack 按照 pattern 變成一個一個 elements
-	* 要 trigger expand，就是在 pattern 右邊擺 `...`
-	* 換句話說 Primer 又先斬後奏了，因為上面的 code 已經用到了
+    * 要 trigger expand，就是在 pattern 右邊擺 `...`
+    * 換句話說 Primer 又先斬後奏了，因為上面的 code 已經用到了
 * 例如我們的 `print` 就有用到兩次 expand:
-	```cpp
-	template <typename T, typename... Args>
-	ostream &
-	print(ostream &os, const T &t, const Args&... rest) // expand Args
-	{
-		os << t << ", ";
-		return print(os, rest...); // expand rest
-	}
-	```
-	* 第一個 expand 把 `const Args&` 展開然後**生成 `print` 的 function *parameter* list**
-	* 第二個 expand 是在遞迴 call `print` 的時候；這時則是**生成 `print` 的 *argument* list**
+    ```cpp
+    template <typename T, typename... Args>
+    ostream &
+    print(ostream &os, const T &t, const Args&... rest) // expand Args
+    {
+        os << t << ", ";
+        return print(os, rest...); // expand rest
+    }
+    ```
+    * 第一個 expand 把 `const Args&` 展開然後**生成 `print` 的 function *parameter* list**
+    * 第二個 expand 是在遞迴 call `print` 的時候；這時則是**生成 `print` 的 *argument* list**
 * 我們再細看他們各自的 "pattern":
-	* 展開 `Args` 的時候，pattern 其實就是 `const Args&`，這樣每個 element 就會在展開的時候多了 `const` 跟 reference
-		* 寫的更精確一點: `const type&`
+    * 展開 `Args` 的時候，pattern 其實就是 `const Args&`，這樣每個 element 就會在展開的時候多了 `const` 跟 reference
+        * 寫的更精確一點: `const type&`
     * 例如:
-	```cpp
-	print(cout, i, s, 42); // two parameters in the pack
-	```
-	* 會被展開成:
-	```cpp
-	ostream& print(ostream&, const int&, const string&, const int&);
-	```
-	* 而第二個遞迴 call `print` 時，pattern 就很單純，只有 pack 本身的 name 而已，也就是 `rest`
+    ```cpp
+    print(cout, i, s, 42); // two parameters in the pack
+    ```
+    * 會被展開成:
+    ```cpp
+    ostream& print(ostream&, const int&, const string&, const int&);
+    ```
+    * 而第二個遞迴 call `print` 時，pattern 就很單純，只有 pack 本身的 name 而已，也就是 `rest`
     * 會展開成這樣:
-	```cpp
-	print(os, s, 42);
-	```
+    ```cpp
+    print(os, s, 42);
+    ```
 #### Understanding Pack Expansions
 * 上面的 expand 看起來很 toy? 來看看更進階的展開方式
 * For example, we might write a second variadic function that calls `debug_rep` (§ 16.3, p. 695) on each of its arguments and then calls `print` to print the resulting `string`s:
-	```cpp
-	// call debug_rep on each argument in the call to print
-	template <typename... Args>
-	ostream &errorMsg(ostream &os, const Args&... rest) {
-		// print(os, debug_rep(a1), debug_rep(a2), ..., debug_rep(an)
-		return print(os, debug_rep(rest)...);
-	}
-	```
-	* 在 `errorMsg` 內呼叫 `print` 的地方用的 pattern 是 `debug_rep(rest)`
-	* That pattern says that **we want to call `debug_rep` on each element in the function parameter pack rest**.
-	* The resulting expanded pack will be a comma-separated list of calls to `debug_rep`
-	* 看 code:
-	```cpp
-	errorMsg(cerr, fcnName, code.num(), otherData, "other", item);
-	```
-	* 裡面呼叫 `print` 的部分會變這樣:
-	```cpp
-	print(cerr, debug_rep(fcnName), debug_rep(code.num()),
-		debug_rep(otherData), debug_rep("otherData"),
-		debug_rep(item));
-	```
+    ```cpp
+    // call debug_rep on each argument in the call to print
+    template <typename... Args>
+    ostream &errorMsg(ostream &os, const Args&... rest) {
+        // print(os, debug_rep(a1), debug_rep(a2), ..., debug_rep(an)
+        return print(os, debug_rep(rest)...);
+    }
+    ```
+    * 在 `errorMsg` 內呼叫 `print` 的地方用的 pattern 是 `debug_rep(rest)`
+    * That pattern says that **we want to call `debug_rep` on each element in the function parameter pack rest**.
+    * The resulting expanded pack will be a comma-separated list of calls to `debug_rep`
+    * 看 code:
+    ```cpp
+    errorMsg(cerr, fcnName, code.num(), otherData, "other", item);
+    ```
+    * 裡面呼叫 `print` 的部分會變這樣:
+    ```cpp
+    print(cerr, debug_rep(fcnName), debug_rep(code.num()),
+        debug_rep(otherData), debug_rep("otherData"),
+        debug_rep(item));
+    ```
 * 如果你寫下面的 code 則無法編譯，**注意看 `...` 的位置**
-	```cpp
-	// passes the pack to debug_rep; print(os, debug_rep(a1, a2, ..., an))
-	print(os, debug_rep(rest...)); // error: no matching function to call
-	```
-	* 最上面的 code 是寫 `debug_rep(rest)...`，這裡則是寫 `debug(rest...)`，	`...` 作用的 pattern 不同
-	* 硬要展開的話就會變成這樣:
-	```cpp
-	print(cerr, debug_rep(fcnName, code.num(), otherData, "otherData", item));
+    ```cpp
+    // passes the pack to debug_rep; print(os, debug_rep(a1, a2, ..., an))
+    print(os, debug_rep(rest...)); // error: no matching function to call
+    ```
+    * 最上面的 code 是寫 `debug_rep(rest)...`，這裡則是寫 `debug(rest...)`，	`...` 作用的 pattern 不同
+    * 硬要展開的話就會變成這樣:
+    ```cpp
+    print(cerr, debug_rep(fcnName, code.num(), otherData, "otherData", item));
     // no matching function call
-	```
+    ```
 ### 16.4.3 *Forwarding* Parameter Packs
 * 太棒惹，又是 forward，這次還要你 forward pack
 * 其實 `vector::emplace_back` 就是這樣實作的
 * 這次要為之前寫的 `StrVec`，他增加一個 `emplace_back`
     * 或者要用練習題寫的 template 版本 `Vec` 新增也可以
-	* `emplace_back` 忘記的話看第九章
-	* `StrVec` container 只有存 `std::string` 一種型別
-	    * 但是因為 `string` 的 ctor 有很多種，參數個數以及型別也不同，所以還是要把 `StrVec` 的 `emplace_back` 寫成 variadic template
-	* **然後我們希望可以用到 `string` 的 move ctor，這意味著我們需要把傳進來的 rvalue 的型別原封不動的丟給 ctor
-	    * *會用到 `std::forward`***
-	* 為了做到這件事情，`emplace_back` 的 function parameters 就要是 rvalue reference to template parameter(forwarding reference)
-	```cpp
-	class StrVec {
-	public:
-		template <class... Args> void emplace_back(Args&&...);
-		// remaining members as in § 13.5 (p. 526)
-	};
-	```
-	* 注意看上面用到的 template parameter pack，他用到了 `&&`，代表展開之後的每個 type 是 rvalue reference to its corresponding template argument
-	```cpp
-	template <class... Args>
-	inline
-	void StrVec::emplace_back(Args&&... args) {
-		chk_n_alloc(); // reallocates the StrVec ifnecessary
-		alloc.construct(first_free++, std::forward<Args>(args)...);
-	}
-	```
+    * `emplace_back` 忘記的話看第九章
+    * `StrVec` container 只有存 `std::string` 一種型別
+        * 但是因為 `string` 的 ctor 有很多種，參數個數以及型別也不同，所以還是要把 `StrVec` 的 `emplace_back` 寫成 variadic template
+    * **然後我們希望可以用到 `string` 的 move ctor，這意味著我們需要把傳進來的 rvalue 的型別原封不動的丟給 ctor
+        * *會用到 `std::forward`***
+    * 為了做到這件事情，`emplace_back` 的 function parameters 就要是 rvalue reference to template parameter(forwarding reference)
+    ```cpp
+    class StrVec {
+    public:
+        template <class... Args> void emplace_back(Args&&...);
+        // remaining members as in § 13.5 (p. 526)
+    };
+    ```
+    * 注意看上面用到的 template parameter pack，他用到了 `&&`，代表展開之後的每個 type 是 rvalue reference to its corresponding template argument
+    ```cpp
+    template <class... Args>
+    inline
+    void StrVec::emplace_back(Args&&... args) {
+        chk_n_alloc(); // reallocates the StrVec ifnecessary
+        alloc.construct(first_free++, std::forward<Args>(args)...);
+    }
+    ```
     * 然後傳給 `alloc.construct`，**傳入 arguments 時就要使用 `forward` 保持原本的型別**
         * pattern 是 `std::forward<Args>(args)`
-	    * 這個 pattern 同時把 template parameter pack 跟 function parameter pack 都用到了...
-	* 然後如果之前沒想到的話，仔細想，`construct` 其實也是 variadic template...
-	* 總之 expansion 會展開成 `std::forward<Ti>(ti)`
-	    * `Ti` 就是傳給 `emplace_back` 的第 i 個 argument 的型別，`ti` 則是第 i 個 argument 本身
-	* 看 code:
-	```cpp
-	svec.emplace_back(10, 'c'); // adds ccccccccccas a new last element
-	```
-	* 則丟給 `construct` 的 expansion 會被展開成:
-	```cpp
-	std::forward<int>(10), std::forward<char>(c)
-	```
+        * 這個 pattern 同時把 template parameter pack 跟 function parameter pack 都用到了...
+    * 然後如果之前沒想到的話，仔細想，`construct` 其實也是 variadic template...
+    * 總之 expansion 會展開成 `std::forward<Ti>(ti)`
+        * `Ti` 就是傳給 `emplace_back` 的第 i 個 argument 的型別，`ti` 則是第 i 個 argument 本身
+    * 看 code:
+    ```cpp
+    svec.emplace_back(10, 'c'); // adds ccccccccccas a new last element
+    ```
+    * 則丟給 `construct` 的 expansion 會被展開成:
+    ```cpp
+    std::forward<int>(10), std::forward<char>(c)
+    ```
 * 總之用了 `std::forward` 之後我們可以保證，如果原本傳給 `emplace_back` 的 value 是 rvalue，則傳給 `construct` 的 value 一樣是 rvalue:
-	```cpp
-	svec.emplace_back(s1 + s2); // uses the move constructor
-	```
-	* 丟給 `construct` 時:
-	```cpp
-	std::forward<string>(string("the end"))
-	```
+    ```cpp
+    svec.emplace_back(s1 + s2); // uses the move constructor
+    ```
+    * 丟給 `construct` 時:
+    ```cpp
+    std::forward<string>(string("the end"))
+    ```
     * `std::forward` 腳括號內為什麼是 `string`
     * 這個情況傳給 `construct` 的 value 型別為 rvalue reference
     * 所以最後會由 `construct` 呼叫 `string` 的 **move ctor**
@@ -2148,64 +2148,64 @@ When there are several overloaded templates that provide an equally good match f
 :::info
 #### ADVICE: FORWARDING AND VARIADIC TEMPLATES
 * 基本上 variadic templates 很常會跟 `forward` 一起使用，其 pattern 跟我們寫的 `emplace_back` 很像:
-	```cpp
-	// fun has zero or more parameters each of which is
-	// an rvalue reference to a template parameter type(forwarding reference)
-	template<typename... Args>
-	void fun(Args&&... args) // expands Args as a list of rvalue references
-	{
-		// the argument to work expands both Args and args
-		work(std::forward<Args>(args)...);
-	}
-	```
-	* 跟在 `construct` 內一樣，我們在 `work` 也會同時展開 `Args` 跟 `args`(function/template parameter packs)
-	* 跟 `emplace_back` 也一樣，讓參數是 rvalue reference，可以傳入任何 type；用 forward，則可以維持原本 argument 的型別
+    ```cpp
+    // fun has zero or more parameters each of which is
+    // an rvalue reference to a template parameter type(forwarding reference)
+    template<typename... Args>
+    void fun(Args&&... args) // expands Args as a list of rvalue references
+    {
+        // the argument to work expands both Args and args
+        work(std::forward<Args>(args)...);
+    }
+    ```
+    * 跟在 `construct` 內一樣，我們在 `work` 也會同時展開 `Args` 跟 `args`(function/template parameter packs)
+    * 跟 `emplace_back` 也一樣，讓參數是 rvalue reference，可以傳入任何 type；用 forward，則可以維持原本 argument 的型別
 :::
 ## 16.5 Template Specializations
 * template 定義的 generic code 有時候不可能滿足所有 type，甚至根本不能編譯，或者行為是錯的
 * 這時候我們就可以根據某個 type 的特定性為它寫一個特別的版本，這樣行為才會正確或更有效率
 * 例如我們的 `compare`，完全不能比較 character pointers
-	* 我們希望比較 char ptr 時是呼叫(lib已經寫好且行為正確的) `strcmp`，而不是用原本 template 定義的直接比較指標
+    * 我們希望比較 char ptr 時是呼叫(lib已經寫好且行為正確的) `strcmp`，而不是用原本 template 定義的直接比較指標
 * 實際上 16.1.1 已經寫了一個*有點像*的東西，還記得的話:
-	```cpp
-	// first version; can compare any two types
-	template <typename T> int compare(const T&, const T&); // second version to handle string literals
-	template<size_t N, size_t M>
-	int compare(const char (&)[N], const char (&)[M]);
-	```
-	* 但是上面有兩個 nontype parameter 的版本只能處理 string literal 或者 `char` array，
-	* 如果你傳 `(const) char*`，一樣是第一個版本會被呼叫:
-	```cpp
-	const char *p1 = "hi", *p2 = "mom";
-	compare(p1, p2); // calls the first template
-	compare("hi", "mom"); // calls the template with two nontype parameters
-	```
-	* 第二個版本 non viable，因為不可能把 `(const) char*` 轉成 reference to array
+    ```cpp
+    // first version; can compare any two types
+    template <typename T> int compare(const T&, const T&); // second version to handle string literals
+    template<size_t N, size_t M>
+    int compare(const char (&)[N], const char (&)[M]);
+    ```
+    * 但是上面有兩個 nontype parameter 的版本只能處理 string literal 或者 `char` array，
+    * 如果你傳 `(const) char*`，一樣是第一個版本會被呼叫:
+    ```cpp
+    const char *p1 = "hi", *p2 = "mom";
+    compare(p1, p2); // calls the first template
+    compare("hi", "mom"); // calls the template with two nontype parameters
+    ```
+    * 第二個版本 non viable，因為不可能把 `(const) char*` 轉成 reference to array
 
 * 我們可以定義對第一個版本的 template 定義 **template specialization** 來解決這個問題
 * A **specialization** is a separate definition of the template **in which one or more template parameters are specified to have particular types.**
 
 #### Defining a Function Template Specialization
 * 格式長這樣:
-	```cpp
-	// special version of compare to handle pointers to character arrays
-	template <>
-	int compare(const char* const &p1, const char* const &p2) {
-		return strcmp(p1, p2);
-	}
-	```
-	* 用 `template<>` 來說這是某個 template 的 specialization
-	* 然後 template type parameter 全部都要給定
+    ```cpp
+    // special version of compare to handle pointers to character arrays
+    template <>
+    int compare(const char* const &p1, const char* const &p2) {
+        return strcmp(p1, p2);
+    }
+    ```
+    * 用 `template<>` 來說這是某個 template 的 specialization
+    * 然後 template type parameter 全部都要給定
 * 注意上面的 specialization 的 function parameter type 有點複雜，為什麼要這樣寫得先從原本的 template 講起:
-	```cpp
-	template <typename T> int compare(const T&, const T&);
-	```
-	* 首先我們的 specialization，除了 T 以外，其他型別都要一致，包含 `const`，reference 等等
-	* 而這邊原本的 template 它是吃一個 **reference to 「`const` T」**
-	* 我們這邊是希望寫一個 T 為 `const char*` 的 specialization
-	* 所以我們的 specialization 要宣告為 **reference to `const` 「`const char*`」**
-	* 正式 type 定義就是 reference to `const` pointer to `const` char
-	    * `const char* const &`
+    ```cpp
+    template <typename T> int compare(const T&, const T&);
+    ```
+    * 首先我們的 specialization，除了 T 以外，其他型別都要一致，包含 `const`，reference 等等
+    * 而這邊原本的 template 它是吃一個 **reference to 「`const` T」**
+    * 我們這邊是希望寫一個 T 為 `const char*` 的 specialization
+    * 所以我們的 specialization 要宣告為 **reference to `const` 「`const char*`」**
+    * 正式 type 定義就是 reference to `const` pointer to `const` char
+        * `const char* const &`
 #### Function Overloading versus Template Specializations
 * 本質上定義一個 template specialization 是在搶 compiler 的工作(因為它做的不會照你的期望)
 * **It is important to realize that *a specialization is an instantiation*; it is not an overloaded instance of the function name.**
@@ -2214,21 +2214,21 @@ When there are several overloaded templates that provide an equally good match f
     * overloading 會影響 function matching，specialization 不會
     * specialization 其實只是告訴 compiler 特定的 instantiation 應該長怎樣，並**不會影響 compiler 看到 function template 被呼叫時怎麼 deduce 成特定的 instantiation**
 * 假設原本有這兩種:
-	```cpp
-	// first version; can compare any two types
-	template <typename T> int compare(const T&, const T&); // second version to handle string literals
-	template<size_t N, size_t M>
-	int compare(const char (&)[N], const char (&)[M]);
-	```
-	* 然後你定義了第一個的 specialization，就如同上面定義的那個參數很噁心的版本
-	* 當你寫
-	```cpp
-	compare("hi", "mom")
-	```
-	* 兩個都是 exact match，但是因為 template nontype parameter 的版本更 specialized，所以 compiler 會選它，這時你定義的 specialization 完全不會被用到
-	* 但如果你不要定義成 specialization，定義成 ordinary function
-	* 則這時會有三個 viable function，一個就是你新定義的一般 function，另外兩個是 template 生的
-	    * 而之前也學到，這種情況下 compiler 會選擇一般 function。
+    ```cpp
+    // first version; can compare any two types
+    template <typename T> int compare(const T&, const T&); // second version to handle string literals
+    template<size_t N, size_t M>
+    int compare(const char (&)[N], const char (&)[M]);
+    ```
+    * 然後你定義了第一個的 specialization，就如同上面定義的那個參數很噁心的版本
+    * 當你寫
+    ```cpp
+    compare("hi", "mom")
+    ```
+    * 兩個都是 exact match，但是因為 template nontype parameter 的版本更 specialized，所以 compiler 會選它，這時你定義的 specialization 完全不會被用到
+    * 但如果你不要定義成 specialization，定義成 ordinary function
+    * 則這時會有三個 viable function，一個就是你新定義的一般 function，另外兩個是 template 生的
+        * 而之前也學到，這種情況下 compiler 會選擇一般 function。
 
 :::warning
 #### KEY CONCEPT: ORDINARY SCOPE RULES APPLY TO SPECIALIZATIONS
@@ -2249,60 +2249,60 @@ When there are several overloaded templates that provide an equally good match f
         * 忘了去看 11 章
 * 如果我們要在 unorder 容器放 `Sales_data` 等沒有支援 `hash` 的 type，但又想要容器用預設的 `hash<key_type>` 我們就要提供 `hash<key_type>` 的 specialization
 * `std::hash` 要定義下列 member:
-	* `operator()`，吃 container 的 `key_type`，return `size_t`
-	* 兩個 type member: `result_type` 跟 `argument_type`，分別就是 `operator()` 的 return type 跟 argument type
-	* default ctor 跟 copy assignment 用 compiler 合成
+    * `operator()`，吃 container 的 `key_type`，return `size_t`
+    * 兩個 type member: `result_type` 跟 `argument_type`，分別就是 `operator()` 的 return type 跟 argument type
+    * default ctor 跟 copy assignment 用 compiler 合成
 * 另外，要對 class/function template 定義 specialization 有一個前提:
     * **必須在跟它同樣 scope 的地方定義 specialization**
 * 但是 `std::hash` 定義在 `std` 這個 namespace 內耶? 要怎麼在這裏面定義 specialization 呢?
 * 18.2 章會講到，我們現在只要知道如下操作就可:
-	* 我們需要"開啟"(open) namespace:
-	```cpp
-	// open the std namespace so we can specialize std::hash
-	namespace std {
-	} // close the std namespace; note: no semicolon after the close curly
-	```
+    * 我們需要"開啟"(open) namespace:
+    ```cpp
+    // open the std namespace so we can specialize std::hash
+    namespace std {
+    } // close the std namespace; note: no semicolon after the close curly
+    ```
 * 這樣你在 `{}` 內定義的 name 就會屬於 `std` 這個 namespace 了
 * 題外話: reopen `std` 除了少數情況都是 UB
     * https://en.cppreference.com/w/cpp/language/extending_std
 * 下面的 code 會寫一個 `std::hash<Sales_data>` 的 specialization:
-	```cpp
-	// open the std namespace so we can specialize std::hash
-	namespace std {
-	template <> // we’re defining a specialization with
-	struct hash<Sales_data> // the template parameter of Sales_data
-	{
-		// the type used to hash an unordered container must define these types
-		typedef size_t result_type;
-		typedef Sales_data argument_type; // by default, this type needs ==
-		size_t operator()(const Sales_data& s) const;
-		// our class uses synthesized copy control and default constructor
-	};
-	size_t
-	hash<Sales_data>::operator()(const Sales_data& s) const
-	{
-		return hash<string>()(s.bookNo) ^
-			   hash<unsigned>()(s.units_sold) ^
-			   hash<double>()(s.revenue);
-	}
-	}// close the std namespace
-	```
+    ```cpp
+    // open the std namespace so we can specialize std::hash
+    namespace std {
+    template <> // we’re defining a specialization with
+    struct hash<Sales_data> // the template parameter of Sales_data
+    {
+        // the type used to hash an unordered container must define these types
+        typedef size_t result_type;
+        typedef Sales_data argument_type; // by default, this type needs ==
+        size_t operator()(const Sales_data& s) const;
+        // our class uses synthesized copy control and default constructor
+    };
+    size_t
+    hash<Sales_data>::operator()(const Sales_data& s) const
+    {
+        return hash<string>()(s.bookNo) ^
+               hash<unsigned>()(s.units_sold) ^
+               hash<double>()(s.revenue);
+    }
+    }// close the std namespace
+    ```
 * 我們對 `std::hash` 這個 template 定義一個 specialization，`hash<Sales_data>`
 * 直接使用 library 定義好的 `hash<string/unsigned/double>` 來算 hash code
     * 而去看 `std::hash` 的文件，這些版本其實也是標準定義的 specializations
 * 總之寫了這個以後，我們就可以寫下面的 code 了:
-	```cpp
-	// uses hash<Sales_data> and Sales_data::operator== from § 14.3.1 (p. 561)
-	unordered_multiset<Sales_data> SDset;
-	```
+    ```cpp
+    // uses hash<Sales_data> and Sales_data::operator== from § 14.3.1 (p. 561)
+    unordered_multiset<Sales_data> SDset;
+    ```
 * 另外需要在 `Sales_data` 內宣告 `std::hash<Sales_data>` 為 friend，因為它會用到 private member
-	```cpp
-	template <class T> class std::hash; // needed for the friend declaration
-	class Sales_data {
-		friend class std::hash<Sales_data>;
-		// other members as before
-	};
-	```
+    ```cpp
+    template <class T> class std::hash; // needed for the friend declaration
+    class Sales_data {
+        friend class std::hash<Sales_data>;
+        // other members as before
+    };
+    ```
 * 另外整個 specialization 要定義在 `Sales_data` 的 header 內，這樣 compiler 實例化 `unorder<Sales_data>`(然後間接實例化 `std::hash<Sales_data>`) 才會看的到這個 specialization
 #### Class-Template *Partial* Specializations
 * 跟 function template 不同
@@ -2313,48 +2313,48 @@ When there are several overloaded templates that provide an equally good match f
     * 因為沒有全部 template argument 都完整提供，所以還是 template
 
 * 之前用過的 `std::remove_reference`，其實就有很多種 partial specializations:
-	```cpp
-	// original, most general template
-	template <class T> struct remove_reference {
-		typedef T type;
-	};
-	// partial specializations that will be used for lvalue and rvalue references
-	template <class T> struct remove_reference<T&> // lvalue references
-		{ typedef T type; };
-	template <class T> struct remove_reference<T&&> // rvalue references
-		{ typedef T type; };
-	```
-	* 第一個 template 最 general，可以實例化任何 type；後面兩個是 partial specializations
+    ```cpp
+    // original, most general template
+    template <class T> struct remove_reference {
+        typedef T type;
+    };
+    // partial specializations that will be used for lvalue and rvalue references
+    template <class T> struct remove_reference<T&> // lvalue references
+        { typedef T type; };
+    template <class T> struct remove_reference<T&&> // rvalue references
+        { typedef T type; };
+    ```
+    * 第一個 template 最 general，可以實例化任何 type；後面兩個是 partial specializations
 * 看看丟不同 type 給 `std::remove_reference` 分別會用到哪種版本
-	```cpp
-	int i;
-	// decltype(42) is int, uses the original template
-	remove_reference<decltype(42)>::type a;
-	// decltype(i) is int&, uses first (T&) partial specialization
-	remove_reference<decltype(i)>::type b;
-	// decltype(std::move(i)) is int&&, uses second (i.e., T&&) partial specialization
-	remove_reference<decltype(std::move(i))>::type c;
-	```
+    ```cpp
+    int i;
+    // decltype(42) is int, uses the original template
+    remove_reference<decltype(42)>::type a;
+    // decltype(i) is int&, uses first (T&) partial specialization
+    remove_reference<decltype(i)>::type b;
+    // decltype(std::move(i)) is int&&, uses second (i.e., T&&) partial specialization
+    remove_reference<decltype(std::move(i))>::type c;
+    ```
 #### Specializing Members but Not the Class
 * 我們可以只 spectialize 某個 class instantiation *的 member*:
-	```cpp
-	template <typename T> struct Foo {
-		Foo(const T &t = T()): mem(t) { }
-		void Bar() { /* .. . */}
-		T mem;
-		// other members of Foo
-	};
-	template<> // we're specializing a template
-	void Foo<int>::Bar() // we're specializing the Bar member of Foo<int>
-	{
-		// do whatever specialized processing that applies to ints
-	}
-	```
-	* 我們這樣寫的話，當我們真的定義了 `Foo<int>` 且使用 `Bar` 時，compiler 就不會實例化這個 member，而是用我們定義的:
-	```cpp
-	Foo<string> fs; // instantiates Foo<string>::Foo()
-	fs.Bar(); 		// instantiates Foo<string>::Bar()
-	Foo<int> fi; 	// instantiates Foo<int>::Foo()
-	fi.Bar(); 		// ***uses our specialization ofFoo<int>::Bar()***
-	```
-	* 最後一行 code 會用我們定義的 `Foo<int>::Bar()`
+    ```cpp
+    template <typename T> struct Foo {
+        Foo(const T &t = T()): mem(t) { }
+        void Bar() { /* .. . */}
+        T mem;
+        // other members of Foo
+    };
+    template<> // we're specializing a template
+    void Foo<int>::Bar() // we're specializing the Bar member of Foo<int>
+    {
+        // do whatever specialized processing that applies to ints
+    }
+    ```
+    * 我們這樣寫的話，當我們真的定義了 `Foo<int>` 且使用 `Bar` 時，compiler 就不會實例化這個 member，而是用我們定義的:
+    ```cpp
+    Foo<string> fs; // instantiates Foo<string>::Foo()
+    fs.Bar(); 		// instantiates Foo<string>::Bar()
+    Foo<int> fi; 	// instantiates Foo<int>::Foo()
+    fi.Bar(); 		// ***uses our specialization ofFoo<int>::Bar()***
+    ```
+    * 最後一行 code 會用我們定義的 `Foo<int>::Bar()`
