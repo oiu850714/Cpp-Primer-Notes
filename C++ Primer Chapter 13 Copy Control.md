@@ -45,7 +45,7 @@ tags: C++
         * 第一個參數是 reference to class type
         * 第一個參數後面還有參數的話，全部都要有 default value
     ```cpp
-    class Foo { 
+    class Foo {
     public:
         Foo(); // default constructor
         Foo(const Foo&, int a = 9487); // copy constructor
@@ -59,7 +59,7 @@ tags: C++
         class NonConstCopyCtor {
             NonConstCopyCtor(NoncostCopyCtor &obj) {}
         };
-        
+
         int main() {
             const NonConstCopyCtor n1;
             NonConstCopyCtor n2 = n1; // error
@@ -96,7 +96,7 @@ tags: C++
     ```cpp
     class Sales_data {
     public:
-        // other members and constructors as before     
+        // other members and constructors as before
         // declaration equivalent to the synthesized copy constructor
         Sales_data(const Sales_data&);
     private:
@@ -104,8 +104,8 @@ tags: C++
         int units_sold = 0;
         double revenue = 0.0;
     };
-    // equivalent to the copy constructor that would be synthesized for Sales_data 
-    Sales_data::Sales_data(const Sales_data &orig):     
+    // equivalent to the copy constructor that would be synthesized for Sales_data
+    Sales_data::Sales_data(const Sales_data &orig):
         bookNo(orig.bookNo), units_sold(orig.units_sold),
         revenue(orig.revenue)
         {   } // empty body
@@ -252,7 +252,7 @@ tags: C++
     Sales_data::operator=(const Sales_data &rhs)
     {
         bookNo = rhs.bookNo; // calls the string::operator=
-        units_sold = rhs.units_sold; // uses the built-in int assignment 
+        units_sold = rhs.units_sold; // uses the built-in int assignment
         revenue = rhs.revenue; // uses the built-in double assignment
         return *this; // return a reference to this object
     }
@@ -303,9 +303,9 @@ tags: C++
         *p = new Sales_data;
         // p is a built-in pointer
         auto p2 = make_shared<Sales_data>(); // p2 is a shared_ptr
-        Sales_data item(*p); // copy constructor copies *p into item 
+        Sales_data item(*p); // copy constructor copies *p into item
         vector<Sales_data> vec; // local object
-        vec.push_back(*p2); // copies the object to which p2 points 
+        vec.push_back(*p2); // copies the object to which p2 points
         delete p; // destructor called on the object pointed to by p
     }// exit local scope; destructor called on item, p2, and vec
      // destroying p2 decrements its use count; if the count goes to 0, the object is freed
@@ -343,20 +343,20 @@ tags: C++
 * 通常如果是在上面這種情境下定義了 dtor，也意味著必須定義 copy ctor 跟 copy assign
 * 如果只定義了 dtor 而沒定義 copy ctor 跟 copy assign:
     ```cpp
-    class HasPtr { 
+    class HasPtr {
     public:
-        HasPtr(const std::string &s = std::string()): 
+        HasPtr(const std::string &s = std::string()):
             ps(new std::string(s)), i(0) { }
-        ~HasPtr() { delete ps; } // WRONG: HasPtr needs a copy constructor and copy-assignment operator 
+        ~HasPtr() { delete ps; } // WRONG: HasPtr needs a copy constructor and copy-assignment operator
         // other members as before
     };
     ```
 * 呼叫以下 function 就會 UB
     ```cpp
-    HasPtr f(HasPtr hp) // HasPtr passed by value, so it is copied 
+    HasPtr f(HasPtr hp) // HasPtr passed by value, so it is copied
     {
         HasPtr ret = hp; // copies the given HasPtr
-        // process ret 
+        // process ret
         return ret;
     }
     ```
@@ -385,10 +385,10 @@ tags: C++
     ```cpp
     class Sales_data {
     public:
-    // copy control; use defaults 
+    // copy control; use defaults
     Sales_data() = default;
-    Sales_data(const Sales_data&) = default; 
-    Sales_data& operator=(const Sales_data &); 
+    Sales_data(const Sales_data&) = default;
+    Sales_data& operator=(const Sales_data &);
     ~Sales_data() = default;
     // other members as before
     };
@@ -415,7 +415,7 @@ tags: C++
 * 在 C++11，我們可以把 copy ctor 跟 copy assignment 定義成 `delete` functions 來防止 class object 被 copy/assign
     * A `delete`d function is one that is **declared but may not be used in any other way.**
     ```cpp
-    struct NoCopy { 
+    struct NoCopy {
         NoCopy() = default; // use the synthesized default constructor
         NoCopy(const NoCopy&) = delete;  // no copy
         NoCopy &operator=(const NoCopy&) = delete; // no assignment
@@ -444,7 +444,7 @@ tags: C++
         NoDtor() = default; // use the synthesized default constructor
         ~NoDtor() = delete; // we can’t destroy objects of type NoDtor
     };
-    NoDtor nd; // error: NoDtordestructor is deleted 
+    NoDtor nd; // error: NoDtordestructor is deleted
     NoDtor *p = new NoDtor(); // ok: but we can’t delete p
     delete p; // error: NoDtor destructor is deleted
     ```
@@ -487,9 +487,9 @@ tags: C++
         PrivateCopy &operator=(const PrivateCopy&);
         // other members
         public:
-        PrivateCopy() = default; // use the synthesized     
+        PrivateCopy() = default; // use the synthesized
         default constructor ~PrivateCopy();
-        // users can 
+        // users can
         define objects of this type but not copy them
     }
     ```
@@ -534,7 +534,7 @@ tags: C++
     ```cpp
     class HasPtr {
     public:
-        HasPtr(const std::string &s = std::string()): 
+        HasPtr(const std::string &s = std::string()):
             ps(new std::string(s)), i(0) { }
         // each HasPtr has its own copy of the string to which ps points
         HasPtr(const HasPtr &p): ps(new std::string(*p.ps)), i(p.i) { }
@@ -560,7 +560,7 @@ tags: C++
     * 我們要確保就算 exception 在 assign 時發生，lhs 也要能維持在一個合理的 state。
     ```cpp
     HasPtr& HasPtr::operator=(const HasPtr &rhs) {
-        auto newp = new string(*rhs.ps); // copy the underlying string 
+        auto newp = new string(*rhs.ps); // copy the underlying string
         delete ps; // free the old memory
         ps = newp; // copy data from rhs into this object
         i = rhs.i;
@@ -575,7 +575,7 @@ tags: C++
 
 * 來 demo 一個錯的 `operator=()`
     ```cpp
-    // WRONG way to write an assignment operator!     
+    // WRONG way to write an assignment operator!
     HasPtr&
     HasPtr::operator=(const HasPtr &rhs) {
         delete ps; // frees the stringto which this object points
@@ -619,7 +619,7 @@ tags: C++
 * 講那麼多可是還沒講要怎麼存 object 內的 reference count
 * 首先不能是 `HasPtr` 的 member
     ```cpp
-    HasPtr p1("Hiya!"); 
+    HasPtr p1("Hiya!");
     HasPtr p2(p1); // p1 and p2 point to the same string
     HasPtr p3(p1); // p1, p2, and p3 all point to the same string
     ```
@@ -633,9 +633,9 @@ tags: C++
 * `HasPtr` 可以這樣寫:
     ```cpp
     class HasPtr {
-    public: 
+    public:
         // constructor allocates a new string and a new counter, which it sets to 1
-        HasPtr(const std::string &s = std::string()): 
+        HasPtr(const std::string &s = std::string()):
             ps(new std::string(s)), i(0), use(new std::size_t(1)) {}
         // copy constructor copies all three data members and increments the counter
         HasPtr(const HasPtr &p): ps(p.ps), i(p.i), use(p.use)
@@ -658,7 +658,7 @@ tags: C++
     ```cpp
     HasPtr::~HasPtr() {
         if (--*use == 0) {
-        // if the reference count goes to 0 
+        // if the reference count goes to 0
         delete ps; // delete the string
         delete use; // and the counter
         }
@@ -720,7 +720,7 @@ tags: C++
     * 只要 copy control 實作正確則生出來的 `swap` 行為也會是正確的
 * 自定義 class 專屬的 `swap` 其實是為了優化。
 :::
-    
+
 #### Writing Our Own `swap` Function
 * We can override the default behavior of `swap` by defining a version of `swap` that operates on our class.
     ```cpp
@@ -760,7 +760,7 @@ tags: C++
     * These operators use a technique known as **copy and swap**.
     * This technique **swaps the lefthand operand with a copy of the right-hand operand:**
     ```cpp
-    // note rhs is ****passed by value****, which means the HasPtr copy constructor 
+    // note rhs is ****passed by value****, which means the HasPtr copy constructor
     // copies the string in the right-hand operand into rhs
     HasPtr& HasPtr::operator=(HasPtr rhs) {
         // swap the contents of the left-hand operand with the local variable rhs
@@ -825,7 +825,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
         // copy control to manage pointers to this Message
         Message(const Message&); // copy constructor
         ~Message(); // destructor
-        Message& operator=(const Message&); // copy assignment 
+        Message& operator=(const Message&); // copy assignment
         // add/remove this Message from the specified Folder’s set of messages
         void save(Folder&);
         void remove(Folder&);
@@ -835,7 +835,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
         // utility functions used by copy constructor, assignment, and destructor
         // add this Message to the Folders that point to the parameter
         void add_to_Folders(const Message&);
-        // remove this Message from every Folder in folders 
+        // remove this Message from every Folder in folders
         void remove_from_Folders();
     };
     ```
@@ -859,7 +859,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
     * `add_to_Folders(const Message &m)`
     * `remove_from_Folders()`:
     ```cpp
-    // add this Message to Folders that point to m 
+    // add this Message to Folders that point to m
     void Message::add_to_Folders(const Message &m) {
         for (auto f : m.folders) // for each Folder that holds m
             f->addMsg(this); // add a pointer to this Message to that Folder
@@ -908,7 +908,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
             contents = rhs.contents;  // copy message contents from rhs
             folders = rhs.folders;    // copy Folder pointers from rhs
             add_to_Folders(rhs);      // add this Message to those Folders
-        } 
+        }
         return *this;
     }
     ```
@@ -926,11 +926,11 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
             f->remMsg(&lhs);
         for (auto f: rhs.folders)
             f->remMsg(&rhs);
-        // swap the contents and Folder pointer sets 
+        // swap the contents and Folder pointer sets
         swap(lhs.folders, rhs.folders); // uses swap(set&, set&)
         swap(lhs.contents, rhs.contents); // swap(string&, string&)
         // add pointers to each Message to their (new) respective Folders
-        for (auto f: lhs.folders) 
+        for (auto f: lhs.folders)
             f->addMsg(&lhs);
         for (auto f: rhs.folders)
             f->addMsg(&rhs);
@@ -966,16 +966,16 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
     * `chk_n_alloc()`: 這個 function 先確認當前配置空間是否可以再塞一個 element，如果空間不夠，`chk_n_alloc` 會呼叫 `reallocate` 配置新空間
         * 題外話這裡的邏輯跟 function name 不符，應該叫做 `checkOrRealloc` 之類的
     * `reallocate`: 重新配置一個比當前更大的空間
-    
+
 #### `StrVec` Class Definition
 * 來定義 `StrVec` 的 interface 吧
     ```cpp
     // simplified implementation of the memory allocation strategy for a vector-like class
     class StrVec {
     public:
-        StrVec(): // the allocator member is default initialized 
+        StrVec(): // the allocator member is default initialized
         elements(nullptr), first_free(nullptr), cap(nullptr) { }
-        StrVec(const StrVec&); // copy constructor     
+        StrVec(const StrVec&); // copy constructor
         StrVec &operator=(const StrVec&); // copy assignment
         ~StrVec(); // destructor
         void push_back(const std::string&); // copy the element
@@ -986,17 +986,17 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
         // ...
     private:
         static std::allocator<std::string> alloc; // allocates the elements
-        void chk_n_alloc() // used by functions that add elements to a StrVec 
+        void chk_n_alloc() // used by functions that add elements to a StrVec
             { if (size() == capacity()) reallocate(); }
-        // utilities used by the copy constructor, assignment operator, and destructor 
+        // utilities used by the copy constructor, assignment operator, and destructor
         std::pair<std::string*, std::string*> alloc_n_copy (const std::string*, const std::string*);
-        void free(); // destroy the elements and free the space 
+        void free(); // destroy the elements and free the space
         void reallocate(); // get more space and copy the existing elements
         std::string *elements; // pointer to the first element in the array
         std::string *first_free; // pointer to the first free element in the array
         std::string *cap; // pointer to one past the end of the array
     };
-    
+
     // allocmust be ***defined in the StrVec implmentation file***
     allocator<string> StrVec::alloc;
     ```
@@ -1020,7 +1020,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
     ```cpp
     void StrVec::push_back(const string& s) {
         chk_n_alloc(); // ensure that there is room for another element
-        // construct a copy of s in the element to which first_free points     
+        // construct a copy of s in the element to which first_free points
         alloc.construct(first_free++, s);
     }
     ```
@@ -1039,7 +1039,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
         // allocate space to hold as many elements as are in the range
         auto data = alloc.allocate(e - b);
         // initialize and return a pair constructed from data and
-        // the value returned by uninitialized_copy 
+        // the value returned by uninitialized_copy
         return {data, uninitialized_copy(b, e, data)};
     }
     ```
@@ -1058,10 +1058,10 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
     ```cpp
     void StrVec::free() {
         // may not pass deallocate a 0 pointer; if elements is 0, there’s no work to do
-        if (elements) { 
-            // destroy the old elements in reverse order 
+        if (elements) {
+            // destroy the old elements in reverse order
             for (auto p = first_free; p != elements; /* empty */)
-                alloc.destroy(--p);     
+                alloc.destroy(--p);
             alloc.deallocate(elements, cap - elements);
         }
     }
@@ -1165,10 +1165,10 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
         auto newcapacity = size() ? 2 * size() : 1;
         // allocate new memory
         auto newdata = alloc.allocate(newcapacity);
-        // move the data from the old memory to the new 
+        // move the data from the old memory to the new
         auto dest = newdata; // points to the next free position in the new array
         auto elem = elements; // points to the next element in the old array
-        for (size_t i = 0; i != size(); ++i) 
+        for (size_t i = 0; i != size(); ++i)
             alloc.construct(dest++, std::move(*elem++));
         free(); // free the old space once we’ve moved the elements
         // update our data structure to point to the new elements
@@ -1262,7 +1262,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
         * arithmetic
         * relational
         * bitwise
-        * and postfix increment/decrement operators, 
+        * and postfix increment/decrement operators,
 * 我們不能用 lref bind 上面的東西，可是可以用 lref to const 或 rref 來 bind
 
 #### Lvalues Persist; Rvalues Are Ephemeral
@@ -1287,7 +1287,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
 * 再講一次，Every C++ expression **has a type**, and **belongs to a value category**.
 * **因為如此，所以我們不能用一個 rref 來 bind 一個 variable(expression)**
     ```cpp
-    int &&rr1 = 42; // ok: literals are rvalues 
+    int &&rr1 = 42; // ok: literals are rvalues
     int &&rr2 = rr1; // error: the expression rr1is an lvalue!
     ```
     * 注意上面的 code 是想把 `rr2` bind 到 `rr1`，即使 `rr1` 的 type 是 rvalue reference，這個 variable expression 的 value category 還是 lvalue，所以 rr2 不能直接拿來綁 `rr1`!
@@ -1325,7 +1325,7 @@ Best Practice: 通常一個 class 的 copy assignment 做的事情會跟 copy cs
 * 總之呼叫了 `std::move()` 之後的 object 只能做兩種操作，assign 或者直接破壞
 * 參考:
     * https://stackoverflow.com/questions/7027523/what-can-i-do-with-a-moved-from-object
-    * 
+    *
 https://stackoverflow.com/questions/7027523/what-can-i-do-with-a-moved-from-object
 
 * 這裡再提醒一次，請用 `std::move` 不要用 `using std::move`，原因 18 章會解釋
@@ -1340,8 +1340,8 @@ https://stackoverflow.com/questions/7027523/what-can-i-do-with-a-moved-from-obje
 
 * 用 `StrVec` 來舉例:
     ```cpp
-    StrVec::StrVec(StrVec &&s) noexcept // move won’t throw any exceptions 
-    // member initializers take over the resources in s 
+    StrVec::StrVec(StrVec &&s) noexcept // move won’t throw any exceptions
+    // member initializers take over the resources in s
     : elements(s.elements), first_free(s.first_free), cap(s.cap)
     {
         // leave s in a state in which it is safe to run the destructor
@@ -1411,13 +1411,13 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
         elements = rhs.elements; // take over resources from rhs
         first_free = rhs.first_free;
         cap = rhs.cap;
-        // leave rhs in a destructible state 
+        // leave rhs in a destructible state
         rhs.elements = rhs.first_free = rhs.cap = nullptr;
     }
     return *this;
 }
 ```
-    
+
 #### A Moved-from Object Must Be Destructible
 * 說了 N 遍，被 move 過的物件呼叫 ctor 必須是安全的
 * 除此之外，物件需要*維持一個 valid 狀態*
@@ -1460,7 +1460,7 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
     ```cpp
     // the compiler will synthesize the move operations for X and hasX
     struct X {
-        int i; // built-in types can be moved 
+        int i; // built-in types can be moved
         std::string s; // string defines its own move operations
     };
     struct hasX {
@@ -1565,10 +1565,10 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
 * **如果這時我們再定義 move ctor，那這個 `operator=` 就同時會是 copy assignment 跟 move assignment!**
     ```cpp
     class HasPtr {
-    public: // added move constructor 
+    public: // added move constructor
         HasPtr(HasPtr &&p) noexcept : ps(p.ps), i(p.i) {p.ps = 0;}
         // ***assignment operator is both the move- and copy-assignment operator***
-        HasPtr& operator=(HasPtr rhs) 
+        HasPtr& operator=(HasPtr rhs)
             { swap(*this, rhs); return *this; }
         // other members as in § 13.2.1 (p. 511)
     };
@@ -1587,7 +1587,7 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
         ![](https://i.imgur.com/Yhkhvef.png)
     * move assignment 時
         ![](https://i.imgur.com/irCTFyT.png)
-        
+
 * ADVICE: UPDATING THE RULE OF THREE(to FIVE)
     * 已經說了要把 copy ctor/copy assignment/dtor 當成一個 unit 來看待
         * 定義其中一個代表其他的也要定義
@@ -1630,7 +1630,7 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
 
 * 於是 move ctor 就可以這樣寫:
     ```cpp
-    Message::Message(Message &&m): contents(std::move(m.contents)) 
+    Message::Message(Message &&m): contents(std::move(m.contents))
     {
         move_Folders(&m); // moves foldersand updates the Folderpointers
     }
@@ -1643,7 +1643,7 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
         if (this != &rhs) { // direct check for self-assignment
             remove_from_Folders();
             contents = std::move(rhs.contents); // move assignment
-            move_Folders(&rhs); // reset the Folders to point to this Message 
+            move_Folders(&rhs); // reset the Folders to point to this Message
         }
         return *this;
     }
@@ -1677,11 +1677,11 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
         auto newcapacity = size() ? 2 * size() : 1;
         auto first = alloc.allocate(newcapacity);
         // move the elements
-        auto last = uninitialized_copy(make_move_iterator(begin()), 
+        auto last = uninitialized_copy(make_move_iterator(begin()),
                                        make_move_iterator(end()),
                                        first);
         free(); // free the old space
-        elements = first; // update the pointers 
+        elements = first; // update the pointers
         first_free = last;
         cap = elements + newcapacity;
     }
@@ -1742,19 +1742,19 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
         vec.push_back(foo()); // using push_back(T&&) directly
     }
     ```
-    
+
 * 另一個例子是對 `StrVec` 增加另一個版本的 `push_back`:
     ```cpp
     class StrVec {
     public:
-        void push_back(const std::string&); // copy the element 
+        void push_back(const std::string&); // copy the element
         void push_back(std::string&&); // move the element
         // other members as before
-    }; 
+    };
     // unchanged from the original version in § 13.5 (p. 527)
     void StrVec::push_back(const string& s) {
-        chk_n_alloc(); // ensure that there is room for another element 
-        // construct a copy of sin the element to which first_free points     
+        chk_n_alloc(); // ensure that there is room for another element
+        // construct a copy of sin the element to which first_free points
         alloc.construct(first_free++, s);
     }
     void StrVec::push_back(string &&s) {
@@ -1767,8 +1767,8 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
         * 再提醒一次，雖然 `s` 的 type 是 `string&&`，可是 variable 就是 lvalue，一定要用 `std::move` 取得 rref
 * 使用 `push_back` 時就會這樣 resolve:
     ```cpp
-    StrVec vec; // empty StrVec 
-    string s = "some string or another";     
+    StrVec vec; // empty StrVec
+    string s = "some string or another";
     vec.push_back(s); // calls push_back(const string&)
     vec.push_back("done"); // calls push_back(string&&)
     ```
@@ -1807,7 +1807,7 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
         // other members of Foo
     };
     Foo &Foo::operator=(const Foo &rhs) & {
-        // do whatever is needed to assign rhs to this object 
+        // do whatever is needed to assign rhs to this object
         return *this;
     }
     ```
@@ -1837,7 +1837,7 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept {
         Foo anotherMem() const &; // ok: constqualifier comes first
     };
     ```
-    
+
 #### Overloading and Reference Functions
 * 我們可以直接用 `const` 來 overloading member function
 * 我們也可以用 reference qualifier 來 overload

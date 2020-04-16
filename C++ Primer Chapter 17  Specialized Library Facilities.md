@@ -1,4 +1,4 @@
-﻿# C++ Primer Chapter 17 Specialized Library Facilities 
+﻿# C++ Primer Chapter 17 Specialized Library Facilities
 * 介紹 `tuple`s,` bitset`s, random-number generation, 還有 regular expressions.
 * 再來是 IO library revisit，介紹一些更奇葩的功能
 * C++ library 的部分還有增加很多東西，不可能全部介紹，這裡只介紹夠 general 的功能
@@ -16,18 +16,18 @@
 * 看例子比較快...:
 	```c++
 	tuple<size_t, size_t, size_t> threeD; // all three members set to 0
-	tuple<string, vector<double>, int, list<int>> 
+	tuple<string, vector<double>, int, list<int>>
 		 someVal("constants", {3.14, 2.718}, 42, {0,1,2,3,4,5});
 	```
 	* `tuple` 的 default ctor 會值初始化 members
 * 如果要餵 initializer 給 member，記得 ctor 是 `explicit`:
 	```c++
-	tuple<size_t, size_t, size_t> threeD = {1,2,3}; // error 
+	tuple<size_t, size_t, size_t> threeD = {1,2,3}; // error
 	tuple<size_t, size_t, size_t> threeD{1,2,3}; // ok
 	```
 * (如果你還記得，)有 `make_pair`，當然也有 `make_tuple`:
 	```c++
-	// tuple that represents a bookstore transaction: ISBN, count, price per book 
+	// tuple that represents a bookstore transaction: ISBN, count, price per book
 	auto item = make_tuple("0-999-78345-X", 3, 20.00);
 	```
 	* 反正配合 `auto` + `make_tuple` 你就不用打超級長的型別惹
@@ -40,15 +40,15 @@
 	```c++
 	auto book = get<0>(item); // returns the first member of item
 	auto cnt = get<1>(item); // returns the second member of item
-	auto price = get<2>(item)/cnt; // returns the last member of item 
+	auto price = get<2>(item)/cnt; // returns the last member of item
 	get<2>(item) *= 0.8; // apply 20% discount
 	```
 	* 餵給 `get` 的參數一定要是 integral constant expression
 * 如果你想要知道一個 `tuple` 的確切型別或者個別 members 的型別可以用以下 templates:
 	```c++
-	typedef decltype(item) trans; // trans is the type of item 
-	// returns the number of members in object’s of type trans 
-	size_t sz = tuple_size<trans>::value; // returns 3 
+	typedef decltype(item) trans; // trans is the type of item
+	// returns the number of members in object’s of type trans
+	size_t sz = tuple_size<trans>::value; // returns 3
 	// cnt has the same type as the second member in item
 	tuple_element<1, trans>::type cnt = get<1>(item); // cnt is an int
 	```
@@ -65,7 +65,7 @@
 	tuple<string, string> duo("1", "2");
 	tuple<size_t, size_t> twoD(1, 2);
 	bool b = (duo == twoD); // error: can’t compare a size_t and a string
-	tuple<size_t, size_t, size_t> threeD(1, 2, 3); 
+	tuple<size_t, size_t, size_t> threeD(1, 2, 3);
 	b = (twoD < threeD); // error: differing number of members
 	tuple<size_t, size_t> origin(0, 0);
 	b = (origin < twoD); // ok: b is true
@@ -87,25 +87,25 @@
 #### A Function That Returns a (vector of)`tuple`s
 * 這 function 就吃 `files` 以及要找的書，然後如果某書店有這筆書的交易紀錄，就為它創造對應的 `tuple`，塞到一個暫時的 vector 內；整個 `files` 掃完後，就 return vector:
 	```c++
-	// matches has three members: an index of a store and iterators into that store’s vector 
-	typedef tuple<vector<Sales_data>::size_type, 	
-			      vector<Sales_data>::const_iterator, 
+	// matches has three members: an index of a store and iterators into that store’s vector
+	typedef tuple<vector<Sales_data>::size_type,
+			      vector<Sales_data>::const_iterator,
 			      vector<Sales_data>::const_iterator> matches;
-	// files holds the transactions for every store 
-	// findBook returns a vector with an entry for each store that sold the given book 
-	vector<matches> 
-	findBook(const vector<vector<Sales_data>> &files, 
+	// files holds the transactions for every store
+	// findBook returns a vector with an entry for each store that sold the given book
+	vector<matches>
+	findBook(const vector<vector<Sales_data>> &files,
 		     const string &book)
 	{
-		vector<matches> ret; // initially empty 
-		// for each store find the range of matching books, if any 
-		for (auto it = files.cbegin(); it != files.cend(); ++it) { 
-			// find the range of Sales_data that have the same ISBN 
-			auto found = equal_range(it->cbegin(), it->cend(), 
+		vector<matches> ret; // initially empty
+		// for each store find the range of matching books, if any
+		for (auto it = files.cbegin(); it != files.cend(); ++it) {
+			// find the range of Sales_data that have the same ISBN
+			auto found = equal_range(it->cbegin(), it->cend(),
 									 book, compareIsbn);
-			if (found.first != found.second) // this store had sales 
-				// remember the index of this store and the matching range 
-				ret.push_back(make_tuple(it - files.cbegin(), 
+			if (found.first != found.second) // this store had sales
+				// remember the index of this store and the matching range
+				ret.push_back(make_tuple(it - files.cbegin(),
 								found.first, found.second));
 		}
 		return ret; // empty if no matches found
@@ -119,20 +119,20 @@
 #### Using a `tuple` Returned by a Function
 * 接下來就只是把找到的 `tuple`s 一個一個印出來:
 	```c++
-	void reportResults(istream &in, ostream &os, 
+	void reportResults(istream &in, ostream &os,
 			           const vector<vector<Sales_data>> &files)
 	{
-		string s; // book to look for 
-		while (in >> s) { 
-			auto trans = findBook(files, s); // stores that sold this book 
-			if (trans.empty()) { 
+		string s; // book to look for
+		while (in >> s) {
+			auto trans = findBook(files, s); // stores that sold this book
+			if (trans.empty()) {
 				cout << s << " not found in any stores" << endl;
 				continue; // get the next book to look for
 		}
-		for (const auto &store : trans) // for every store with a sale 
-			// get<n> returns the specified member from the tuple in store 
-			os << "store " << get<0>(store) << " sales: " 
-			   << accumulate(get<1>(store), get<2>(store), 
+		for (const auto &store : trans) // for every store with a sale
+			// get<n> returns the specified member from the tuple in store
+			os << "store " << get<0>(store) << " sales: "
+			   << accumulate(get<1>(store), get<2>(store),
 							 Sales_data(s))
 			   << endl; }
 	}
@@ -166,10 +166,10 @@
 
 * 看例子...:
 	```c++
-	// bitvec1 is smaller than the initializer; high-order bits from the initializer are discarded 
-	bitset<13> bitvec1(0xbeef); // bits are 1111011101111 
-	// bitvec2 is larger than the initializer; high-order bits in bitvec2 are set to zero 
-	bitset<20> bitvec2(0xbeef); // bits are 00001011111011101111 
+	// bitvec1 is smaller than the initializer; high-order bits from the initializer are discarded
+	bitset<13> bitvec1(0xbeef); // bits are 1111011101111
+	// bitvec2 is larger than the initializer; high-order bits in bitvec2 are set to zero
+	bitset<20> bitvec2(0xbeef); // bits are 00001011111011101111
 	// on machines with 64-bit longlong 0ULL is 64 bits of 0, so ~0ULL is 64 ones
 	bitset<128> bitvec3(~0ULL); // bits 0... 63 are one; 63. ..127 are zero
 	```
@@ -183,7 +183,7 @@
 * 如果 string 的長度低於 `bitset` 的 bit 數量，則 `bitset` 的 high order bits 也會補 0
 * 當然除了用整個 string 來初始化，`bitset` 的 API 也跟 `string` 自己的一樣有彈性，看 code...:
 	```c++
-	string str("1111111000000011001101"); 
+	string str("1111111000000011001101");
 	bitset<32> bitvec5(str, 5, 4); // four bits starting at str[5], 1100
 	bitset<32> bitvec6(str, str.size()-4); // use last four characters
 	```
@@ -202,14 +202,14 @@
 	* 改變 `bitset` 狀態的 API 有 overload: 如果是有接收「位置參數」的版本就是改變參數對應位置的 bit，沒有的話就是對整個 `bitset` 做操作
 * 看例子zzz:
 	```c++
-	bitset<32> bitvec(1U); // 32bits; low-order bit is 1, remaining bits are 0 
+	bitset<32> bitvec(1U); // 32bits; low-order bit is 1, remaining bits are 0
 	bool is_set = bitvec.any(); // true, one bit is set
-	bool is_not_set = bitvec.none(); // false, one bit is set 
-	bool all_set = bitvec.all(); // false, only one bit is set 
-	size_t onBits = bitvec.count(); // returns 1 
+	bool is_not_set = bitvec.none(); // false, one bit is set
+	bool all_set = bitvec.all(); // false, only one bit is set
+	size_t onBits = bitvec.count(); // returns 1
 	size_t sz = bitvec.size(); // returns 32
-	bitvec.flip(); // reverses the value of all the bits in bitvec 
-	bitvec.reset(); // sets all the bits to 0 
+	bitvec.flip(); // reverses the value of all the bits in bitvec
+	bitvec.reset(); // sets all the bits to 0
 	bitvec.set(); // sets all the bits to 1
 	```
 	* 注意，`all` 這個實用的 API 是 C++11 才有的 LOL
@@ -217,9 +217,9 @@
 
 * 再多看一點例子...:
 	```c++
-	bitvec.flip(0); // reverses the value of the first bit 
-	bitvec.set(bitvec.size() - 1); // turns on the last bit 
-	bitvec.set(0, 0); // turns off the first bit 
+	bitvec.flip(0); // reverses the value of the first bit
+	bitvec.set(bitvec.size() - 1); // turns on the last bit
+	bitvec.set(0, 0); // turns off the first bit
 	bitvec.reset(i); // turns off the ith bit
 	bitvec.test(0); // returns false because the first bit is off
 	```
@@ -229,8 +229,8 @@
 	* 看例子:
 	```c++
 	bitvec[0] = 0; // turn off the bit at position 0
-	bitvec[31] = bitvec[0]; // set the last bit to the same value as the first bit 
-	bitvec[0].flip(); // flip the value of the bit at position 0 
+	bitvec[31] = bitvec[0]; // set the last bit to the same value as the first bit
+	bitvec[0].flip(); // flip the value of the bit at position 0
 	~bitvec[0]; // equivalent operation; flips the bit at position 0
 	// 注意上面這行 code，看起來沒有 assign，實際上會更改 bit!!! API有點鳥
 	bool b = bitvec[0]; // convert the value of bitvec[0] to bool
@@ -239,7 +239,7 @@
 * `to_ulong` 和 `to_ullong` 會回傳對應的 integral value，其 bit pattern 跟 `bitset` 內的一樣
 	* 注意只有當你 `bitset` 的 size 小於這兩種 integral typ(`unsigned long` 或 `unsigned long long`) 的 bit 長度時才可使用:
 	```c++
-	unsigned long ulong = bitvec3.to_ulong(); 
+	unsigned long ulong = bitvec3.to_ulong();
 	cout << "ulong = " << ulong << endl;
 	```
 	* 如果 `bitset` 長度超過這兩個對應的 member functions 回傳的型別，就會 `throw` `overflow_error`
@@ -250,11 +250,11 @@
 	* `EOF` 或者 input error
 * 然後 `bitset` 就會用這個 temp `string` 來建構 bit pattern
 	* 一樣，如果 `string` 比 `bitset` size 短，那就在 `bitset` high order bits 補 0
-		* 然後不會發生比較長的問題，因為這邊的 `string` 最多跟 `bitset` 一樣長 
+		* 然後不會發生比較長的問題，因為這邊的 `string` 最多跟 `bitset` 一樣長
 * output operator 就把 bit pattern 印粗乃
 * 看 code:
 	```c++
-	bitset<16> bits; 
+	bitset<16> bits;
 	cin >> bits; // read up to 16 1 or 0 characters from cin
 	cout << "bits: " << bits << endl; // print what we just read
 	```
@@ -263,15 +263,15 @@
 * 直接重新實作 4.8 的 grading code lol，如果你還記得那是什麼鬼的話:
 	* 簡單說就是紀錄 30 個學生的 pass/fail 狀態，然後這裡提供 4.8 的 code 跟用 `bitset` 實作的 code:
 	```c++
-	bool status; // version using bitwise operators 
-	unsigned long quizA = 0; // this value is used as a collection of bits 
+	bool status; // version using bitwise operators
+	unsigned long quizA = 0; // this value is used as a collection of bits
 	quizA |= 1UL << 27; // indicate student number 27 passed
-	status = quizA & (1UL << 27); // check how student number 27 did 
+	status = quizA & (1UL << 27); // check how student number 27 did
 	quizA &= ~(1UL << 27); // student number 27 failed
-	// equivalent actions using the bitset library 
+	// equivalent actions using the bitset library
 	bitset<30> quizB; // allocate one bit per student; all bits initialized to 0
 	quizB.set(27); // indicate student number 27 passed
-	status = quizB[27]; // check how student number 27 did 
+	status = quizB[27]; // check how student number 27 did
 	quizB.reset(27); // student number 27 failed
 	```
 	* 好吧看起來真的比較好懂...

@@ -19,7 +19,7 @@ tags: C++
 
 * 接下來用一個簡單例子說明 C++ I/O 的使用：
 ```cpp
-#include <iostream> 
+#include <iostream>
 int main() {
     std::cout << "Enter two numbers:" << std::endl;
     //上面的這個 statement "執行"了一個 expression
@@ -27,8 +27,8 @@ int main() {
     //上面的 statement 裡面的 expression 就是
     //std::cout << "Enter two numbers:" << std::endl
     int v1 = 0, v2 = 0; //初始化是種好的信仰
-    std::cin >> v1 >> v2; 
-    std::cout << "The sum of " << v1 << " and " << v2 
+    std::cin >> v1 >> v2;
+    std::cout << "The sum of " << v1 << " and " << v2
               << " is " << v1 + v2 << std::endl;
     return 0;
 }
@@ -43,17 +43,17 @@ int main() {
     * 等價於：
         std::cout << "Enter two numbers:";
         std::cout << std::endl;
-        
-        
-        
+
+
+
 * 接下來是說 namespace 的概念，不過之後的章節才會詳細解釋
     * 注意看 std::cout 的 std::，這個 prefix 代表說，cout 是定義在 std 這個 namespace 裡面的。這樣可以防止自己定義的 name 跟 standard library 的 name coliision(namespace 到底要怎麼用之後章節會介紹)。
     * ch3.1會講怎麼使用更簡單的方法來用 cout。
 
 * 再來換介紹 cin，跟 cout 有 87%像，不過他是 istream，>>(input operator)左邊要擺 istream object，>> 回傳左邊的 istream object。
-        
+
 ## 1.3
-* comment 粉重要， They are typically used to summarize an algorithm, identify the purpose of a variable, or clarify an otherwise obscure segment of code. 
+* comment 粉重要， They are typically used to summarize an algorithm, identify the purpose of a variable, or clarify an otherwise obscure segment of code.
 * An incorrect comment is worse than no comment at all because it may mislead the reader.
 * 一般用 C++ 的 comment 大 guy4 這樣:
     * ![](https://i.imgur.com/2KXAfCr.png)
@@ -61,7 +61,7 @@ int main() {
 ## 1.4
 介紹一些 flow control statement
  * while 是由一個 condition 跟 statement 組成
-     ```cpp 
+     ```cpp
          while (condition)
             statement
     ```
@@ -101,8 +101,8 @@ int main() {
         statement_i
     ```
     *
-    
-    
+
+
 ## 1.5
 * Define our own data types!
 * Primer 定義了一個 class 叫做 Sales_item，然後把詳細定義放在 Sales_item.h 這個檔案

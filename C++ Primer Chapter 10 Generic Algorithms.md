@@ -10,11 +10,11 @@ tags: C++
 
 * 一個使用 `find`(algo) 的簡單小例子
     ```cpp
-    int val = 42; // value we’ll look for 
+    int val = 42; // value we’ll look for
     // result will denote the element we want if it’s in vec,or vec.cend() if not
     auto result = find(vec.cbegin(), vec.cend(), val);
     // report the result
-    cout << "The value " << val << (result == vec.cend() ? 
+    cout << "The value " << val << (result == vec.cend() ?
         " is not present" : " is present") << endl;
     ```
     * 這個例子可以看出使用 lib algo 的一些 "pattern"
@@ -24,7 +24,7 @@ tags: C++
 * Because `find` operates in terms of iterators, we can **use the same `find` function to look for values in any type of container.**
     ```cpp
     string val = "a value";
-    // value we’ll look for 
+    // value we’ll look for
     // this call to find looks through string elements in a list
     auto result = find(lst.cbegin(), lst.cend(), val);
     ```
@@ -204,7 +204,7 @@ Algorithms that write to a destination iterator **assume** the destination is la
     * 用 sizeof 的技巧讓兩個 array 一樣大，而且不用管 element type
 * 其實很多 algo 都有提供一個 "copy version"，命名方式是 `algo_copy`，用 `replace` 來舉例
     ```cpp
-    // replace any element with the value 0 with 42 
+    // replace any element with the value 0 with 42
     replace(ilst.begin(), ilst.end(), 0, 42);
     ```
     * copy version
@@ -262,7 +262,7 @@ Algorithms that write to a destination iterator **assume** the destination is la
     ```cpp
     // comparison function to be used to sort by word length
     bool isShorter(const string &s1, const string &s2) {
-        return s1.size() < s2.size(); 
+        return s1.size() < s2.size();
     }
     // sort on word length, shortest to longest
     sort(words.begin(), words.end(), isShorter);
@@ -275,7 +275,7 @@ Algorithms that write to a destination iterator **assume** the destination is la
 * 可以用 stable_sort，不過實作方式是這樣
     ```cpp
     elimDups(words); // put words in alphabetical order and remove duplicates
-    // resort by length, maintaining alphabetical order among words of the same length         
+    // resort by length, maintaining alphabetical order among words of the same length
     stable_sort(words.begin(), words.end(), isShorter);
     for (const auto &s : words) // no need to copy the strings
         cout << s << " "; // print each element separated by a space
@@ -303,10 +303,10 @@ Algorithms that write to a destination iterator **assume** the destination is la
     void biggies(vector<string> &words, vector<string>::size_type sz)
     {
         elimDups(words); // put words in alphabetical order and remove duplicates
-        // resort by length, maintaining alphabetical order among words of the same length 
+        // resort by length, maintaining alphabetical order among words of the same length
         stable_sort(words.begin(), words.end(), isShorter);
         // get an iterator to the first element whose size() is >= sz
-        // compute the number of elements with size >=sz 
+        // compute the number of elements with size >=sz
         // print words of the given size or longer, each one followed by a space
     }
     ```
@@ -324,7 +324,7 @@ Algorithms that write to a destination iterator **assume** the destination is la
 #### Introducing Lambdas
 * callable object
     * 到目前為止只學過兩種，function 跟 function pointer
-    
+
     * 還有另外兩種
         * 定義了 operator() 的 class, 14章會講
         * 跟 lambda expressions
@@ -335,7 +335,7 @@ Algorithms that write to a destination iterator **assume** the destination is la
 * Unlike a function, *lambdas may be defined inside a function.*
 * A lamba expression has the form
     * ![](https://i.imgur.com/P79D7QT.png)
-    * capture list is an (often empty) **list of local variables** **defined** in the enclosing function; 
+    * capture list is an (often empty) **list of local variables** **defined** in the enclosing function;
     * return type, parameter list, and function body are the same as in any ordinary function.
     * a lambda must use a trailing return (§ 6.3.3, p. 229) to specify its return type.
         * 就是用 -> 指定 return type 的語法
@@ -363,14 +363,14 @@ Lambdas with function bodies that contain anything other than a single return st
 
 * 來寫一個跟之前寫的 `isShorter` 等價的 lambda exp
     ```cpp
-    [](const string &a, const string &b) 
+    [](const string &a, const string &b)
         { return a.size() < b.size();}
     ```
     * The empty capture list(`[]`) indicates that this lambda will not use any local variables from the surrounding function
 * 我們可以把上面這個 lambda 丟到 `std::stable_sort` 來代替 `isShorter`，達到跟之前把字串按照常度排列的效果
     ```cpp
-    // sort wordsby size, but maintain alphabetical order for words ofthe same size 
-    stable_sort(words.begin(), words.end(), 
+    // sort wordsby size, but maintain alphabetical order for words ofthe same size
+    stable_sort(words.begin(), words.end(),
         [](const string &a, const string &b)
             { return a.size() < b.size();});
     ```
@@ -398,19 +398,19 @@ Lambdas with function bodies that contain anything other than a single return st
     [](const string &a)
         { return a.size() >= sz; };
     ```
-    
+
 #### Calling `find_if`
 * 直接把上面寫的 lambda 丟到 `find_if` 就可以解決我們的問題惹
     ```cpp
     // get an iterator to the first element whose size() is >= sz
-    auto wc = find_if(words.begin(), words.end(), 
+    auto wc = find_if(words.begin(), words.end(),
         [sz](const string &a)
             { return a.size() >= sz; });
     ```
     * The call to `find_if` *returns an iterator to the first element that is at least as long as the given `sz`*, or a copy of words.end() if no such element exists.
 * 有了 `wc` 這個 iterator，我們就可以計算在 words 裡長度 >= `sz` 的字串有多少
     ```cpp
-    // compute the number of elements with size >= sz 
+    // compute the number of elements with size >= sz
     auto count = words.end() - wc;
     cout << count << " " << make_plural(count, "word", "s")
          << " of length " << sz << " or longer" << endl;
@@ -424,7 +424,7 @@ Lambdas with function bodies that contain anything other than a single return st
     ```cpp
     // print words of the given size or longer, each one followed by a space
     for_each(wc, words.end(),
-        [](const string &s)    
+        [](const string &s)
             {cout << s << " ";});
     cout << endl;
     ```
@@ -439,8 +439,8 @@ Lambdas with function bodies that contain anything other than a single return st
     void biggies(vector<string> &words, vector<string>::size_type sz)
     {
         elimDups(words); // put words in alphabetical order and remove duplicates
-        // sort wordsby size, but maintain alphabetical order for words of the same size 
-        stable_sort(words.begin(), words.end(),     
+        // sort wordsby size, but maintain alphabetical order for words of the same size
+        stable_sort(words.begin(), words.end(),
             [](const string &a, const string &b)
                 { return a.size() < b.size(); });
         // get an iterator to the first element whose size() is >= sz
@@ -478,7 +478,7 @@ Lambdas with function bodies that contain anything other than a single return st
     ```cpp
     void fcn1() {
         size_t v1 = 42; // local variable
-        // copies v1into the callable object named f 
+        // copies v1into the callable object named f
         auto f = [v1] { return v1; };
         v1 = 0;
         auto j = f(); // j is 42; f stored a copy of v1 when we created it
@@ -490,7 +490,7 @@ Lambdas with function bodies that contain anything other than a single return st
 ```cpp
 void fcn2() {
     size_t v1 = 42; // local variable
-    // the object f2 contains a reference to v1 
+    // the object f2 contains a reference to v1
     auto f2 = [&v1] { return v1; };
     v1 = 0;
     auto j = f2(); // j is 0; f2 refers to v1; it doesn’t store it
@@ -525,7 +525,7 @@ void fcn2() {
 * `[=]` 告訴 compiler lamda 內用到的 function local variable 都是用 capture by value，而 `[&]` 則是 capture by reference
     ```cpp
     // sz implicitly captured by value
-    wc = find_if(words.begin(), words.end(),     
+    wc = find_if(words.begin(), words.end(),
         [=](const string &s)
             { return s.size() >= sz; });
     ```
@@ -533,12 +533,12 @@ void fcn2() {
     ```cpp
     void biggies(vector<string> &words, vector<string>::size_type sz, ostream &os = cout, char c = ' ')
     {
-        // other processing as before 
-        // os implicitly captured by reference; c explicitly captured by value         
+        // other processing as before
+        // os implicitly captured by reference; c explicitly captured by value
         for_each(words.begin(), words.end(),
             [&, c](const string &s)
                 { os << s << c; });
-        // os explicitly captured by reference; c implicitly captured by value     
+        // os explicitly captured by reference; c implicitly captured by value
         for_each(words.begin(), words.end(),
             [=, &os](const string &s)
                 { os << s << c; });
@@ -554,7 +554,7 @@ void fcn2() {
     void fcn3() {
         size_t v1 = 42; // local variable
         // f can change the value of the variables it captures
-        auto f = [v1] () mutable { return ++v1; };     
+        auto f = [v1] () mutable { return ++v1; };
         v1 = 0;
         auto j = f(); // j is 43
     }
@@ -563,14 +563,14 @@ void fcn2() {
     ```cpp
     void fcn4() {
         size_t v1 = 42; // local variable
-        // v1 is a reference to a nonconst variable 
+        // v1 is a reference to a nonconst variable
         // we can change that variable through the reference inside f2
         auto f2 = [&v1] { return ++v1; };
         v1 = 0;
         auto j = f2(); // j is 1
     }
     ```
-    
+
 #### Specifying the Lambda Return Type
 * 有時候你的 lambda **不只是一句 return，還有其他 statement**；
 * 這樣的話如果不給 return type，compiler 就會當成是 return `void`，而這時如果你的 lambda body 內有 return value，就會噴 error
@@ -579,7 +579,7 @@ void fcn2() {
 * 附帶一提，`std::transform` 如果 dest 跟 input range 一樣，那就會直接把 transform 後 element value 塞回 input range 的位置，有點 `std::replace` 的感覺
     * `std::transform` 會把每個 element 都丟到 predicate，然後把 return value 塞到 dest 指定的 range
     ```cpp
-    transform(vi.begin(), vi.end(), vi.begin(), 
+    transform(vi.begin(), vi.end(), vi.begin(),
         [](int i) { return i < 0 ? -i : i; });
     ```
     * 上面這個 lambda 一樣不用指定 return type，因為 lambda body 內只有一個 return statement
@@ -588,17 +588,17 @@ void fcn2() {
     ```cpp
     // error: cannot deduce the return type for the lambda
     transform(vi.begin(), vi.end(), vi.begin(),
-        [](int i) 
+        [](int i)
             { if (i < 0) return -i; else return i; });
     ```
     * lambda body 內不是單一一個 return statement，所以 compiler 預設 return type 是 `void`，還是 body 內還是有 return value!
     * 要改成這樣
     ```cpp
-    transform(vi.begin(), vi.end(), vi.begin(), 
+    transform(vi.begin(), vi.end(), vi.begin(),
         [](int i) -> int
         { if (i < 0) return -i; else return i; });
     ```
-    
+
 ### 10.3.4 Binding Arguments
 * 如果要綁定的 predicate 的邏輯要用 N 遍，或者我們需要的那段邏輯很複雜需要很多 statement 才能完成，那還是要寫成 function 比較適合，可是這樣就有 argument 數量不合的問題，所以 C++11 有 `std::bind` 可以用，很ㄎㄧㄤ
 * 定義在 `<functional>`
@@ -626,14 +626,14 @@ void fcn2() {
         `check6(string_obj);`
     * `check6` 的第一個參數，也就是 `string_obj`，會被丟到 bind 那行 `check_size` 那行 expression 時 `_1` 放的位置，所以實際上就等於 call
         `check_size(string_obj, 6);`
-        
+
 * 更 general 來說，**當你用 `bind` 回傳的 value 來宣告 callable object 時，你在 `bind` 的 `arg_list` 內放了幾個 `std::placeholders::_n`，`bind` 回傳的 callable object 就會有幾個參數**
-    
+
 * 於是我們就可以利用 `std::bind` 做到跟 lambda capture list 一樣的事情惹!
     ```cpp
-    auto wc = find_if(words.begin(), words.end(), 
+    auto wc = find_if(words.begin(), words.end(),
         [sz](const string &a) {...})
-    auto wc = find_if(words.begin(), words.end(), 
+    auto wc = find_if(words.begin(), words.end(),
         bind(check_size, _1, sz));
     ```
     * This call to `bind` **generates a callable object that binds the second argument of `check_size` to the value of `sz`.**
@@ -651,7 +651,7 @@ void fcn2() {
     using std::placeholders::_1;
     using namespace std::placeholders;
     ```
-    
+
 #### Arguments to `bind`
 * `std::bind(func, arg_list)` 產生出來的 callable object 參數傳遞方式是這樣:
     * 傳給 callable 第 n 個參，在內部呼叫 `func` 時，會被傳到 `std::bind` 那行 expression 內 `arg_list` 對應 `_n` 的位置
@@ -665,7 +665,7 @@ void fcn2() {
 #### Using `std::bind` to Reorder Parameters
 * 我們甚至可以用 `std::bind` 來讓一個已經寫好的 function 意義相反
     ```cpp
-    // sort on word length, shortest to longest 
+    // sort on word length, shortest to longest
     sort(words.begin(), words.end(), isShorter);
     // sort on word length, longest to shortest
     sort(words.begin(), words.end(), bind(isShorter, _2, _1));
@@ -676,8 +676,8 @@ void fcn2() {
 * 可是就跟使用 lambda 或者某些 type 的限制(例如不能 copy 或成本很高) 一樣，我們希望可以用 reference
 * 用之前的小例子舉例
     ```cpp
-    // os is a local variable referring to an output stream 
-    // c is a local variable of type char     
+    // os is a local variable referring to an output stream
+    // c is a local variable of type char
     for_each(words.begin(), words.end(),
         [&os, c](const string &s)
             { os << s << c; });
@@ -690,14 +690,14 @@ void fcn2() {
     ```
 * 可是直接用之前一樣的方式用 bind 會噴 error
     ```cpp
-    // error: cannot copy os     
+    // error: cannot copy os
     for_each(words.begin(), words.end(), bind(print, os, _1, ' '));
     ```
     * `os` 不能用 copy 的
 
 * 為此我們需要一個 std 的函數，ref...
     ```cpp
-    for_each(words.begin(), words.end(), 
+    for_each(words.begin(), words.end(),
         bind(print, std::ref(os), std::placeholders::_1, ' '));
     ```
     * The `std::ref` function returns an object that
@@ -757,7 +757,7 @@ void fcn2() {
     ```cpp
     list<int> lst = {1,2,3,4};
     list<int> lst2, lst3; // empty lists
-    // after copy completes, lst2 contains 4 3 2 1 
+    // after copy completes, lst2 contains 4 3 2 1
     copy(lst.cbegin(), lst.cend(), front_inserter(lst2));
     // after copy completes, lst3 contains 1 2 3 4
     copy(lst.cbegin(), lst.cend(), inserter(lst3, lst3.begin()));
@@ -789,7 +789,7 @@ void fcn2() {
     * 上面的 code 又 demo 了一次繼承的好處: `istream_iterator` argument 可以綁 `ifstream`!
 * 也可以這樣寫把 istream 讀東西到 container
     ```cpp
-    istream_iterator<int> in_iter(cin); // read ints from cin 
+    istream_iterator<int> in_iter(cin); // read ints from cin
     istream_iterator<int> eof; // istream "end" iterator
     while (in_iter != eof) // while there’s valid input to read
     // postfix increment reads the stream and returns the old value of the iterator
@@ -813,7 +813,7 @@ void fcn2() {
     cout << accumulate(in, eof, 0) << endl;
     ```
     上面的 a`std::ccumulate` 會把 stdin 的 int 吃光然後做加總
-    
+
 #### `istream_iterator`s Are Permitted to Use **Lazy Evaluation**
 * When we bind an `istream_iterator` to a stream, **we are not guaranteed that it will read the stream immediately.** The implementation is permitted to delay reading the stream until we use the iterator.
     * 很自然阿，IO 要丟給 OS 優化
@@ -847,7 +847,7 @@ void fcn2() {
     copy(vec.begin(), vec.end(), out_iter);
     cout << endl;
     ```
-    
+
 #### Using Stream Iterators with Class Types
 * Primer 用 `Sales_item` 來舉例，因為它有定義 `operator>>()`, `operator<<()`
     ```cpp
@@ -863,11 +863,11 @@ void fcn2() {
             out_iter = sum; // write the current sum
             sum += *item_iter++;  // read the next transaction
         }
-        
+
     }
     out_iter = sum; // remember to print the last set of records
     ```
-    
+
 ### 10.4.3 Reverse Iterators
 * 有篇文章可以看，Andrew Koenig 寫的
     * https://www.drdobbs.com/cpp/how-to-use-reverse-iterators-without-get/240168652
@@ -885,14 +885,14 @@ void fcn2() {
 
 * 把 container elements 倒過來印的小例子
     ```cpp
-    vector<int> vec = {0,1,2,3,4,5,6,7,8,9}; 
-    // reverse iterator ofvector from back to front 
+    vector<int> vec = {0,1,2,3,4,5,6,7,8,9};
+    // reverse iterator ofvector from back to front
     for (auto r_iter = vec.crbegin(); // binds r_iterto the last element
             r_iter != vec.crend(); // crend refers 1 before 1st element
             ++r_iter) // decrements the iterator one element
         cout << *r_iter << endl; // prints 9, 8, 7,. .. 0
     ```
-    
+
 * 上面說的讓操作 iterator 的 algo 不用管 iter type 的好處，可以用下面的例子 demo
     ```cpp
     sort(vec.begin(), vec.end()); // sorts vecin "normal" order
@@ -1015,7 +1015,7 @@ void fcn2() {
 * `std::sort` 就需要 random-access iterators
     * `array`, `deque`, `vector`, `string` 回傳的都是 random-access iterators
     * built-in array 的 pointer 也算
-    
+
 ### 10.5.2 Algorithm Parameter Patterns
 * Most of the algorithms have one of the following four forms:
     * alg(beg, end, *other* *args*);
@@ -1068,7 +1068,7 @@ reverse_copy(beg, end, dest);// copy elements in reverse order into dest
 ```
 * 有些 algo 甚至提供了 algo_copy_if 的版本，額外吃兩個參數，一個是代表第二個 range 的 output iterator，一個是 predicate
 ```cpp
-// removes the odd elements from v1 
+// removes the odd elements from v1
 remove_if(v1.begin(), v1.end(), [](int i) { return i % 2; });
 // copies only the even elements from v1into v2; v1 is unchanged
 remove_copy_if(v1.begin(), v1.end(), back_inserter(v2),

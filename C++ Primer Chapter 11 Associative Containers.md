@@ -70,7 +70,7 @@ tags: C++
 // count the number of times each word occurs in the input
 map<string, size_t> word_count; // empty map from string to size_t
 set<string> exclude
-    = {"The", "But", "And", "Or", "An", "A", 
+    = {"The", "But", "And", "Or", "An", "A",
        "the", "but", "and", "or", "an", "a"};
 string word;
 while (cin >> word) // count only words that are not in exclude
@@ -110,12 +110,12 @@ if (exclude.find(word) == exclude.end())
     ```cpp
     map<string, size_t> word_count; // empty
     // list initialization
-    set<string> exclude = {"the", "but", "and", "or", "an", "a", 
+    set<string> exclude = {"the", "but", "and", "or", "an", "a",
                            "The", "But", "And", "Or", "An", "A"};
     // three elements; authors maps last name to first
     map<string, string> authors = {
-            {"Joyce", "James"}, 
-            {"Austen", "Jane"}, 
+            {"Joyce", "James"},
+            {"Austen", "Jane"},
             {"Dickens", "Charles"} };
     ```
     * 注意 `std::map` 型態用 list initialize 時，key value 都要寫，用 `{key, value}` 包住
@@ -123,7 +123,7 @@ if (exclude.find(word) == exclude.end())
 #### Initializing a `std::multimap` or `std::multiset`
 * several elements with the same key
     * 例如字典可用 multimap，key 是單字，value 是單字的其中一種定義(definition)
-    
+
 * The following example **illustrates the differences between the containers with unique keys and those that have multiple keys**.
     ```cpp
     // define a vector with 20 elements, holding two copies of each number from 0 to 9
@@ -132,9 +132,9 @@ if (exclude.find(word) == exclude.end())
         ivec.push_back(i);
         ivec.push_back(i); // duplicate copies ofeach number
     }
-    // iset holds unique elements from ivec; miset holds all 20 elements 
-    set<int> iset(ivec.cbegin(), ivec.cend()); 
-    multiset<int> miset(ivec.cbegin(), 
+    // iset holds unique elements from ivec; miset holds all 20 elements
+    set<int> iset(ivec.cbegin(), ivec.cend());
+    multiset<int> miset(ivec.cbegin(),
     ivec.cend()); cout << ivec.size() << endl; // prints 20
     cout << iset.size() << endl; // prints 10
     cout << miset.size() << endl; // prints 20
@@ -178,8 +178,8 @@ if (exclude.find(word) == exclude.end())
         return lhs.isbn() < rhs.isbn();
     }
     // bookstore can have several transactions with the same ISBN
-    // elements in bookstore will be in ISBN order     
-    multiset<Sales_data, decltype(compareIsbn)*> 
+    // elements in bookstore will be in ISBN order
+    multiset<Sales_data, decltype(compareIsbn)*>
         bookstore(compareIsbn);
     ```
     * 角括號(`<>`)內除了給 element type(如果是 map 就給 key 跟 value 的 type，如果是 set 就給 key type 就好)，**還要給一個 function pointer type**
@@ -223,12 +223,12 @@ if (exclude.find(word) == exclude.end())
     ```
 * 舊版 C++ 不能用上面 list initialize 的寫法，要馬就用 else 呼叫 default ctor，要馬用 `std::make_pair`
     ```cpp
-    if (!v.empty()) 
+    if (!v.empty())
         return pair<string, int>(v.back(), v.back().size());
     if (!v.empty())
         return make_pair(v.back(), v.back().size());
     ```
-    
+
 ## 11.3 Operations on Associative Containers
 * 關連容器額外定義的 type
 * ![](https://i.imgur.com/BNGiEyj.png)
@@ -242,7 +242,7 @@ if (exclude.find(word) == exclude.end())
     * `value_type` 則是 `pair<const key_type, mapped_type>`
 * 看範例猜每個變數的型別
 ```cpp
-set<string>::value_type v1; // v1  is a string 
+set<string>::value_type v1; // v1  is a string
 set<string>::key_type v2; // v2 is a string
 map<string, int>::value_type v3; // v3 is a pair<const string, int>
 map<string, int>::key_type v4; // v4 is a string
@@ -254,9 +254,9 @@ map<string, int>::mapped_type v5; // v5 is an int
 * 而 associative container 的 `value_type` 是 pair
     * 所以 `for(auto &e : map_obj)` 才會拿到 pair
     * **而且不能更改 `e.first`**，因為是 `const`
-    
+
     ```cpp
-    // get an iterator to an element in word_count 
+    // get an iterator to an element in word_count
     auto map_it = word_count.begin();
     // *map_it is a reference to a pair<const string, size_t>object
     cout << map_it->first; // prints the key for this element
@@ -269,23 +269,23 @@ map<string, int>::mapped_type v5; // v5 is an int
 
 * 其實為什麼 `set` iterator 跟 `map` 的 pair 會有 `const` 行為要從資料結構去想，因為如果可以直接藉由 `set` 的 iterator 或者 `map` 的 value_type 的 key 改值，這樣關連容器內的 element 順序就會亂掉
     ```cpp
-    set<int> iset = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}; 
+    set<int> iset = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     set<int>::iterator set_it = iset.begin();
     if (set_it != iset.end()) {
         *set_it = 42; // error: keys in a set are read-only
     }
     cout << *set_it << endl; // ok: can read the key
     ```
-    
+
 #### Iterating across an Associative Container
 * 一樣可用 `begin` `end` 把關連容器的 elements 掃一遍
     ```cpp
-    // get an iterator positioned on the first element 
-    auto map_it = word_count.cbegin(); 
-    // compare the current iterator to the off-the-end iterator 
-    while (map_it != word_count.cend()) { 
+    // get an iterator positioned on the first element
+    auto map_it = word_count.cbegin();
+    // compare the current iterator to the off-the-end iterator
+    while (map_it != word_count.cend()) {
     // dereference the iterator to print the element key--value pairs
-        cout << map_it->first << " occurs " 
+        cout << map_it->first << " occurs "
              << map_it->second << " times" << endl;
         ++map_it; // increment the iterator to denote the next element
     }
@@ -313,7 +313,7 @@ map<string, int>::mapped_type v5; // v5 is an int
     ```cpp
     vector<int> ivec = {2,4,6,8,2,4,6,8}; // ivec has eight elements
     set<int> set2; // empty set
-    set2.insert(ivec.cbegin(), ivec.cend()); // set2 has four elements     
+    set2.insert(ivec.cbegin(), ivec.cend()); // set2 has four elements
     set2.insert({1,3,5,7,1,3,5,7});
     // set2
     now has eight elements
@@ -327,9 +327,9 @@ map<string, int>::mapped_type v5; // v5 is an int
 * 記得 `map` 的 element type 是 `std::pair`，所以 `insert` 給的 argument type 也要是 `std::pair`
 * 但是常常我們不會生一個 `std::pair` 再插進 map，通常會像下面這樣寫
     ```cpp
-    // four ways to add word to word_count 
-    word_count.insert({word, 1}); 
-    word_count.insert(make_pair(word, 1)); 
+    // four ways to add word to word_count
+    word_count.insert({word, 1});
+    word_count.insert(make_pair(word, 1));
     word_count.insert(pair<string, size_t>(word, 1));
     word_count.insert(map<string, size_t>::value_type(word, 1));
     ```
@@ -354,7 +354,7 @@ map<string, int>::mapped_type v5; // v5 is an int
 * 上面的 ```++ret.first->second;``` 可以看成```++((ret.first)->second);``` 就比較好懂
 * 還有，上面的 `ret` 是用 `auto` 宣告的，如果你要看 Pre C++ code，會變成這樣
     ```cpp
-    pair<map<string, size_t>::iterator, bool> ret = 
+    pair<map<string, size_t>::iterator, bool> ret =
         word_count.insert(make_pair(word, 1));
     ```
     * 總是會有機會看 Legacy code ㄉ(抖
@@ -363,7 +363,7 @@ map<string, int>::mapped_type v5; // v5 is an int
 * 再舉個用 multi 系列的小例子: 一本書，多個共同作者
 * `multiset/multimap` 的 *`insert` 一定會插入 element*
     ```cpp
-    multimap<string, string> authors; 
+    multimap<string, string> authors;
     // adds the first element with the key Barth, John
     authors.insert({"Barth, John", "Sot-Weed Factor"});
     // ok: adds the second element with the key Barth, John
@@ -383,7 +383,7 @@ map<string, int>::mapped_type v5; // v5 is an int
     else
         cout << "oops: " << removal_word << " not found!\n";
     ```
-    
+
 ### 11.3.4 Subscripting a map
 ![](https://i.imgur.com/UPOgWKW.png)
 
@@ -393,7 +393,7 @@ map<string, int>::mapped_type v5; // v5 is an int
 * However, unlike other subscript operators, **if the key is not already present, *a new element is created and inserted*** into the map for that key.
     * 對應這個 key 的 value 會被 value initialized(因為 pair 預設是 value initialize)
     ```cpp
-    map <string, size_t> word_count; // empty map 
+    map <string, size_t> word_count; // empty map
     // insert a value-initialized element with key Anna; then assign 1 to its value
     word_count["Anna"] = 1;
     ```
@@ -408,8 +408,8 @@ map<string, int>::mapped_type v5; // v5 is an int
 
 * 不過 `map` 的 `operator[]` 一樣還是 return lvalue，所以可以拿來讀寫:
     ```cpp
-    cout << word_count["Anna"]; 
-    // fetch the element indexed by Anna; prints 1     
+    cout << word_count["Anna"];
+    // fetch the element indexed by Anna; prints 1
     ++word_count["Anna"];
     // fetch the element and add 1to it
     cout << word_count["Anna"];
@@ -431,7 +431,7 @@ map<string, int>::mapped_type v5; // v5 is an int
     * 這三個也只有 order 版本的 associative container 可用
 * 對 unique container 系列來說，`count` 永遠回傳 1 或 0
     ```cpp
-    set<int> iset = {0,1,2,3,4,5,6,7,8,9}; 
+    set<int> iset = {0,1,2,3,4,5,6,7,8,9};
     iset.find(1); // returns an iterator that refers to the element with key == 1
     iset.find(11); // returns the iterator ==iset.end()
     iset.count(1); // returns 1
@@ -443,7 +443,7 @@ map<string, int>::mapped_type v5; // v5 is an int
     if (word_count.find("foobar") == word_count.end())
         cout << "foobar is not in the map" << endl;
     ```
-    
+
 #### Finding Elements in a `multimap` or `multiset`
 * 可能會存有很多同樣的 keys
 * (multi) associative container 會把 key 同樣的 elements 都擺在一起
@@ -454,10 +454,10 @@ map<string, int>::mapped_type v5; // v5 is an int
 string search_item("Alain de Botton"); // author we’ll look for
 auto entries = authors.count(search_item); // number of elements
 auto iter = authors.find(search_item); // first entry for this author
-// loop through the number of entries there are for this author 
+// loop through the number of entries there are for this author
 while(entries) {
-    cout << iter->second << endl; // print each title 
-    ++iter; // advance to the next title 
+    cout << iter->second << endl; // print each title
+    ++iter; // advance to the next title
     --entries; // keep track ofhow many we’ve printed
 }
 ```
@@ -478,7 +478,7 @@ for (auto beg = authors.lower_bound(search_item),
 * 如果 container 裡有這個 key 的 elements，`lower_bound` 會指向第一個，`upper_bound` 會指向最後一個的後面一個
     * 精簡的說法就是 `[lower_bound, upper_bound)`
 * 如果沒有這個 key 的 element，那 `lower_bound` 跟 `upper_bound` 會指向同一個地方，**這個地方的意義是，在這個位置插入這個 key 的 element，container 的 order 不會亂掉**
-    * 可以推論出，如果你找的 key 比 container 內的所有 key 都大，那 
+    * 可以推論出，如果你找的 key 比 container 內的所有 key 都大，那
 * 總之，**如果 lower_bound() == upper_bound()，那 key 就不在 container 裡面**
 
 ##### 第三種，用 `equal_range` Function
@@ -520,7 +520,7 @@ okay? thanks! later
 
 * 三個 function:
     * `word_transform`: overall processing, 收兩個檔案的 `ifstream&`
-    * `buildMap`: 吃第一個 `word_transform` 的第一個 `ifstream&`，建立出一個 `map` that maps string to phrase 
+    * `buildMap`: 吃第一個 `word_transform` 的第一個 `ifstream&`，建立出一個 `map` that maps string to phrase
     * `transform`: 吃一個字串，如果存在規則把字串做轉換，則回傳轉換後的字串，否則回傳原字串
 ```cpp
 void word_transform(ifstream &map_file, ifstream &input) {
@@ -558,7 +558,7 @@ map<string, string> buildMap(ifstream &map_file) {
         if (value.size() > 1) // check that there is a transformation
             trans_map[key] = value.substr(1); // skip leading space
         else
-            throw runtime_error("no rule for " + key);     
+            throw runtime_error("no rule for " + key);
     return trans_map;
 }
 ```
@@ -606,11 +606,11 @@ const string & transform(const string &s, const map<string, string> &m) {
 * 例如重寫之前的計數問題
     ```cpp
     // count occurrences, but the words won’t be in alphabetical order
-    unordered_map<string, size_t> word_count; 
+    unordered_map<string, size_t> word_count;
     string word;
     while (cin >> word)
         ++word_count[word]; // fetch and increment the counter for word
-    for (const auto &w : word_count) // for each element in the map 
+    for (const auto &w : word_count) // for each element in the map
     // print the results
         cout << w.first << " occurs " << w.second
              << ((w.second > 1) ? " times" : " time") << endl;
@@ -657,10 +657,10 @@ const string & transform(const string &s, const map<string, string> &m) {
     ```
 * 如果自定義的 class 有 `operator==`，可以在宣告無序容器時只給 hash function:
     ```cpp
-    // use FooHash to generate the hash code; Foo must have an == operator 
+    // use FooHash to generate the hash code; Foo must have an == operator
     unordered_set<Foo, decltype(FooHash)*> fooSet(10, FooHash);
     ```
-    
+
 ## 延伸閱讀
 * `ste::tie`
     * https://www.google.com/search?q=std%3A%3Aignore&oq=std%3A%3Aignore&aqs=chrome..69i57j69i58.1968j0j7&sourceid=chrome&ie=UTF-8

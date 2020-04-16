@@ -17,15 +17,15 @@ tags: C++
 * 除了操作 char data，還會有操作 w_char 的可能
 * Standard 為此定義了除了 istream 跟 ostream 之外的一些 type 來讓我們達成上述操作，分別在下述 header 內:
 1. iostream
-    * istream, wistream reads from a stream 
+    * istream, wistream reads from a stream
     * ostream, wostream writes to a stream
-    * iostream, wiostream reads and writes a stream 
+    * iostream, wiostream reads and writes a stream
 2. fstream
-    * ifstream, wifstream reads from a file 
+    * ifstream, wifstream reads from a file
     * ofstream, wofstream writes to a file
     * fstream, wfstream reads and writes a file
 3. sstream
-    * istringstream, wistringstream reads from a string 
+    * istringstream, wistringstream reads from a string
     * ostringstream, wostringstream writes to a string
     * stringstream, wstringstream reads and writes a string
 
@@ -51,7 +51,7 @@ tags: C++
     ```cpp
     ofstream out1, out2;
     out1 = out2; // error: cannot assign stream objects
-    ofstream print(ofstream); // error: can’t initialize the 
+    ofstream print(ofstream); // error: can’t initialize the
     ofstream parameter out2 = print(out2); // error: cannot copy stream objects
     ```
 
@@ -104,7 +104,7 @@ tags: C++
 * By implication, the right way to **determine the overall state** of a stream is to use either `good()` or `fail()`.
 * 其實把一個 stream 當 condition 就如同寫成 !stream_obj.fail() 一樣
 * 如果真的 fail 了再去檢查到底是因為 eof 還是普通 fail 還是更慘，bad
-    
+
 #### Managing the Condition State
 * `stream_obj.rdstate()` 回傳 stream 當前 state 對應的 iostate value
 * setstate 有點像 bitwise OR，把給定的(多個) state(s) 打開
@@ -115,7 +115,7 @@ tags: C++
     // remember the current state of
     cin
     cin.clear(); // make cin valid
-    process_input(cin); // use cin    
+    process_input(cin); // use cin
     cin.setstate(old_state); // now reset cin to its old state
     ```
     * 上面又在一次 demo 用 auto 的好處，你可以不用記得標準定義的物件或是 value 是什麼型態
@@ -220,7 +220,7 @@ cin.tie(old_tie); // reestablish normal tie between cinand cout
 * 還記得很久以前為了 Sales_data 寫過 print 跟 read 嗎? 我們這時候可以傳 fstream 給他們，這樣就可以從檔案讀寫啦!
 * 下面的 code 假設 input 跟 output file 當成 command line arg 傳進來
     ```cpp
-    ifstream input(argv[1]); // open the file of sales transactions 
+    ifstream input(argv[1]); // open the file of sales transactions
     ofstream output(argv[2]); // open the output file
     Sales_data total;           // variable to hold running sum
     if(read(input, total)){
@@ -263,10 +263,10 @@ cin.tie(old_tie); // reestablish normal tie between cinand cout
 * 下面的 code 是一個 fstream 可能的使用場景
 ```cpp
 // for each file passed to the program
-for (auto p = argv + 1; p != argv + argc; ++p) { 
-    ifstream input(*p); // create input and open the file 
+for (auto p = argv + 1; p != argv + argc; ++p) {
+    ifstream input(*p); // create input and open the file
     if (input) {
-        process(input); } 
+        process(input); }
     else
         cerr << "couldn’t open: " + string(*p);
 }// input goes out of scope and is destroyed on each iteration
@@ -300,9 +300,9 @@ for (auto p = argv + 1; p != argv + argc; ++p) {
 
 #### Opening a File in `out` Mode Discards Existing Data
 ```cpp
-// file1 is truncated in each of these cases 
-ofstream out("file1"); // out and trunc are implicit ofstream 
-out2("file1", ofstream::out); // trunc is implicit ofstream 
+// file1 is truncated in each of these cases
+ofstream out("file1"); // out and trunc are implicit ofstream
+out2("file1", ofstream::out); // trunc is implicit ofstream
 out3("file1", ofstream::out | ofstream::trunc);
 // to preserve the file’s contents, we must explicitly specify app mode
 ofstream app("file2", ofstream::app); // out is implicit
@@ -315,7 +315,7 @@ ofstream app2("file2", ofstream::out | ofstream::app);
 ```cpp
 ofstream out; // no file mode is set
 out.open("scratchpad"); // mode implicitly out and trunc
-out.close(); // close out so we can use it for a different file 
+out.close(); // close out so we can use it for a different file
 out.open("precious", ofstream::app); // mode is out and app
 out.close();
 ```
@@ -341,12 +341,12 @@ out.close();
 * 例子: 現在有一份檔案，每一行是一筆資料
     * 每筆資料第一個字是人名
     * 之後的會有一筆或多筆電話號碼
-    morgan 2015552368 8625550123 
+    morgan 2015552368 8625550123
     drew  9735550130
     lee 6095550132 2015550175 8005550000
 * 我們用一個 struct 來存每一筆資料
     ```cpp
-    struct PersonInfo { 
+    struct PersonInfo {
         string name;
         vector<string> phones;
     };
@@ -358,21 +358,21 @@ out.close();
     // read the input a line at a time until cin hits end-of-file (or another error)
     while (getline(cin, line)) {
         PersonInfo info; // create an object to hold this record’s data
-        istringstream record(line); // bind record to the line we just read     
-        record >> info.name; // read the name     
+        istringstream record(line); // bind record to the line we just read
+        record >> info.name; // read the name
         while (record >> word) // read the phone numbers
             info.phones.push_back(word); // and store them
         people.push_back(info); // append this record to people
     }
     ```
-    
+
 * 一種 practice 是，你的資料是以什麼樣的單位擺放的，最外層的迴圈就以這樣的單位來讀取檔案
     * 例如這邊是以行為單位擺放，那最外層就一次讀一行，內層迴圈再對這行慢慢處理
     * 不要發生那種明明是以行為單位，卻一次讀一個字的狀況，這樣你程式的"狀態機"會很難定義，而且很難懂
 * 注意上面使用的一些專屬 stringstream 的 member function
     * 先創一個 `istringstream`，把 line 丟進去，這樣就可以用 >> 把 word 從 istringstream object 裡面讀出來
     * When the string has been completely read(from the `istringstream`), **"end-of-file" is signaled** and the next input operation on record will fail.
-    
+
 ### 8.3.2 Using `ostringstreams`
 * An `ostringstream` is useful when we need to build up our output a little at a time but do not want to print the output until later.
 * 例如上面 phone number 的例子，我們可能需要對 number 做一些格式上的驗證，然後再寫到新的檔案裡，不符格式的那一行就不輸出

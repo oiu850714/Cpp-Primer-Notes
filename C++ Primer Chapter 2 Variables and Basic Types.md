@@ -20,7 +20,7 @@ C++ 定義了幾種基本型別，這幾種基本型別又可以分為兩大類�
 
 ### 2.1.2 Type Conversions
 * \型態轉換/
-* Type conversions happen **automatically** when we use an object of one type where an object of another type is expected. 
+* Type conversions happen **automatically** when we use an object of one type where an object of another type is expected.
     * **HOW?**
     * **YOU NEED TO UNDRSTAND!**
     * 第四章回有詳細介紹，不過這裡先提一點
@@ -35,7 +35,7 @@ C++ 定義了幾種基本型別，這幾種基本型別又可以分為兩大類�
 
 ### 2.1.3 Literals
 https://en.cppreference.com/w/cpp/language/integer_literal
-*  Every literal has a type. 
+*  Every literal has a type.
 *  Integer literals
     *  有8進位，10進位，16進位的寫法
         *  然後到底一個 integer literal 的**型態是什麼取決於他的 value 跟表示方式。**
@@ -49,7 +49,7 @@ https://en.cppreference.com/w/cpp/language/integer_literal
     * By default 是 double 型別
     * 一樣可以用 suffix 改成 float 型別
 * Character and Character String Literals
-    * ’a’ // character literal 
+    * ’a’ // character literal
         * A character enclosed within single quotes is a literal of type char
     * "Hello World!" // string literal
         * The type of a string literal is array of constant chars，array 之後會講(?(XD
@@ -64,7 +64,7 @@ https://en.cppreference.com/w/cpp/language/integer_literal
     ```cpp
     true false nullptr
     ```
-    
+
 ## 2.2 Variables
 * variable 就是有名稱的儲存空間(named object)
 * 每一個 variable 都有型別
@@ -76,13 +76,13 @@ https://en.cppreference.com/w/cpp/language/integer_literal
 ```
 * Initializers
     * 嚇人的東西...
-    * Initialization in C++ is a surprisingly complicated topic and one we will return to again and again. 
+    * Initialization in C++ is a surprisingly complicated topic and one we will return to again and again.
     * Initialization 看起來跟 assignment 很像，**可是在 C++ 這是不一樣的 operation**，Primer 非常強調這件事，到底怎麼個不一樣，請慢慢看下去...
 
 * List Initialization
     * Initialization 很複雜的其中一個原因，就是光是語法就有很多種:
     ```cpp
-    int units_sold = 0; 
+    int units_sold = 0;
     int units_sold = {0}; //C++11
     int units_sold{0}; //C++11
     int units_sold(0);
@@ -92,9 +92,9 @@ https://en.cppreference.com/w/cpp/language/integer_literal
         1. 如果你用 range 比較大的型別來當 list initialization 的 initializer，會噴 error
             * e.g.
             ```cpp
-                long double ld = 3.1415926536; 
+                long double ld = 3.1415926536;
                 int a{ld}, b = {ld}; // error: narrowing conversion required
-                int c(ld), d = ld; // ok: but value will be truncated 
+                int c(ld), d = ld; // ok: but value will be truncated
             ```
             * 你可能會覺得上面的例子太ㄎㄧㄤ，不過 Primer 說到 16章時會好好解釋這種由大型別轉到小型別的狀況可能會不小心發生(寫糞code?)
     * 這些很ㄎㄧㄤ的 initialization 方式到第三章才會詳細說明
@@ -116,7 +116,7 @@ https://en.cppreference.com/w/cpp/language/integer_literal
     * A variable **definition is a declaration**. In addition to specifying the name and type, a **definition also allocates storage and may provide the variable with an initial value.**
     * 用 extern 這個 keyword 可以做到**宣告**某個變數但是**不定義**某個變數
         ```cpp
-            extern int i; // declares but does not define i 
+            extern int i; // declares but does not define i
             int j; // declares and defines j
         ```
     * Any declaration that includes an explicit initializer is a definition
@@ -140,7 +140,7 @@ https://en.cppreference.com/w/cpp/language/integer_literal
         * 變數可以宣告很多次，但(在同個 scope 下)只能定義一次。
 ### 2.2.3 Identifiers
     老生常談...
-    
+
 ### 2.2.4 Scope of a Name
 * 這也是超重要議題
     * 我怎麼覺得每個都很重要...
@@ -175,7 +175,7 @@ https://en.cppreference.com/w/cpp/language/integer_literal
 * 又是一個對新手很殘忍的定義
 * 這章會講 pointer 跟 reference 這兩種 compound types
 * 前面說過，變數宣告是由一個型別名稱加上一堆的變數名稱形成的
-    *  More generally, a declaration is a **base type** followed by a list of **declarators**. 
+    *  More generally, a declaration is a **base type** followed by a list of **declarators**.
     *   Each declarator names a variable and gives the variable a type that is **related** to the base type.
         ```cpp
             type_name var_name;
@@ -194,8 +194,8 @@ https://en.cppreference.com/w/cpp/language/integer_literal
     * base type 是 `type_name`, declarator 是 `&var_name`
 * 注意，reference type 一定要初始化!
     ```cpp
-    int ival = 1024; 
-    int &refVal = ival; // refVal refers to (is another name for) ival 
+    int ival = 1024;
+    int &refVal = ival; // refVal refers to (is another name for) ival
     int &refVal2; // error: a reference must be initialized
     ```
 * 一般型別在初始化時，都是把 initializer 的 value copy 到 var_name 裡，可是 reference 的初始化是說，把 `var_name` **bind** 到他的 initializer。
@@ -286,7 +286,7 @@ https://en.cppreference.com/w/cpp/language/integer_literal
 ### 2.5.1 Type Aliases
 * 傳統的 typedef
     ```cpp
-    typedef double wages; // wages is a synonym for double 
+    typedef double wages; // wages is a synonym for double
     typedef wages base, *p; // base is a synonym for double, p for double*
     ```
     * The keyword `typedef` may appear as **part of the base type of a declaration**
@@ -304,19 +304,19 @@ https://en.cppreference.com/w/cpp/language/integer_literal
 ### 2.5.2 The auto Type Specifier
 * C++11 的 auto
     * 讚！
-    * let the compiler figure out the type for us by using the auto type specifier. 
+    * let the compiler figure out the type for us by using the auto type specifier.
     * **deduce the type from the initializer**
     * 換句話說，你要用 auto 宣告某個變數，你一定要給 initializer！
-    * 注意：The type that the compiler infers for auto is **not always exactly the same as** the initializer’s type. 
+    * 注意：The type that the compiler infers for auto is **not always exactly the same as** the initializer’s type.
         * Instead, the compiler adjusts the type to conform to normal initialization rules.
         * auto 會 ignore initializer 的 Top-level constant
         * 但 Low-level constant 一樣會保留
         * 而且如果你給的 initializer 實際上是 referece 的話，auto 會用 referece bind 的 object 來推斷型別
         ```cpp
         int i=0, &r= i; auto a = r; // a is an int (r is an alias for i, which has type int)
-        const int ci = i, &cr = ci; 
-        auto b = ci; // b is an int(top-level const in ci is dropped) 
-        auto c = cr; // c is an int(cr is an alias for ci whose const is top-level) 
+        const int ci = i, &cr = ci;
+        auto b = ci; // b is an int(top-level const in ci is dropped)
+        auto c = cr; // c is an int(cr is an alias for ci whose const is top-level)
         auto d = &i; // d is an int*(& of an int object is int*)
         auto e = &ci; // e is const int*(& of a const object is low-level const)
         ```
@@ -343,8 +343,8 @@ https://en.cppreference.com/w/cpp/language/integer_literal
     *  we get the type that that expression yields.
         *  不過有些 exp 還是會推導出 reference type(就是可以當 lvalue 的 exp)
         ```cpp
-        // decltype of an expression can be a reference type 
-        int i = 42, *p = &i, &r = i; 
+        // decltype of an expression can be a reference type
+        int i = 42, *p = &i, &r = i;
         decltype(r + 0) b; // ok: addition yields an int; b is an (uninitialized) int
         decltype(*p) c; // error: c is int& and must be initialized
         ```
@@ -359,9 +359,9 @@ Primer 的例子是定義很基本的 Sales_data 這個 struct(注意不是 Sale
 ### 2.6.1 Defining the Sales_data Type
 
 ```cpp
-struct Sales_data { 
-    std::string bookNo; 
-    unsigned units_sold = 0; 
+struct Sales_data {
+    std::string bookNo;
+    unsigned units_sold = 0;
     double revenue = 0.0;
 };
 ```
