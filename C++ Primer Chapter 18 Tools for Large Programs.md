@@ -781,8 +781,11 @@ namespace namespace_name {
 :::info
 #### UNNAMED NAMESPACES REPLACE FILE STATICS
 * 這裡很ㄎㄧㄤ，這裡在說 C 在 global scope 宣告 name 成 `static`(internal linkage)，以達到其他 file 看不到這個 name 的效果，這叫做 *file statics*
-* 這在 C++ 被認為是 deprecated，我們應該要用無名空間來達到這樣的功能(你定義在無名空間的 name 其他 file 看不到)
+* ~~這在 C++ 被認為是 deprecated~~，我們應該要用無名空間來達到這樣的功能(你定義在無名空間的 name 其他 file 看不到)
     * 這個看看就好啦，你很多情況還是要接 C code
+    * 更新: https://stackoverflow.com/questions/154469/unnamed-anonymous-namespaces-vs-static-functions
+        * `static` 被 undeprecated 了
+        * 主要原因還是要接 C code
 :::
 
 ### 18.2.2 Using Namespace Members
