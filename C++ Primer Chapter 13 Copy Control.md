@@ -736,7 +736,7 @@ tags: C++
     ```
     * `swap` 是 global function，要宣告成 `HasPtr` 的 `friend`
     * 另外 `swap` 內有一行 `using std::swap;`，這是我們第一次在 function 內使用這種 `using` 語法，等等會講這在幹嘛
-        * 還有該死的超後面的 18 章才會真正講他的原李
+        * 還有該死的超後面的 18 章才會真正講他的原理
 
 * `swap` 本質上是要優化 class object 的 swap 行為，一不做二不休用 `inline`
 * 具體時做很單純，就是將內部 member 做交換
