@@ -735,6 +735,10 @@ tags: C++
     }
     ```
     * `swap` 是 global function，要宣告成 `HasPtr` 的 `friend`
+        * 其實也可以不要宣告成 `friend`，而是讓 `HasPtr` 自定義一個 swap(`public`)member function，來實作 swap 功能
+        * 然後 global `swap` 使用這個 member function 完成 `swap` 即可
+        * 能不是 `friend` 就不要宣告成 `friend`
+        * 參考 Effective C++ item 23, item 25
     * 另外 `swap` 內有一行 `using std::swap;`，這是我們第一次在 function 內使用這種 `using` 語法，等等會講這在幹嘛
         * 還有該死的超後面的 18 章才會真正講他的原理
 
